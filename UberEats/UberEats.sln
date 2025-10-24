@@ -5,6 +5,18 @@ VisualStudioVersion = 17.14.36603.0 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UberEats.WebApi", "UberEats.WebApi\UberEats.WebApi.csproj", "{88E0C6D6-6EB9-48C4-9F85-6E12426198E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UberEats.Tests", "UberEats.Tests\UberEats.Tests.csproj", "{D57620A7-2988-4F93-BDF7-C179EB84206C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UberEats.Infrastructure", "UberEats.Infrastructure\UberEats.Infrastructure.csproj", "{22EB5E6C-742E-49A4-A3BD-E8D4EBB570BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UberEats.Domain", "UberEats.Domain\UberEats.Domain.csproj", "{A3D6D155-4263-4961-940E-4ABCBB816D2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A385BAE9-4222-4A9C-B7B1-7B7E975BA7E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UberEats.Application", "UberEats.Application\UberEats.Application.csproj", "{CF699B43-C1B0-4D2A-B379-4C7879C653F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +27,32 @@ Global
 		{88E0C6D6-6EB9-48C4-9F85-6E12426198E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88E0C6D6-6EB9-48C4-9F85-6E12426198E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88E0C6D6-6EB9-48C4-9F85-6E12426198E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D57620A7-2988-4F93-BDF7-C179EB84206C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D57620A7-2988-4F93-BDF7-C179EB84206C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D57620A7-2988-4F93-BDF7-C179EB84206C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D57620A7-2988-4F93-BDF7-C179EB84206C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22EB5E6C-742E-49A4-A3BD-E8D4EBB570BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22EB5E6C-742E-49A4-A3BD-E8D4EBB570BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22EB5E6C-742E-49A4-A3BD-E8D4EBB570BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22EB5E6C-742E-49A4-A3BD-E8D4EBB570BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3D6D155-4263-4961-940E-4ABCBB816D2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3D6D155-4263-4961-940E-4ABCBB816D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3D6D155-4263-4961-940E-4ABCBB816D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3D6D155-4263-4961-940E-4ABCBB816D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF699B43-C1B0-4D2A-B379-4C7879C653F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF699B43-C1B0-4D2A-B379-4C7879C653F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF699B43-C1B0-4D2A-B379-4C7879C653F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF699B43-C1B0-4D2A-B379-4C7879C653F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{88E0C6D6-6EB9-48C4-9F85-6E12426198E5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{D57620A7-2988-4F93-BDF7-C179EB84206C} = {A385BAE9-4222-4A9C-B7B1-7B7E975BA7E0}
+		{22EB5E6C-742E-49A4-A3BD-E8D4EBB570BC} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A3D6D155-4263-4961-940E-4ABCBB816D2A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{CF699B43-C1B0-4D2A-B379-4C7879C653F1} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97619EEA-220E-4EB2-9825-D5E64748112F}
