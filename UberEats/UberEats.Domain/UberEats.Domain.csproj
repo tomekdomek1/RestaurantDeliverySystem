@@ -7,8 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Constants\**" />
+    <EmbeddedResource Remove="Constants\**" />
+    <None Remove="Constants\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Enums\" />
-    <Folder Include="Constants\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Enums\" />
     <Folder Include="Exceptions\" />
   </ItemGroup>
 
