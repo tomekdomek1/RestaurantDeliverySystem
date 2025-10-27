@@ -7,21 +7,21 @@ using UberEats.Domain.Common.Models;
 
 namespace UberEats.Domain.Entities;
 
-public sealed class Restaurant : Entity<Guid>
+public sealed class Customer : Entity<Guid>
 {
     public string Name { get; private set; } = string.Empty;
+    public string Surname { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
-    public string Descrition { get; private set; } = string.Empty;
     public Guid AddressId { get; private set; }
     public Address Address { get; private set; } = null!;
 
-    public ICollection<Dish> Dishes { get; private set; } = new List<Dish>();
-
-    public Restaurant(Guid id, string name, string phoneNumber, string descrition, Guid addressId) : base(id)
+    public Customer(Guid id, string name, string surname, string email, string phoneNumber, Guid addressId) : base(id)
     {
         Name = name;
+        Surname = surname;
+        Email = email;
         PhoneNumber = phoneNumber;
-        Descrition = descrition;
         AddressId = addressId;
     }
 }

@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UberEats.Domain.Common.Models;
+
+namespace UberEats.Domain.Entities;
+
+public sealed class DriverShift : Entity<Guid>
+{
+    public DayOfWeek DayOfWeek { get; private set; }
+    public TimeOnly StartTime { get; private set; }
+    public TimeOnly EndTime { get; private set; }
+    public Guid DriverId { get; private set; }
+    public Driver Driver { get; private set; } = null!;
+    public DriverShift(Guid id, DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime, Guid driverId) : base(id)
+    {
+        DayOfWeek = dayOfWeek;
+        StartTime = startTime;
+        EndTime = endTime;
+        DriverId = driverId;
+    }
+}
