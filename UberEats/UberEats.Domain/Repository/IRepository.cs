@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UberEats.Domain.Entities;
 
-namespace UberEats.Domain.IRepository;
+namespace UberEats.Domain.Repository;
 
-public interface IAppRepository
+public interface IRepository
 {
     // Restaurant
     Task<Restaurant?> GetRestaurantByIdAsync(Guid restaurantId);

@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UberEats.Domain.Entities;
-using UberEats.Domain.IRepository;
+using UberEats.Domain.Repository;
 using UberEats.Infrastructure.Databases;
 
 namespace UberEats.Infrastructure.Repository;
 
-public class AppRepository : IAppRepository
+public class Repository : IRepository
 {
     private readonly AppDbContext _context;
-    public AppRepository(AppDbContext context)
+    public Repository(AppDbContext context)
     {
         _context = context;
     }

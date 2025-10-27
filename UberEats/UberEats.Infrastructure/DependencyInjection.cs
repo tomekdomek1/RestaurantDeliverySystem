@@ -7,7 +7,7 @@ using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UberEats.Domain.IRepository;
+using UberEats.Domain.Repository;
 using UberEats.Infrastructure.Databases;
 using UberEats.Infrastructure.Repository;
 
@@ -20,7 +20,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddScoped<IAppRepository, AppRepository>();
+        services.AddScoped<IRepository, Repository.Repository>();
 
         return services;
         //And then in program.cs builder.Services.AddApplication();

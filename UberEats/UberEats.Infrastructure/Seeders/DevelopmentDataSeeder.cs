@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UberEats.Domain.Entities;
-using UberEats.Domain.IRepository;
+using UberEats.Domain.Repository;
 
 namespace UberEats.Infrastructure.Seeders;
 
@@ -25,7 +25,7 @@ public class DevelopmentDataSeeder : IHostedService
         _logger.LogInformation("Data seeder running");
         
         using var scope = _serviceProvider.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IAppRepository>();
+        var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
         if (await repository.HasRestaurantsAsync())
         {
