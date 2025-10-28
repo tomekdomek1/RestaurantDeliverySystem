@@ -9,13 +9,17 @@ namespace UberEats.Domain.Entities;
 
 public sealed class DriverLocation : Entity<Guid>
 {
+    // Fields
     public decimal Lat {  get; private set; }
     public decimal Lon { get; private set; }
     public TimeOnly TimeStamp { get; private set; }
     public bool IsAvailable { get; private set; }
+    
+    // References
     public Guid DriverId { get; private set; }
     public Driver Driver { get; private set; } = null!;
-    public DriverLocation (Guid id, decimal lat, decimal lon, TimeOnly timestamp, bool isAvailable, Guid driverId) : base(id)
+    public DriverLocation (Guid id, decimal lat, decimal lon, TimeOnly timestamp, bool isAvailable,
+        Guid driverId) : base(id)
     {
         Lat = lat;
         Lon = lon;

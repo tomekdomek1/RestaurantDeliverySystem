@@ -9,12 +9,16 @@ namespace UberEats.Domain.Entities;
 
 public sealed class DriverShift : Entity<Guid>
 {
+    // Fields
     public DayOfWeek DayOfWeek { get; private set; }
     public TimeOnly StartTime { get; private set; }
     public TimeOnly EndTime { get; private set; }
+
+    // References
     public Guid DriverId { get; private set; }
     public Driver Driver { get; private set; } = null!;
-    public DriverShift(Guid id, DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime, Guid driverId) : base(id)
+    public DriverShift(Guid id, DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime,
+        Guid driverId) : base(id)
     {
         DayOfWeek = dayOfWeek;
         StartTime = startTime;
