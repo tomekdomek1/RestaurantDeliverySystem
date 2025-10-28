@@ -53,4 +53,10 @@ public class Repository : IRepository
     {
         return await _context.Restaurants.AnyAsync();
     }
+
+    public async Task AddAddressAsync(Address address)
+    {
+        _context.Addresses.Add(address);
+        await _context.SaveChangesAsync();
+    }
 }

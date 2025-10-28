@@ -17,4 +17,7 @@ public interface IRepository
     Task UpdateRestaurantAsync(Restaurant restaurant);
     Task DeleteRestaurantAsync(Guid restaurantId);
     Task<bool> HasRestaurantsAsync();
+
+    // Shouldn't be here - testing
+    Task AddAddressAsync(Address address);
 }

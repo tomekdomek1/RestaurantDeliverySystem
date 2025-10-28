@@ -35,12 +35,20 @@ public class DevelopmentDataSeeder : IHostedService
 
         _logger.LogInformation("DB empty. Adding a test restaurant");
 
+        var newAddress = new Address(
+            Guid.NewGuid(),
+            "Towarowa",
+            1,
+            2,
+            "Białystok"
+            );
+
         var newRestaurant = new Restaurant(
             Guid.NewGuid(),
             "Sushi Bistro",
-            "Towarowa 1/2",
             "123456789",
-            "Średnie, ale za to drogie"
+            "Średnie, ale za to drogie",
+            newAddress.Id
             );
 
         var newDish = new Dish(
@@ -53,6 +61,7 @@ public class DevelopmentDataSeeder : IHostedService
 
         newRestaurant.Dishes.Add(newDish);
 
+        await repository.AddAddressAsync(newAddress);
         await repository.AddRestaurantAsync(newRestaurant);
 
         _logger.LogInformation($"Successfully asdded a new restaurant {newRestaurant.Name} with an Id:{newRestaurant.Id}");

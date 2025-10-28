@@ -13,14 +13,15 @@ public sealed class Driver : Entity<Guid>
     public string Name { get; private set; } = string.Empty;
     public string Surname { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
+
     // References
     public ICollection<DriverShift> DriverShifts { get; private set; } = new List<DriverShift>();
     public DriverLocation? DriverLocation { get; private set; } // Nullable because we remove a DriverLocation of an off-duty Driver
 
-    public Driver(Guid id, string name, string surname, string phonenumber) : base(id)
+    public Driver(Guid id, string name, string surname, string phoneNumber) : base(id)
     {
         Name = name;
         Surname = surname;
-        PhoneNumber = phonenumber;
+        PhoneNumber = phoneNumber;
     }
 }

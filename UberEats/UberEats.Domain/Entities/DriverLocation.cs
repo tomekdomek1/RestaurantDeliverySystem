@@ -18,12 +18,12 @@ public sealed class DriverLocation : Entity<Guid>
     // References
     public Guid DriverId { get; private set; }
     public Driver Driver { get; private set; } = null!;
-    public DriverLocation (Guid id, decimal lat, decimal lon, TimeOnly timestamp, bool isAvailable,
+    public DriverLocation (Guid id, decimal lat, decimal lon, TimeOnly timeStamp, bool isAvailable,
         Guid driverId) : base(id)
     {
         Lat = lat;
         Lon = lon;
-        TimeStamp = timestamp;
+        TimeStamp = timeStamp;
         IsAvailable = isAvailable;
         DriverId = driverId;
     }
