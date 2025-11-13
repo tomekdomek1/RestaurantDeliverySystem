@@ -34,7 +34,6 @@ const RegistrationForm: React.FC = () => {
     }
 
     try {
-      // TODO: Replace with real API call later
       const response = await fetch("https://localhost:5001/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
