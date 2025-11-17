@@ -24,6 +24,15 @@ namespace UberEats.WebApi.Features.Auth
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
+            if (string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Password))
+                return BadRequest("Email and password are required.");
+
+            if (dto.Password != dto.ConfirmPassword)
+                return BadRequest("Passwords do not match.");
+
+            if (!dto.Email.Contains("@"))
+                return BadRequest("Invalid email format.");
+
             var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, FullName = dto.FullName };
             var result = await _userManager.CreateAsync(user, dto.Password);
 
@@ -72,6 +81,7 @@ namespace UberEats.WebApi.Features.Auth
         {
             public string Email { get; set; }
             public string Password { get; set; }
+            public string ConfirmPassword { get; set; }
             public string FullName { get; set; }
         }
 
