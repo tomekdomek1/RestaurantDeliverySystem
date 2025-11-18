@@ -20,7 +20,8 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddScoped<IRepository, Repository.Repository>();
+        services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
 
         return services;
         //And then in program.cs builder.Services.AddApplication();

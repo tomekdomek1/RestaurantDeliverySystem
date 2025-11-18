@@ -25,9 +25,10 @@ public class DevelopmentDataSeeder : IHostedService
         _logger.LogInformation("Data seeder running");
         
         using var scope = _serviceProvider.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var restaurantRepository = scope.ServiceProvider.GetRequiredService<IRestaurantRepository>();
+        var addressRepository = scope.ServiceProvider.GetRequiredService<IAddressRepository>();
 
-        if (await repository.HasRestaurantsAsync())
+        if (await restaurantRepository.AnyAsync())
         {
             _logger.LogInformation("DB is not empty, skipping seeding");
             return;
@@ -61,8 +62,11 @@ public class DevelopmentDataSeeder : IHostedService
 
         newRestaurant.Dishes.Add(newDish);
 
-        await repository.AddAddressAsync(newAddress);
-        await repository.AddRestaurantAsync(newRestaurant);
+        await addressRepository.AddAsync(newAddress);
+        await restaurantRepository.AddAsync(newRestaurant);
+
+        await addressRepository.SaveChangesAsync();
+        await restaurantRepository.SaveChangesAsync();
 
         _logger.LogInformation($"Successfully asdded a new restaurant {newRestaurant.Name} with an Id:{newRestaurant.Id}");
     }
