@@ -3,21 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UberEats.Domain.Entities;
+using UberEats.Domain.Common.Models;
 
 namespace UberEats.Domain.Repository;
 
-// TODO: Create an inheritance structure for Repositories
-
-public interface IRepository
+public interface IRepository<TEntity> where TEntity : Entity<Guid>
 {
-    // Restaurant
-    Task<Restaurant?> GetRestaurantByIdAsync(Guid restaurantId);
-    Task AddRestaurantAsync(Restaurant restaurant);
-    Task UpdateRestaurantAsync(Restaurant restaurant);
-    Task DeleteRestaurantAsync(Guid restaurantId);
-    Task<bool> HasRestaurantsAsync();
-
-    // Shouldn't be here - testing
-    Task AddAddressAsync(Address address);
+    Task<TEntity?> GetByIdAsync(Guid id);
+    Task AddAsync(TEntity entity);
+    void Update(TEntity entity);
+    Task DeleteAsync(Guid id);
+    Task<bool> ExistsAsync(Guid id);
+    Task<int> SaveChangesAsync();
 }
