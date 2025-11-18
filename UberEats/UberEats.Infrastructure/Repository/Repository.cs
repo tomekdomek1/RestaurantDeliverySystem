@@ -4,59 +4,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UberEats.Domain.Common.Models;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Repository;
 using UberEats.Infrastructure.Databases;
 
 namespace UberEats.Infrastructure.Repository;
 
-public class Repository : IRepository
+public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : Entity<Guid>
 {
-    private readonly AppDbContext _context;
-    public Repository(AppDbContext context)
+    protected readonly AppDbContext _context;
+    protected readonly DbSet<TEntity> _set;
+    protected RepositoryBase(AppDbContext context)
     {
         _context = context;
+        _set = context.Set<TEntity>();
     }
 
-    public async Task<Restaurant?> GetRestaurantByIdAsync(Guid restaurantId)
+    public virtual async Task<TEntity?> GetByIdAsync(Guid id)
     {
-        return await _context.Restaurants
-            .Include(r => r.Dishes)
-            .FirstOrDefaultAsync(r => r.Id == restaurantId);
+        return await _set.FindAsync(id);
     }
 
-    public async Task AddRestaurantAsync(Restaurant restaurant)
+    public virtual async Task AddAsync(TEntity entity)
     {
-        _context.Restaurants.Add(restaurant);
-        await _context.SaveChangesAsync();
+        await _set.AddAsync(entity);
     }
 
-    public async Task UpdateRestaurantAsync(Restaurant restaurant)
+    public virtual void Update(TEntity entity)
     {
-        _context.Restaurants.Update(restaurant);
-        await _context.SaveChangesAsync();
+        _set.Update(entity);
     }
 
-    public async Task DeleteRestaurantAsync(Guid restaurantId)
+    public virtual async Task DeleteAsync(Guid id)
     {
-        Restaurant? restaurant = await _context.Restaurants.FirstOrDefaultAsync(r => r.Id == restaurantId);
-        if (restaurant == null)
+        var entity = await GetByIdAsync(id);
+        if (entity == null)
         {
             // will become exception
             return;
         }
-        _context.Restaurants.Remove(restaurant);
-        await _context.SaveChangesAsync();
+        _set.Remove(entity);
     }
-
-    public async Task<bool> HasRestaurantsAsync()
+    public virtual async Task<bool> ExistsAsync(Guid id)
     {
-        return await _context.Restaurants.AnyAsync();
+        return await _set.AnyAsync(e => e.Id == id);
     }
-
-    public async Task AddAddressAsync(Address address)
+    public virtual async Task<int> SaveChangesAsync()
     {
-        _context.Addresses.Add(address);
-        await _context.SaveChangesAsync();
+        return await _context.SaveChangesAsync();
     }
 }
