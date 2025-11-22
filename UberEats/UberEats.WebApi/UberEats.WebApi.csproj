@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UberEats.Application\UberEats.Application.csproj" />
     <ProjectReference Include="..\UberEats.Infrastructure\UberEats.Infrastructure.csproj" />
   </ItemGroup>
 
