@@ -11,4 +11,5 @@ public interface IRestaurantRepository : IRepository<Restaurant>
 {
     Task<Restaurant?> GetWithDishesAsync(Guid id);
     Task<bool> AnyAsync();
+    Task<List<Restaurant>> GetAllAsync();
 }
