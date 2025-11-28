@@ -1,6 +1,6 @@
 ﻿namespace UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
 
-public class GetRestaurantsResultDto
+public class EditRestaurantResultDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
