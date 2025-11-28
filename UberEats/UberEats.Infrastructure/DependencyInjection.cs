@@ -22,6 +22,7 @@ public static class DependencyInjection
 
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         return services;
         //And then in program.cs builder.Services.AddApplication();

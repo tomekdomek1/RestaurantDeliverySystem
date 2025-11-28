@@ -27,6 +27,7 @@ public class DevelopmentDataSeeder : IHostedService
         using var scope = _serviceProvider.CreateScope();
         var restaurantRepository = scope.ServiceProvider.GetRequiredService<IRestaurantRepository>();
         var addressRepository = scope.ServiceProvider.GetRequiredService<IAddressRepository>();
+        var categoryRepository = scope.ServiceProvider.GetRequiredService<ICategoryRepository>();
 
         if (await restaurantRepository.AnyAsync())
         {
@@ -35,6 +36,12 @@ public class DevelopmentDataSeeder : IHostedService
         }
 
         _logger.LogInformation("DB empty. Adding a test restaurant");
+
+        var newCategory = new Category(
+            Guid.NewGuid(),
+            "Sushi",
+            "z biedronki"
+            );
 
         var newAddress = new Address(
             Guid.NewGuid(),
@@ -57,14 +64,17 @@ public class DevelopmentDataSeeder : IHostedService
             "Cali Roll",
             "Jako takie",
             27.99m,
-            newRestaurant.Id
+            newRestaurant.Id,
+            newCategory.Id
             );
 
         newRestaurant.Dishes.Add(newDish);
 
+        await categoryRepository.AddAsync(newCategory);
         await addressRepository.AddAsync(newAddress);
         await restaurantRepository.AddAsync(newRestaurant);
 
+        await categoryRepository.SaveChangesAsync();
         await addressRepository.SaveChangesAsync();
         await restaurantRepository.SaveChangesAsync();
 

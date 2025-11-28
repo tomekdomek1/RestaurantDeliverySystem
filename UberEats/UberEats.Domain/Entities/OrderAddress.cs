@@ -10,14 +10,14 @@ namespace UberEats.Domain.Entities;
 public sealed class OrderAddress : Entity<Guid>
 {
     // Fields
-    public string Street { get; private set; } = string.Empty;
-    public int BuildingNumber { get; private set; }
-    public int AppartmentNumber { get; private set; }
-    public string City { get; private set; } = string.Empty;
+    public string Street { get; set; } = string.Empty;
+    public int BuildingNumber { get; set; }
+    public int AppartmentNumber { get; set; }
+    public string City { get; set; } = string.Empty;
 
     // References
-    public Guid OrderId { get; private set; }
-    public Order Order { get; private set; } = null!;
+    public Guid OrderId { get; set; }
+    public Order Order { get; set; } = null!;
     public OrderAddress(Guid id, string street, int buildingNumber, int appartmentNumber, string city,
         Guid orderId) : base(id)
     {
