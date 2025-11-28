@@ -23,8 +23,4 @@ public class RestaurantRepository : RepositoryBase<Restaurant>, IRestaurantRepos
     {
         return await _set.AnyAsync();
     }
-    public async Task<List<Restaurant>> GetAllAsync()
-    {
-        return await _set.AsNoTracking().ToListAsync();
-    }
 }

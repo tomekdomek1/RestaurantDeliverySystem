@@ -7,8 +7,7 @@ using UberEats.Domain.Entities;
 
 namespace UberEats.Domain.Repository;
 
-public interface IRestaurantRepository : IRepository<Restaurant>
+public interface ICategoryRepository : IRepository<Category>
 {
-    Task<Restaurant?> GetWithDishesAsync(Guid id);
-    Task<bool> AnyAsync();
+
 }

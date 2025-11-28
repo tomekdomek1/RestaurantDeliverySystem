@@ -26,6 +26,11 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity> where TEnti
         return await _set.FindAsync(id);
     }
 
+    public virtual async Task<List<TEntity>> GetAllAsync()
+    {
+        return await _set.AsNoTracking().ToListAsync();
+    }
+
     public virtual async Task AddAsync(TEntity entity)
     {
         await _set.AddAsync(entity);
