@@ -9,7 +9,6 @@ using UberEats.Domain.Entities;
 using UberEats.Domain.Repository;
 using UberEats.Infrastructure.Databases;
 using UberEats.Infrastructure.Repository;
-using UberEats.Domain.Entities;
 
 namespace UberEats.Infrastructure
 {
@@ -18,8 +17,8 @@ namespace UberEats.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase("UberEatsDb"));
-            
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
