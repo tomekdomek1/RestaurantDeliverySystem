@@ -1,10 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using UberEats.Application.Common;
 using UberEats.Application.Restaurants.CreateRestaurant;
+using UberEats.Application.Restaurants.DeleteImage;
 using UberEats.Application.Restaurants.DeleteRestaurant;
 using UberEats.Application.Restaurants.EditRestaurant;
 using UberEats.Application.Restaurants.GetRestaurantById;
 using UberEats.Application.Restaurants.GetRestaurants;
+using UberEats.Application.Restaurants.UploadImages;
 using UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
 
 namespace UberEats.WebApi.Features.Restaurants;
@@ -23,7 +26,7 @@ public class RestaurantController : ControllerBase
     public async Task<IActionResult> GetRestaurants()
     {
         var entities = await _mediator.Send(new GetRestaurantsQuery());
-        
+
         // TODO: implement pagination
         var resultDto = entities.Select(r => new GetRestaurantsResultDto
         {
@@ -131,6 +134,39 @@ public class RestaurantController : ControllerBase
         await _mediator.Send(command);
 
         return NoContent();
+    }
+
+
+
+    [HttpPost("{id:Guid}/images")]
+    public async Task<IActionResult> UploadImages(Guid id, IFormFileCollection images)
+    {
+        var uploadFiles = new List<UploadFile>();
+
+        foreach (var file in images)
+        {
+            uploadFiles.Add(new UploadFile(
+                FileName: file.FileName,
+                Content: file.OpenReadStream(),
+                ContentType: file.ContentType,
+                Length: file.Length
+            ));
+        }
+
+        var command = new UploadImagesRestaurantCommand(id, uploadFiles);
+
+        var result = await _mediator.Send(command);
+
+        return Ok(result) ;
+    }
+
+    [HttpDelete("{id:Guid}/images/{imageId:guid}")]
+    public async Task<IActionResult> DeleteImage(Guid id, Guid imageId)
+    {
+
+        var command = new DeleteImageRestaurantCommand(id, imageId);
+        var result = await _mediator.Send(command);
+        return result ? NoContent() : BadRequest();
     }
 
 }
