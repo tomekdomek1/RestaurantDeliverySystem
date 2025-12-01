@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UberEats.Infrastructure.Databases;
@@ -11,9 +12,11 @@ using UberEats.Infrastructure.Databases;
 namespace UberEats.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251117224016_InitPostgres")]
+    partial class InitPostgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,25 +255,6 @@ namespace UberEats.Infrastructure.Migrations
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("UberEats.Domain.Entities.Category", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("UberEats.Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -309,9 +293,6 @@ namespace UberEats.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -327,8 +308,6 @@ namespace UberEats.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("RestaurantId");
 
@@ -646,19 +625,11 @@ namespace UberEats.Infrastructure.Migrations
 
             modelBuilder.Entity("UberEats.Domain.Entities.Dish", b =>
                 {
-                    b.HasOne("UberEats.Domain.Entities.Category", "Category")
-                        .WithMany("Dishes")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
                         .WithMany("Dishes")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
 
                     b.Navigation("Restaurant");
                 });
@@ -777,11 +748,6 @@ namespace UberEats.Infrastructure.Migrations
                     b.Navigation("Customers");
 
                     b.Navigation("Restaurants");
-                });
-
-            modelBuilder.Entity("UberEats.Domain.Entities.Category", b =>
-                {
-                    b.Navigation("Dishes");
                 });
 
             modelBuilder.Entity("UberEats.Domain.Entities.Customer", b =>
