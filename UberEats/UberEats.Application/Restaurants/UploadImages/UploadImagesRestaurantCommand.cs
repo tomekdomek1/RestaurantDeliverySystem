@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using UberEats.Application.Common;
 
-namespace UberEats.Application.Restaurants.CreateRestaurant;
+namespace UberEats.Application.Restaurants.UploadImages;
 
 
 public class UploadImagesRestaurantCommand : IRequest<List<UploadResult>>

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using UberEats.Application.Common;
+using UberEats.Application.Restaurants.UploadImages;
 using UberEats.Domain.Interfaces;
 using UberEats.Domain.Repository;
 
