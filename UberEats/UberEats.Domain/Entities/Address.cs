@@ -10,14 +10,14 @@ namespace UberEats.Domain.Entities;
 public sealed class Address : Entity<Guid>
 {
     // Fields
-    public string Street { get; private set; } = string.Empty;
-    public int BuildingNumber { get; private set; }
-    public int AppartmentNumber { get; private set; }
-    public string City { get; private set; } = string.Empty;
+    public string Street { get; set; } = string.Empty;
+    public int BuildingNumber { get; set; }
+    public int AppartmentNumber { get; set; }
+    public string City { get; set; } = string.Empty;
 
     // References
-    public ICollection<Restaurant> Restaurants { get; private set; } = new List<Restaurant>();
-    public ICollection<Customer> Customers { get; private set; } = new List<Customer>();
+    public ICollection<Restaurant> Restaurants { get; set; } = new List<Restaurant>();
+    public ICollection<Customer> Customers { get; set; } = new List<Customer>();
     public Address(Guid id, string street, int buildingNumber, int appartmentNumber, string city) : base(id)
     {
         Street = street;

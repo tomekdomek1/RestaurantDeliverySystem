@@ -25,15 +25,23 @@ public class DevelopmentDataSeeder : IHostedService
         _logger.LogInformation("Data seeder running");
         
         using var scope = _serviceProvider.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var restaurantRepository = scope.ServiceProvider.GetRequiredService<IRestaurantRepository>();
+        var addressRepository = scope.ServiceProvider.GetRequiredService<IAddressRepository>();
+        var categoryRepository = scope.ServiceProvider.GetRequiredService<ICategoryRepository>();
 
-        if (await repository.HasRestaurantsAsync())
+        if (await restaurantRepository.AnyAsync())
         {
             _logger.LogInformation("DB is not empty, skipping seeding");
             return;
         }
 
         _logger.LogInformation("DB empty. Adding a test restaurant");
+
+        var newCategory = new Category(
+            Guid.NewGuid(),
+            "Sushi",
+            "z biedronki"
+            );
 
         var newAddress = new Address(
             Guid.NewGuid(),
@@ -56,13 +64,19 @@ public class DevelopmentDataSeeder : IHostedService
             "Cali Roll",
             "Jako takie",
             27.99m,
-            newRestaurant.Id
+            newRestaurant.Id,
+            newCategory.Id
             );
 
         newRestaurant.Dishes.Add(newDish);
 
-        await repository.AddAddressAsync(newAddress);
-        await repository.AddRestaurantAsync(newRestaurant);
+        await categoryRepository.AddAsync(newCategory);
+        await addressRepository.AddAsync(newAddress);
+        await restaurantRepository.AddAsync(newRestaurant);
+
+        await categoryRepository.SaveChangesAsync();
+        await addressRepository.SaveChangesAsync();
+        await restaurantRepository.SaveChangesAsync();
 
         _logger.LogInformation($"Successfully asdded a new restaurant {newRestaurant.Name} with an Id:{newRestaurant.Id}");
     }

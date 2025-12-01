@@ -23,14 +23,14 @@ namespace UberEats.Domain.Entities;
 public sealed class ShoppingCartItem : Entity<Guid>
 {
     // Fields
-    public int Quantity { get; private set; }
-    public DateTime AddedAt { get; private set; }
+    public int Quantity { get; set; }
+    public DateTime AddedAt { get; set; }
 
     // References
-    public Guid CustomerId { get; private set; }
-    public Customer Customer { get; private set; } = null!;
-    public Guid DishId { get; private set; }
-    public Dish Dish { get; private set; } = null!;
+    public Guid CustomerId { get; set; }
+    public Customer Customer { get; set; } = null!;
+    public Guid DishId { get; set; }
+    public Dish Dish { get; set; } = null!;
     public ShoppingCartItem(Guid id, int quantity, DateTime addedAt,
         Guid customerId, Guid dishId) : base(id)
     {

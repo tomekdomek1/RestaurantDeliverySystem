@@ -252,6 +252,25 @@ namespace UberEats.Infrastructure.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("UberEats.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("UberEats.Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -290,6 +309,9 @@ namespace UberEats.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -305,6 +327,8 @@ namespace UberEats.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("RestaurantId");
 
@@ -622,11 +646,19 @@ namespace UberEats.Infrastructure.Migrations
 
             modelBuilder.Entity("UberEats.Domain.Entities.Dish", b =>
                 {
+                    b.HasOne("UberEats.Domain.Entities.Category", "Category")
+                        .WithMany("Dishes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
                         .WithMany("Dishes")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Restaurant");
                 });
@@ -745,6 +777,11 @@ namespace UberEats.Infrastructure.Migrations
                     b.Navigation("Customers");
 
                     b.Navigation("Restaurants");
+                });
+
+            modelBuilder.Entity("UberEats.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Dishes");
                 });
 
             modelBuilder.Entity("UberEats.Domain.Entities.Customer", b =>

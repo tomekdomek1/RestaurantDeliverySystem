@@ -19,6 +19,10 @@ namespace UberEats.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
