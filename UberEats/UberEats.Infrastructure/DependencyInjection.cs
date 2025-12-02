@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using UberEats.Domain.Entities;
+using UberEats.Domain.Interfaces;
 using UberEats.Domain.Repository;
 using UberEats.Infrastructure.Databases;
 using UberEats.Infrastructure.Repository;
+using UberEats.Infrastructure.Services;
 
 namespace UberEats.Infrastructure
 {
@@ -22,6 +24,7 @@ namespace UberEats.Infrastructure
             services.AddScoped<IRestaurantRepository, RestaurantRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IFileStorage,FileSystemImageStorage>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
@@ -49,7 +52,6 @@ namespace UberEats.Infrastructure
                 };
             });
 
-            services.AddScoped<IRepository, Repository.Repository>();
 
             return services;
         }
