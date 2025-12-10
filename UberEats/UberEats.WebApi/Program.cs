@@ -1,6 +1,7 @@
 using UberEats.Application;
 using UberEats.Infrastructure;
 using UberEats.Infrastructure.Seeders;
+using UberEats.WebApi.Middlewares;
 
 namespace UberEats.WebApi;
 
@@ -15,6 +16,8 @@ public class Program
         builder.Services.AddApplication(); // MediatR
 
         builder.Services.AddControllers();
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        builder.Services.AddProblemDetails();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
@@ -63,6 +66,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseExceptionHandler();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
