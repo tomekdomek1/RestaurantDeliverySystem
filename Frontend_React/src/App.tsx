@@ -1,26 +1,42 @@
-import React from "react";
-import { Container, Tabs, Tab, Box } from "@mui/material";
+// Frontend_React/src/App.tsx
+
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+import { CartProvider } from "./context/CartContext"; 
 import LoginForm from "./components/LoginForm";
-import RegistrationForm from "./components/RegistrationForm";
-import CategoriesPage from "./components/CategoriesPage";
+import RegistrationForm from "./components/RegistrationForm"; // Używamy RegistrationForm zamiast RegisterForm z poprzedniej iteracji
+import ShoppingCartUI from "./components/ShoppingCartUI"; 
+import TestProduct from "./components/TestProduct"; 
+import { Button, Box } from '@mui/material'; // Do stylizacji linków
 
-const App: React.FC = () => {
-  const [tab, setTab] = React.useState(0);
-
+function App() {
   return (
-    <Container>
-      <Box sx={{ mt: 4 }}>
-        <Tabs value={tab} onChange={(e, val) => setTab(val)} centered>
-          <Tab label="Login" />
-          <Tab label="Register" />
-          <Tab label="Categories" />
-        </Tabs>
-        {tab === 0 && <LoginForm />}
-        {tab === 1 && <RegistrationForm/>}
-        {tab === 2 && <CategoriesPage/>}
-      </Box>
-    </Container>
+    <Router>
+      <CartProvider>
+        <Box sx={{ textAlign: "center", mt: 3, mb: 3 }}>
+          <Button component={Link} to="/login" variant="outlined" sx={{ mr: 1 }}>Login</Button>
+          <Button component={Link} to="/register" variant="outlined" sx={{ mr: 1 }}>Register</Button>
+          <Button component={Link} to="/products" variant="outlined" sx={{ mr: 1 }}>Produkty</Button>
+          <Button component={Link} to="/cart" variant="contained" color="secondary">Koszyk</Button>
+        </Box>
+
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegistrationForm />} />
+          
+          <Route path="/cart" element={<ShoppingCartUI />} /> 
+          
+          <Route path="/products" element={
+            <Box sx={{ textAlign: 'center', mt: 3 }}>
+                <TestProduct id={1} name="Burger Klasyczny" price={25.99} />
+                <TestProduct id={2} name="Frytki Duże" price={9.50} />
+                <TestProduct id={3} name="Cola Zero 1L" price={7.00} />
+            </Box>
+          } />
+        </Routes>
+      </CartProvider>
+    </Router>
   );
-};
+}
 
 export default App;

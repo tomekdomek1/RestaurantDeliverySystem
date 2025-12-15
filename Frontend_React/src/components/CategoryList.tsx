@@ -1,4 +1,5 @@
-import type { Category } from "./CategoriesPage";
+import type { Category } from "../types/category";
+import { List, ListItem, ListItemText, Button, Stack } from "@mui/material";
 
 interface Props {
   categories: Category[];
@@ -8,26 +9,34 @@ interface Props {
 
 export default function CategoryList({ categories, onEdit, onDelete }: Props) {
   return (
-    <ul style={{ listStyle: "none", padding: 0 }}>
+    <List>
       {categories.map((cat) => (
-        <li key={cat.id} style={{ marginBottom: 8 }}>
-          {cat.name}
+        <ListItem
+          key={cat.id}
+          sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        >
+          <ListItemText primary={cat.name} />
 
-          <button
-            style={{ marginLeft: 10 }}
-            onClick={() => onEdit(cat)}
-          >
-            Edit
-          </button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => onEdit(cat)}
+            >
+              Edit
+            </Button>
 
-          <button
-            style={{ marginLeft: 5 }}
-            onClick={() => onDelete(cat.id)}
-          >
-            Delete
-          </button>
-        </li>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={() => onDelete(cat.id)}
+            >
+              Delete
+            </Button>
+          </Stack>
+        </ListItem>
       ))}
-    </ul>
+    </List>
   );
 }
