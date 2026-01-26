@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack"; 
+import { useSnackbar } from "notistack"; // Import biblioteki
 
 const RegistrationForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar(); 
+  const { enqueueSnackbar } = useSnackbar(); // Inicjalizacja toastów
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,11 +32,13 @@ const RegistrationForm: React.FC = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      // Dodatkowy toast o błędach w walidacji (opcjonalnie)
       enqueueSnackbar("Please fix the errors in the form.", { variant: "warning" });
       return;
     }
 
     try {
+      // Zmieniono port na 5122, aby pasował do Twojego działającego Backendu
       const response = await fetch("http://localhost:5122/api/Auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

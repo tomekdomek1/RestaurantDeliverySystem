@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack"; 
+import { useSnackbar } from "notistack"; // Import biblioteki powiadomień
 
 const LoginForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar(); 
+  const { enqueueSnackbar } = useSnackbar(); // Inicjalizacja toastów
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -20,6 +20,7 @@ const LoginForm: React.FC = () => {
     setError("");
 
     try {
+      // Zmieniono port na 5122, aby pasował do Twojego działającego Backendu
       const response = await fetch("http://localhost:5122/api/Auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,11 +31,12 @@ const LoginForm: React.FC = () => {
         const data = await response.json();
         console.log("Login successful:", data);
         
+        // Wyświetlenie zielonego powiadomienia zamiast alertu
         enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });
       } else {
         const errorMsg = "Invalid email or password";
         setError(errorMsg);
-
+        // Wyświetlenie czerwonego powiadomienia
         enqueueSnackbar(errorMsg, { variant: "error" });
       }
     } catch (error) {

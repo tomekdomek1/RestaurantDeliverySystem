@@ -1,5 +1,5 @@
 import type { Category } from "./CategoriesPage";
-import { useSnackbar } from "notistack";
+import { useSnackbar } from "notistack"; 
 
 interface Props {
   categories: Category[];
@@ -12,7 +12,6 @@ export default function CategoryList({ categories, onEdit, onDelete }: Props) {
 
   const handleDelete = (id: number) => {
     onDelete(id);
-
     enqueueSnackbar("Category deleted successfully!", { variant: "success" });
   };
 
