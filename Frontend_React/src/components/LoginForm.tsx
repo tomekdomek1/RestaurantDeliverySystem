@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
+import { useSnackbar } from "notistack"; 
 
 const LoginForm: React.FC = () => {
+  const { enqueueSnackbar } = useSnackbar(); 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,7 +20,7 @@ const LoginForm: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch("https://localhost:5001/api/auth/login", {
+      const response = await fetch("http://localhost:5122/api/Auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -27,13 +29,19 @@ const LoginForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Login successful:", data);
-        alert("Login successful!");
+        
+        enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });
       } else {
-        setError("Invalid email or password");
+        const errorMsg = "Invalid email or password";
+        setError(errorMsg);
+
+        enqueueSnackbar(errorMsg, { variant: "error" });
       }
     } catch (error) {
       console.error("Error:", error);
-      setError("Something went wrong. Please try again later.");
+      const catchMsg = "Something went wrong. Please try again later.";
+      setError(catchMsg);
+      enqueueSnackbar(catchMsg, { variant: "error" });
     }
   };
 
@@ -43,7 +51,6 @@ const LoginForm: React.FC = () => {
         Login
       </Typography>
       <Box component="form" onSubmit={handleSubmit}>
-
         <TextField
           fullWidth
           label="Email"

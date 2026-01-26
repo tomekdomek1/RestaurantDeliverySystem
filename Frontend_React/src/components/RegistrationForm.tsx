@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
+import { useSnackbar } from "notistack"; 
 
 const RegistrationForm: React.FC = () => {
+  const { enqueueSnackbar } = useSnackbar(); 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -30,23 +32,28 @@ const RegistrationForm: React.FC = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      enqueueSnackbar("Please fix the errors in the form.", { variant: "warning" });
       return;
     }
 
     try {
-      const response = await fetch("https://localhost:5001/api/auth/register", {
+      const response = await fetch("http://localhost:5122/api/Auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        alert("Registration successful!");
+        enqueueSnackbar("Registration successful! You can now log in.", { variant: "success" });
+        // Możesz tutaj wyczyścić formularz
+        setFormData({ username: "", email: "", password: "", confirmPassword: "" });
+        setErrors({});
       } else {
-        alert("Registration failed");
+        enqueueSnackbar("Registration failed. Email might be already taken.", { variant: "error" });
       }
     } catch (error) {
       console.error("Error:", error);
+      enqueueSnackbar("Could not connect to the server.", { variant: "error" });
     }
   };
 
