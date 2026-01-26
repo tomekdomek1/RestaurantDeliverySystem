@@ -1,6 +1,5 @@
 import type { Category } from "../types/category";
 import { List, ListItem, ListItemText, Button, Stack } from "@mui/material";
-import type { Category } from "./CategoriesPage";
 import { useSnackbar } from "notistack"; 
 
 interface Props {
@@ -17,12 +16,17 @@ export default function CategoryList({ categories, onEdit, onDelete }: Props) {
     enqueueSnackbar("Category deleted successfully!", { variant: "success" });
   };
 
+  const handleEdit = (cat: Category) => {
+    onEdit(cat);
+    enqueueSnackbar("Editing " + cat.name, { variant: "info" });
+  };
+
   return (
     <List>
       {categories.map((cat) => (
         <ListItem
           key={cat.id}
-          sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+          sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #eee" }}
         >
           <ListItemText primary={cat.name} />
 
@@ -30,39 +34,21 @@ export default function CategoryList({ categories, onEdit, onDelete }: Props) {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => onEdit(cat)}
+              onClick={() => handleEdit(cat)}
             >
               Edit
             </Button>
-        <li key={cat.id} style={{ marginBottom: 8 }}>
-          {cat.name}
-          <button
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-                onEdit(cat);
-                enqueueSnackbar("Editing " + cat.name, { variant: "info" });
-            }}
-          >
-            Edit
-          </button>
 
             <Button
               variant="outlined"
               color="error"
               size="small"
-              onClick={() => onDelete(cat.id)}
+              onClick={() => handleDelete(cat.id)}
             >
               Delete
             </Button>
           </Stack>
         </ListItem>
-          <button
-            style={{ marginLeft: 5 }}
-            onClick={() => handleDelete(cat.id)}
-          >
-            Delete
-          </button>
-        </li>
       ))}
     </List>
   );
