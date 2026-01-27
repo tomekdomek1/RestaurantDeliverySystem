@@ -19,6 +19,8 @@ public sealed class Dish : Entity<Guid>
     public Restaurant Restaurant { get; set; } = null!;
     public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
+    public ICollection<Allergy> Allergies { get; set; } = new List<Allergy>();
+
     public Dish(Guid id, string name, string description, decimal price,
         Guid restaurantId, Guid categoryId) : base(id)
     {
