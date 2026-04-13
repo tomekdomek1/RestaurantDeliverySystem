@@ -10,19 +10,22 @@ namespace UberEats.Domain.Entities;
 public sealed class Dish : Entity<Guid>
 {
     // Fields
-    public string Name { get; private set; } = string.Empty;
-    public string Description { get; private set; } = string.Empty;
-    public decimal Price { get; private set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
 
     // References
-    public Guid RestaurantId { get; private set; }
-    public Restaurant Restaurant { get; private set; } = null!;
+    public Guid RestaurantId { get; set; }
+    public Restaurant Restaurant { get; set; } = null!;
+    public Guid CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
     public Dish(Guid id, string name, string description, decimal price,
-        Guid restaurantId) : base(id)
+        Guid restaurantId, Guid categoryId) : base(id)
     {
         Name = name;
         Description = description;
         Price = price;
         RestaurantId = restaurantId;
+        CategoryId = categoryId;
     }
 }
