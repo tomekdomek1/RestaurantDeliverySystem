@@ -1,0 +1,27 @@
+{
+  "name": "restaurantdeliverysystem",
+  "version": "1.0.0",
+  "description": "* Rejestracja/logowanie,\r * przeglądanie menu,\r * koszyk i składanie zamówienia\r * historia zamówień,\r * powiadomienia (np. o zmianie statusu).\r * Systemy ocen i recenzji.\r ### Panel Restauracji:\r * Zarządzanie menu (dodawanie/edycja dań),\r * obsługa zamówień (przyjmowanie/odrzucanie),\r * powiadomienia o nowych zamówieniach.\r * Generowanie raportów z danego okresu\r ### Panel Dostawcy:\r * Rejestracja,\r * dostępność online/oƯline,\r * przyjmowanie zleceń,\r * przeglądanie szczegółów zamówienia,\r * potwierdzenie odbioru i dostawy",
+  "main": "index.js",
+  "scripts": {
+    "install:frontend": "cd Frontend_React && npm install",
+    "install:backend": "dotnet restore UberEats",
+    "docker:db": "docker compose -f UberEats/docker-compose.yml up -d",
+    "setup": "npm run install:frontend && npm run install:backend",
+    "start": "concurrently --kill-others --names \"BACKEND,FRONTEND\" --prefix-colors \"magenta,cyan\" \"cd UberEats/UberEats.WebApi && dotnet run\" \"cd Frontend_React && npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomekdomek1/RestaurantDeliverySystem.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tomekdomek1/RestaurantDeliverySystem/issues"
+  },
+  "homepage": "https://github.com/tomekdomek1/RestaurantDeliverySystem#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
