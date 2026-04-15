@@ -14,6 +14,7 @@ public class AppDbContext : IdentityDbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Address> Addresses { get; set; }
+    public DbSet<Allergy> Allergies { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Dish> Dishes { get; set; }
