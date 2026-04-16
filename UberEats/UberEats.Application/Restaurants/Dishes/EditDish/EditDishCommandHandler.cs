@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using UberEats.Application.Common;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Repository;
 
@@ -39,7 +38,25 @@ public class EditDishCommandHandler : IRequestHandler<EditDishCommand, Dish>
             }
         }
 
-        MapObjects.Map(request, dishToUpdate);
+        if (request.Name != null)
+        {
+            dishToUpdate.Name = request.Name;
+        }
+
+        if (request.Description != null)
+        {
+            dishToUpdate.Description = request.Description;
+        }
+
+        if (request.Price.HasValue)
+        {
+            dishToUpdate.Price = request.Price.Value;
+        }
+
+        if (request.CategoryId.HasValue)
+        {
+            dishToUpdate.CategoryId = request.CategoryId.Value;
+        }
 
         await _restaurantRepository.SaveChangesAsync();
 
