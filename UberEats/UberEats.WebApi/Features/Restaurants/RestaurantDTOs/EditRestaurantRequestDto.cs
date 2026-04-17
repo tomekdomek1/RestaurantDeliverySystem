@@ -2,7 +2,7 @@
 
 public class EditRestaurantRequestDto
 {
-    public string Name { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
-    public string Descrition { get; set; } = string.Empty;
+    public string? Name { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? Descrition { get; set; }
 }
