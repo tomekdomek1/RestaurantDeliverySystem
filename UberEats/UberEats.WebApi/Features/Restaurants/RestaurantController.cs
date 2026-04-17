@@ -91,8 +91,7 @@ public class RestaurantController : ControllerBase
         return Created(string.Empty, resultDto);
     }
 
-    // Change to Patch (already implemented in CategoryController - can copy)
-    [HttpPut("{id:Guid}")]
+    [HttpPatch("{id:Guid}")]
     public async Task<IActionResult> EditRestaurant(Guid id, [FromBody] EditRestaurantRequestDto request)
     {
         if (request == null)

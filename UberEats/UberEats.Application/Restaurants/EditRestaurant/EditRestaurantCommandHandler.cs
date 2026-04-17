@@ -25,9 +25,20 @@ public class EditRestaurantCommandHandler : IRequestHandler<EditRestaurantComman
             return null; // maybe a custom exception
         }
 
-        restaurantToUpdate.Name = request.Name;
-        restaurantToUpdate.PhoneNumber = request.PhoneNumber;
-        restaurantToUpdate.Descrition = request.Description;
+        if (request.Name != null)
+        {
+            restaurantToUpdate.Name = request.Name;
+        }
+
+        if (request.PhoneNumber != null)
+        {
+            restaurantToUpdate.PhoneNumber = request.PhoneNumber;
+        }
+
+        if (request.Description != null)
+        {
+            restaurantToUpdate.Descrition = request.Description;
+        }
 
         await _restaurantRepository.SaveChangesAsync();
 
