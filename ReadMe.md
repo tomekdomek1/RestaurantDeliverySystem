@@ -1,5 +1,32 @@
 # Projekt zespołowy
 
+### Instalacja i uruchomienie (monorepo)
+Projekt został skonfigurowany tak, aby całą aplikację można było uruchomić z poziomu katalogu głównego.
+
+1.  **Klonowanie repozytorium i przejście do folderu głównego:**
+    ```powershell
+    git clone https://github.com/tomekdomek1/RestaurantDeliverySystem.git
+    cd RestaurantDeliverySystem
+    ```
+
+2.  **Instalacja narzędzi pomocniczych:**
+    ```bash
+    npm install
+    ```
+
+3.  **Konfiguracja projektów:**
+    Zainstaluje zależności dla Reacta oraz przywróci pakiety NuGet dla .NET.
+    ```bash
+    npm run setup
+    ```
+
+4.  **Uruchomienie aplikacji:**
+    Uruchamia jednocześnie serwer API oraz Frontend.
+    ```bash
+    npm start
+    ```
+
+---
 
 ## Główne funkcjonalności
 
