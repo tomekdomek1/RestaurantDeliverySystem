@@ -4,8 +4,8 @@ import {
   ListItemText, Divider, CircularProgress, Paper, Stack
 } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useCategories } from "../hooks/category/useCategories";
-import { useCategory } from "../hooks/category/useCategory";
+import { useGetCategories } from "../hooks/category/useGetCategories";
+import { useGetCategory } from "../hooks/category/useGetCategory";
 import { useCreateCategory } from "../hooks/category/useCreateCategory";
 import { useEditCategory } from "../hooks/category/useEditCategory";
 import { useDeleteCategory } from "../hooks/category/useDeleteCategory";
@@ -31,8 +31,8 @@ export default function CategoryTestPage() {
   const [selectedId, setSelectedId] = useState<Guid | null>(null);
 
   // --- API Hooks (SWR) ---
-  const { categories, isLoading: isListLoading, error: listError, refreshCategories } = useCategories();
-  const { category: detail, isLoading: isDetailLoading } = useCategory(selectedId);
+  const { categories, isLoading: isListLoading, error: listError, refreshCategories } = useGetCategories();
+  const { category: detail, isLoading: isDetailLoading } = useGetCategory(selectedId);
   const { createCategory, isCreating } = useCreateCategory();
   const { editCategory, isSaving } = useEditCategory();
   const { deleteCategoy, isDeleting } = useDeleteCategory();
@@ -67,9 +67,9 @@ export default function CategoryTestPage() {
       if (editName.trim()) payload.name = editName;
       if (editDesc.trim()) payload.description = editDesc;
 
-      await editCategory({ 
-        id: editingId, 
-        data: payload 
+      await editCategory({
+        id: editingId,
+        data: payload
       });
 
       enqueueSnackbar("Category updated successfully!", { variant: "info" });

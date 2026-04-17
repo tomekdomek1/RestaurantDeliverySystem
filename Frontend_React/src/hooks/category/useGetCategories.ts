@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import type { GetCategoryResponseDto } from "../../types/categoryDtos";
 
-export function useCategories() {
+export function useGetCategories() {
     const { data, error, isLoading, mutate } = useSWR<GetCategoryResponseDto[]>('/api/categories');
 
     return {

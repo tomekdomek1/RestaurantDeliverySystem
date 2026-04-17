@@ -2,7 +2,7 @@ import useSWR from "swr";
 import type { Guid } from "../../types/guid";
 import type { GetAddressResponseDto } from "../../types/addressDtos";
 
-export function useAddress(id?: Guid | null) {
+export function useGetAddress(id?: Guid | null) {
     const { data, error, isLoading, mutate } = useSWR<GetAddressResponseDto>(id ? `/api/addresses/${id}` : null);
 
     return {

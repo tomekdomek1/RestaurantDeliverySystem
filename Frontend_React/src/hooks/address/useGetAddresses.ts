@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import type { GetAddressResponseDto } from "../../types/addressDtos";
 
-export function useAddresses() {
+export function useGetAddresses() {
     const { data, error, isLoading, mutate } = useSWR<GetAddressResponseDto[]>('/api/addresses');
 
     return {

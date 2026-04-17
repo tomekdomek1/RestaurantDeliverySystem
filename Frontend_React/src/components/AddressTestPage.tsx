@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { 
-  Box, Button, Typography, TextField, List, ListItem, 
-  ListItemText, Divider, CircularProgress, Paper, Stack 
+import {
+  Box, Button, Typography, TextField, List, ListItem,
+  ListItemText, Divider, CircularProgress, Paper, Stack
 } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useAddresses } from "../hooks/address/useAddresses";
-import { useAddress } from "../hooks/address/useAddress";
+import { useGetAddresses } from "../hooks/address/useGetAddresses";
+import { useGetAddress } from "../hooks/address/useGetAddress";
 import { useCreateAddress } from "../hooks/address/useCreateAddress";
 import { useEditAddress } from "../hooks/address/useEditAddress";
 import { useDeleteAddress } from "../hooks/address/useDeleteAddress";
@@ -17,7 +17,7 @@ import type { Guid } from "../types/guid";
  */
 export default function AddressTestPage() {
   const { enqueueSnackbar } = useSnackbar();
-  
+
   // --- State for Creating New Address ---
   const [newStreet, setNewStreet] = useState("");
   const [newBuilding, setNewBuilding] = useState<number | "">("");
@@ -35,8 +35,8 @@ export default function AddressTestPage() {
   const [selectedId, setSelectedId] = useState<Guid | null>(null);
 
   // --- API Hooks (SWR) ---
-  const { addresses, isLoading: isListLoading, error: listError, refreshAddresses } = useAddresses();
-  const { address: detail, isLoading: isDetailLoading } = useAddress(selectedId);
+  const { addresses, isLoading: isListLoading, error: listError, refreshAddresses } = useGetAddresses();
+  const { address: detail, isLoading: isDetailLoading } = useGetAddress(selectedId);
   const { createAddress, isCreating } = useCreateAddress();
   const { editAddress, isSaving } = useEditAddress();
   const { deleteAddress, isDeleting } = useDeleteAddress();
@@ -46,11 +46,11 @@ export default function AddressTestPage() {
   const handleAdd = async () => {
     if (!newStreet || !newCity || newBuilding === "") return;
     try {
-      await createAddress({ 
-        street: newStreet, 
-        buildingNumber: Number(newBuilding), 
-        appartmentNumber: Number(newApartment || 0), 
-        city: newCity 
+      await createAddress({
+        street: newStreet,
+        buildingNumber: Number(newBuilding),
+        appartmentNumber: Number(newApartment || 0),
+        city: newCity
       });
       enqueueSnackbar("Address created successfully!", { variant: "success" });
       setNewStreet("");
@@ -81,11 +81,11 @@ export default function AddressTestPage() {
       if (editApartment !== "") payload.appartmentNumber = Number(editApartment);
       if (editCity.trim()) payload.city = editCity;
 
-      await editAddress({ 
-        id: editingId, 
-        data: payload 
+      await editAddress({
+        id: editingId,
+        data: payload
       });
-      
+
       enqueueSnackbar("Address updated successfully!", { variant: "info" });
       setEditingId(null);
       refreshAddresses();
@@ -136,14 +136,14 @@ export default function AddressTestPage() {
         <Typography variant="h5" gutterBottom sx={{ color: '#555' }}>Existing Addresses</Typography>
         {isListLoading && <CircularProgress sx={{ my: 2 }} />}
         {listError && <Typography color="error">Error loading list: {listError.message}</Typography>}
-        
+
         <List sx={{ width: '100%' }}>
           {addresses.map((addr) => (
-            <ListItem 
-              key={addr.id} 
-              divider 
-              sx={{ 
-                flexDirection: 'column', 
+            <ListItem
+              key={addr.id}
+              divider
+              sx={{
+                flexDirection: 'column',
                 alignItems: 'stretch',
                 py: 2,
                 bgcolor: editingId === addr.id ? '#e8f5e9' : 'transparent',
@@ -172,9 +172,9 @@ export default function AddressTestPage() {
               ) : (
                 /* --- Standard List Item View --- */
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                  <ListItemText 
-                    primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{addr.street} {addr.buildingNumber}{addr.appartmentNumber ? `/${addr.appartmentNumber}` : ""}</Typography>} 
-                    secondary={`${addr.city} | ID: ${addr.id}`} 
+                  <ListItemText
+                    primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{addr.street} {addr.buildingNumber}{addr.appartmentNumber ? `/${addr.appartmentNumber}` : ""}</Typography>}
+                    secondary={`${addr.city} | ID: ${addr.id}`}
                   />
                   <Stack direction="row" spacing={1}>
                     <Button size="small" variant="text" onClick={() => setSelectedId(addr.id)}>Details</Button>
@@ -194,7 +194,7 @@ export default function AddressTestPage() {
               <Typography variant="h6" color="success.dark">Address Details</Typography>
               <Button size="small" variant="contained" color="inherit" onClick={() => setSelectedId(null)}>Close</Button>
             </Box>
-            
+
             {isDetailLoading ? (
               <CircularProgress size={30} />
             ) : detail ? (
