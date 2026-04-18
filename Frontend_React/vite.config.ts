@@ -6,9 +6,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://localhost:7062",
+        target: "http://localhost:3000",
         changeOrigin: true,
-        secure: false
+        secure: false,
+        // Usuwamy przedrostek /api, bo json-server go nie rozumie
+        rewrite: (path) => path.replace(/^\/api/, "")
       },
     },
   },

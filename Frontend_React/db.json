@@ -1,12 +1,94 @@
 {
   "categories": [
     {
-      "id": "21a8",
-      "name": "test"
+      "id": "cat-1",
+      "name": "Fast Food",
+      "description": "Szybko i smacznie kocham"
     },
     {
-      "id": "eb1a",
-      "name": "Test2"
+      "id": "cat-2",
+      "name": "Włoska",
+      "description": "Pizza i makarony"
+    },
+    {
+      "id": "cat-3",
+      "name": "Polska",
+      "description": "Tradycyjne obiady"
+    }
+  ],
+  "addresses": [
+    {
+      "id": "addr-1",
+      "street": "Złota",
+      "buildingNumber": 44,
+      "appartmentNumber": null,
+      "city": "Warszawa"
+    },
+    {
+      "id": "addr-2",
+      "street": "Rynek Główny",
+      "buildingNumber": 1,
+      "appartmentNumber": null,
+      "city": "Kraków"
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "rest-1",
+      "name": "Burger Drwal",
+      "phoneNumber": "123 456 789",
+      "descrition": "Najlepsze rzemieślnicze burgery w mieście. 100% wołowiny.",
+      "addressId": "addr-1"
+    },
+    {
+      "id": "rest-2",
+      "name": "Mamma Mia Pizza",
+      "phoneNumber": "987 654 321",
+      "descrition": "Oryginalna pizza neapolitańska z pieca opalanego drewnem.",
+      "addressId": "addr-2"
+    }
+  ],
+  "dishes": [
+    {
+      "id": "dish-1",
+      "name": "Burger Klasyk",
+      "description": "Wołowina 200g, cheddar, bekon, warzywa, sos autorski.",
+      "price": 35.99,
+      "restaurantId": "rest-1",
+      "categoryId": "cat-1"
+    },
+    {
+      "id": "dish-2",
+      "name": "Frytki Belgijskie",
+      "description": "Duża porcja frytek z domowym majonezem.",
+      "price": 12,
+      "restaurantId": "rest-1",
+      "categoryId": "cat-1"
+    },
+    {
+      "id": "dish-3",
+      "name": "Pizza Margherita",
+      "description": "Pomidory San Marzano, mozzarella fior di latte, bazylia.",
+      "price": 32.5,
+      "restaurantId": "rest-2",
+      "categoryId": "cat-2"
+    }
+  ],
+  "orders": [
+    {
+      "id": "c8d976c9-30df-49b7-a108-b65be22c2e31",
+      "date": "2026-04-18T13:55:43.987Z",
+      "status": "W trakcie przygotowania",
+      "totalAmount": 12,
+      "addressId": "addr-2",
+      "items": [
+        {
+          "id": "dish-2",
+          "name": "Frytki Belgijskie",
+          "price": 12,
+          "quantity": 1
+        }
+      ]
     }
   ]
 }

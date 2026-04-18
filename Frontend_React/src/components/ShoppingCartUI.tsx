@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 import { useCart } from '../context/CartContext'; 
 import { 
     Container, 
@@ -116,12 +117,14 @@ const ShoppingCartUI: React.FC = () => {
       <Box sx={{ mt: 2, textAlign: 'right', pt: 2 }}>
         <Typography variant="h5" sx={{ mb: 1 }}>Suma całkowita: {totalPrice.toFixed(2)} zł</Typography>
         <Button 
-          variant="contained" 
-          color="success"
-          size="large"
-        >
-          Przejdź do kasy
-        </Button>
+          component={Link}
+          to="/checkout"
+          variant="contained" 
+          color="success"
+          size="large"
+        >
+          Przejdź do kasy
+        </Button>
       </Box>
     </Container>
   );
