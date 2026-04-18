@@ -89,6 +89,21 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "id": "6580b2df-8961-4612-8dd5-be5747794932",
+      "date": "2026-04-18T14:02:31.544Z",
+      "status": "W trakcie przygotowania",
+      "totalAmount": 48,
+      "addressId": "addr-2",
+      "items": [
+        {
+          "id": "dish-2",
+          "name": "Frytki Belgijskie",
+          "price": 12,
+          "quantity": 4
+        }
+      ]
     }
   ]
 }

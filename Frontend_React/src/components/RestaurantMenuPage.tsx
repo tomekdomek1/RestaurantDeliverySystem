@@ -6,6 +6,7 @@ import { useSnackbar } from "notistack";
 import { useGetRestaurant } from "../hooks/restaurant/useGetRestaurant";
 import { useGetDishes } from "../hooks/restaurant/useGetDishes";
 import { useCart } from "../context/CartContext";
+import RestaurantInfoHeader from "./RestaurantInfoHeader";
 
 export default function RestaurantMenuPage() {
   const { id } = useParams();
@@ -42,11 +43,7 @@ export default function RestaurantMenuPage() {
         Wróć do listy
       </Button>
 
-      <Box sx={{ mb: 5 }}>
-        <Typography variant="h3" sx={{ fontWeight: 800 }}>{restaurant.name}</Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>{restaurant.descrition}</Typography>
-        <Typography variant="subtitle2" color="primary" sx={{ mt: 1 }}>📞 {restaurant.phoneNumber}</Typography>
-      </Box>
+      <RestaurantInfoHeader restaurant={restaurant} />
 
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>Menu</Typography>
       <Divider sx={{ mb: 3 }} />
