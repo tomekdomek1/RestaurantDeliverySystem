@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using UberEats.Domain.Entities;
+using UberEats.Domain.Roles;
 using UberEats.Domain.Repository;
 
 namespace UberEats.Infrastructure.Seeders;
@@ -84,7 +85,7 @@ public class DevelopmentDataSeeder : IHostedService
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        string[] roles = { "Admin", "User", "RestaurantOwner", "Deliverer" };
+        string[] roles = { UserRoles.Admin, UserRoles.User, UserRoles.RestaurantOwner, UserRoles.Deliverer };
 
         foreach (var role in roles)
         {
@@ -103,7 +104,7 @@ public class DevelopmentDataSeeder : IHostedService
             var result = await userManager.CreateAsync(newAdmin, "Admin123!");
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(newAdmin, "Admin");
+                await userManager.AddToRoleAsync(newAdmin, UserRoles.Admin);
             }
         }
 

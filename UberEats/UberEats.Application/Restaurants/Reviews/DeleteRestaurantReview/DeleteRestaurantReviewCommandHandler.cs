@@ -1,12 +1,12 @@
 using MediatR;
 using UberEats.Domain.Interfaces;
+using UberEats.Domain.Roles;
 using UberEats.Domain.Repository;
 
 namespace UberEats.Application.Restaurants.Reviews.DeleteRestaurantReview;
 
 public sealed class DeleteRestaurantReviewCommandHandler : IRequestHandler<DeleteRestaurantReviewCommand>
 {
-    private const string AdminRole = "Admin";
     private readonly IRestaurantReviewRepository _restaurantReviewRepository;
     private readonly ICurrentUserContext _currentUserContext;
 
@@ -32,7 +32,7 @@ public sealed class DeleteRestaurantReviewCommandHandler : IRequestHandler<Delet
             throw new KeyNotFoundException("Review not found.");
         }
 
-        var isAdmin = _currentUserContext.IsInRole(AdminRole);
+        var isAdmin = _currentUserContext.IsInRole(UserRoles.Admin);
         var isAuthor = review.AuthorUserId == userId;
         if (!isAdmin && !isAuthor)
         {

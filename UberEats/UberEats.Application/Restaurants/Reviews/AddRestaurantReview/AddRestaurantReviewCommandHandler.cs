@@ -1,13 +1,13 @@
 using MediatR;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Interfaces;
+using UberEats.Domain.Roles;
 using UberEats.Domain.Repository;
 
 namespace UberEats.Application.Restaurants.Reviews.AddRestaurantReview;
 
 public sealed class AddRestaurantReviewCommandHandler : IRequestHandler<AddRestaurantReviewCommand, RestaurantReview>
 {
-    private const string UserRole = "User";
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IRestaurantReviewRepository _restaurantReviewRepository;
     private readonly ICurrentUserContext _currentUserContext;
@@ -30,7 +30,7 @@ public sealed class AddRestaurantReviewCommandHandler : IRequestHandler<AddResta
             throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
-        if (!_currentUserContext.IsInRole(UserRole))
+        if (!_currentUserContext.IsInRole(UserRoles.User))
         {
             throw new UnauthorizedAccessException("Only users with role User can add reviews.");
         }
