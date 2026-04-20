@@ -7,7 +7,7 @@ namespace UberEats.Application.Restaurants.Reviews.AddRestaurantReview;
 
 public sealed class AddRestaurantReviewCommandHandler : IRequestHandler<AddRestaurantReviewCommand, RestaurantReview>
 {
-    private const string UserRole = "Admin";
+    private const string UserRole = "User";
     private readonly IRestaurantRepository _restaurantRepository;
     private readonly IRestaurantReviewRepository _restaurantReviewRepository;
     private readonly ICurrentUserContext _currentUserContext;
