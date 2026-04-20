@@ -19,6 +19,7 @@ public sealed class Restaurant : Entity<Guid>
     public Address Address { get; set; } = null!;
 
     public ICollection<Dish> Dishes { get; set; } = new List<Dish>();
+    public ICollection<RestaurantReview> Reviews { get; set; } = new List<RestaurantReview>();
 
     public Restaurant(Guid id, string name, string phoneNumber, string descrition,
         Guid addressId) : base(id)
