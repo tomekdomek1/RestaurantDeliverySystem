@@ -104,6 +104,21 @@
           "quantity": 4
         }
       ]
+    },
+    {
+      "id": "16240dea-080b-49ce-b1c2-4b1c0ea123a7",
+      "date": "2026-04-18T17:57:02.928Z",
+      "status": "W trakcie przygotowania",
+      "totalAmount": 179.95000000000002,
+      "addressId": "addr-1",
+      "items": [
+        {
+          "id": "dish-1",
+          "name": "Burger Klasyk",
+          "price": 35.99,
+          "quantity": 5
+        }
+      ]
     }
   ]
 }

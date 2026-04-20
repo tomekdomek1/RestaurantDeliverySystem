@@ -1,124 +1,138 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack"; // Import biblioteki
+import { useState } from "react";
+import { TextField, Button, Box, Typography, Paper, InputAdornment, Fade, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from "@mui/material";
+import { useNavigate, Link } from "react-router-dom";
+import PersonIcon from '@mui/icons-material/Person';
+import EmailIcon from '@mui/icons-material/Email';
+import LockIcon from '@mui/icons-material/Lock';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
 
-const RegistrationForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar(); // Inicjalizacja toastów
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+export default function RegistrationForm() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ fullName: "", email: "", password: "", role: "Customer" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validate = () => {
-    let newErrors: { [key: string]: string } = {};
-    if (!formData.username) newErrors.username = "Username is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-    return newErrors;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      // Dodatkowy toast o błędach w walidacji (opcjonalnie)
-      enqueueSnackbar("Please fix the errors in the form.", { variant: "warning" });
-      return;
-    }
-
     try {
-      // Zmieniono port na 5122, aby pasował do Twojego działającego Backendu
-      const response = await fetch("http://localhost:5122/api/Auth/register", {
+      const response = await fetch("/api/Auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        enqueueSnackbar("Registration successful! You can now log in.", { variant: "success" });
-        // Możesz tutaj wyczyścić formularz
-        setFormData({ username: "", email: "", password: "", confirmPassword: "" });
-        setErrors({});
+        navigate("/login");
       } else {
-        enqueueSnackbar("Registration failed. Email might be already taken.", { variant: "error" });
+        alert("Błąd podczas rejestracji");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      enqueueSnackbar("Could not connect to the server.", { variant: "error" });
+    } catch {
+      navigate("/login");
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 400, mx: "auto", mt: 8 }}>
-      <Typography variant="h5" textAlign="center" mb={2}>
-        Create Account
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.username}
-          helperText={errors.username}
+    <Fade in={true} timeout={800}>
+      <Paper 
+        elevation={12} 
+        sx={{ 
+          display: 'flex', 
+          maxWidth: 1000, 
+          mx: "auto", 
+          mt: 8, 
+          borderRadius: 4, 
+          overflow: 'hidden', 
+          minHeight: 600 
+        }}
+      >
+        <Box sx={{ flex: 1, p: { xs: 4, md: 6 }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, color: '#1a237e' }}>
+            <RestaurantIcon fontSize="large" sx={{ mr: 1.5 }} />
+            <Typography variant="h5" fontWeight="900">
+              DOŁĄCZ DO NAS
+            </Typography>
+          </Box>
+          <Box component="form" onSubmit={handleSubmit}>
+            <TextField 
+              fullWidth 
+              label="Imię i Nazwisko" 
+              name="fullName" 
+              value={formData.fullName} 
+              onChange={handleChange} 
+              margin="dense" 
+              InputProps={{ 
+                startAdornment: (<InputAdornment position="start"><PersonIcon color="action" /></InputAdornment>), 
+                sx: { borderRadius: 2 } 
+              }} 
+            />
+            <TextField 
+              fullWidth 
+              label="Email" 
+              name="email" 
+              type="email" 
+              value={formData.email} 
+              onChange={handleChange} 
+              margin="dense" 
+              InputProps={{ 
+                startAdornment: (<InputAdornment position="start"><EmailIcon color="action" /></InputAdornment>), 
+                sx: { borderRadius: 2 } 
+              }} 
+            />
+            <TextField 
+              fullWidth 
+              label="Hasło" 
+              name="password" 
+              type="password" 
+              value={formData.password} 
+              onChange={handleChange} 
+              margin="dense" 
+              InputProps={{ 
+                startAdornment: (<InputAdornment position="start"><LockIcon color="action" /></InputAdornment>), 
+                sx: { borderRadius: 2 } 
+              }} 
+            />
+            
+            <FormControl component="fieldset" sx={{ mt: 2, mb: 1 }}>
+              <FormLabel component="legend" sx={{ fontWeight: 'bold' }}>Typ konta</FormLabel>
+              <RadioGroup row name="role" value={formData.role} onChange={handleChange}>
+                <FormControlLabel value="Customer" control={<Radio color="primary" />} label="Klient" />
+                <FormControlLabel value="RestaurantOwner" control={<Radio color="secondary" />} label="Restaurator" />
+              </RadioGroup>
+            </FormControl>
+            
+            <Button 
+              fullWidth 
+              type="submit" 
+              variant="contained" 
+              size="large" 
+              sx={{ 
+                mt: 2, 
+                mb: 2, 
+                py: 1.5, 
+                borderRadius: 2, 
+                fontWeight: 'bold', 
+                background: 'linear-gradient(45deg, #1a237e 30%, #303f9f 90%)' 
+              }}
+            >
+              Zarejestruj się
+            </Button>
+            <Typography align="center" variant="body2">
+              Masz już konto? <Link to="/login" style={{ color: '#1a237e', fontWeight: 'bold', textDecoration: 'none' }}>Zaloguj się</Link>
+            </Typography>
+          </Box>
+        </Box>
+        <Box 
+          sx={{ 
+            flex: 1.2, 
+            display: { xs: 'none', md: 'block' }, 
+            backgroundImage: 'url(https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000&auto=format&fit=crop)', 
+            backgroundSize: 'cover', 
+            backgroundPosition: 'center' 
+          }} 
         />
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.email}
-          helperText={errors.email}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.password}
-          helperText={errors.password}
-        />
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword}
-        />
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          sx={{ mt: 2 }}
-        >
-          Register
-        </Button>
-      </Box>
-    </Paper>
+      </Paper>
+    </Fade>
   );
-};
-
-export default RegistrationForm;
+}

@@ -1,6 +1,7 @@
 import type { Category } from "../types/category";
 
-const BASE = "http://localhost:3000"; 
+const BASE = "/api"; 
+
 async function handleResponse(res: Response) {
   if (!res.ok) {
     const text = await res.text();

@@ -1,15 +1,13 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack"; // Import biblioteki powiadomień
+import { useState } from "react";
+import { TextField, Button, Box, Typography, Paper, InputAdornment, Fade } from "@mui/material";
+import { useNavigate, Link } from "react-router-dom";
+import EmailIcon from '@mui/icons-material/Email';
+import LockIcon from '@mui/icons-material/Lock';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
 
-const LoginForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar(); // Inicjalizacja toastów
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [error, setError] = useState<string>("");
+export default function LoginForm() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,76 +15,127 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-
     try {
-      // Zmieniono port na 5122, aby pasował do Twojego działającego Backendu
-      const response = await fetch("http://localhost:5122/api/Auth/login", {
+      const response = await fetch("/api/Auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Login successful:", data);
-        
-        // Wyświetlenie zielonego powiadomienia zamiast alertu
-        enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });
+        navigate("/restaurants");
       } else {
-        const errorMsg = "Invalid email or password";
-        setError(errorMsg);
-        // Wyświetlenie czerwonego powiadomienia
-        enqueueSnackbar(errorMsg, { variant: "error" });
+        alert("Nieprawidłowe dane logowania");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      const catchMsg = "Something went wrong. Please try again later.";
-      setError(catchMsg);
-      enqueueSnackbar(catchMsg, { variant: "error" });
+    } catch {
+      navigate("/restaurants");
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 400, mx: "auto", mt: 8 }}>
-      <Typography variant="h5" textAlign="center" mb={2}>
-        Login
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          margin="normal"
-        />
-        {error && (
-          <Typography color="error" variant="body2" mt={1}>
-            {error}
-          </Typography>
-        )}
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          sx={{ mt: 2 }}
+    <Fade in={true} timeout={800}>
+      <Paper 
+        elevation={12} 
+        sx={{ 
+          display: 'flex', 
+          maxWidth: 1000, 
+          mx: "auto", 
+          mt: 8, 
+          borderRadius: 4, 
+          overflow: 'hidden', 
+          minHeight: 600 
+        }}
+      >
+        <Box 
+          sx={{ 
+            flex: 1.2, 
+            display: { xs: 'none', md: 'block' }, 
+            backgroundImage: 'url(https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop)', 
+            backgroundSize: 'cover', 
+            backgroundPosition: 'center', 
+            position: 'relative', 
+            '&::after': { 
+              content: '""', 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8))' 
+            } 
+          }}
         >
-          Login
-        </Button>
-      </Box>
-    </Paper>
-  );
-};
+          <Box sx={{ position: 'absolute', bottom: 40, left: 40, color: 'white', zIndex: 1 }}>
+            <Typography variant="h3" fontWeight="900" gutterBottom>
+              Smakuj życie.
+            </Typography>
+            <Typography variant="h6" fontWeight="400">
+              Najlepsze restauracje w Twojej okolicy.
+            </Typography>
+          </Box>
+        </Box>
 
-export default LoginForm;
+        <Box sx={{ flex: 1, p: { xs: 4, md: 6 }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, color: '#ff5252' }}>
+            <RestaurantIcon fontSize="large" sx={{ mr: 1.5 }} />
+            <Typography variant="h5" fontWeight="900" letterSpacing={1}>
+              UBEREATS CLONE
+            </Typography>
+          </Box>
+          
+          <Typography variant="h4" fontWeight="800" gutterBottom>
+            Witaj z powrotem
+          </Typography>
+          
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <TextField 
+              fullWidth 
+              label="Email" 
+              name="email" 
+              type="email" 
+              value={formData.email} 
+              onChange={handleChange} 
+              margin="normal" 
+              InputProps={{ 
+                startAdornment: (<InputAdornment position="start"><EmailIcon color="action" /></InputAdornment>), 
+                sx: { borderRadius: 2 } 
+              }} 
+            />
+            <TextField 
+              fullWidth 
+              label="Hasło" 
+              name="password" 
+              type="password" 
+              value={formData.password} 
+              onChange={handleChange} 
+              margin="normal" 
+              InputProps={{ 
+                startAdornment: (<InputAdornment position="start"><LockIcon color="action" /></InputAdornment>), 
+                sx: { borderRadius: 2 } 
+              }} 
+            />
+            <Button 
+              fullWidth 
+              type="submit" 
+              variant="contained" 
+              size="large" 
+              sx={{ 
+                mt: 4, 
+                mb: 3, 
+                py: 1.8, 
+                borderRadius: 2, 
+                fontWeight: 'bold', 
+                background: 'linear-gradient(45deg, #ff5252 30%, #ff1744 90%)' 
+              }}
+            >
+              Zaloguj się
+            </Button>
+            <Typography align="center">
+              Nie masz konta? <Link to="/register" style={{ color: '#ff5252', fontWeight: 'bold', textDecoration: 'none' }}>Zarejestruj się</Link>
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
+    </Fade>
+  );
+}
