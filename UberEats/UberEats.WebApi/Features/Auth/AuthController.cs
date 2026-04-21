@@ -37,6 +37,8 @@ namespace UberEats.WebApi.Features.Auth
 
             await _userManager.AddToRoleAsync(user, UserRoles.User);
 
+            var token = await GenerateJwtToken(user);
+            SetJwtCookie(token);
             return Ok(new { Message = "User registered successfully" });
         }
 
@@ -71,7 +73,16 @@ namespace UberEats.WebApi.Features.Auth
                 return Unauthorized(new { Error = "Account is inactive. Please contact support." });
 
             var token = await GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            SetJwtCookie(token);
+            return Ok(new { Message = "Login successful" });
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("auth_token");
+            return Ok(new { Message = "Logged out successfully" });
         }
 
         private async Task<string> GenerateJwtToken(ApplicationUser user)
@@ -104,6 +115,17 @@ namespace UberEats.WebApi.Features.Auth
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private void SetJwtCookie(string token)
+        {
+            Response.Cookies.Append("auth_token", token, new Microsoft.AspNetCore.Http.CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
         }
     }
 
