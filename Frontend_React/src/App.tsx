@@ -1,18 +1,18 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { CartProvider } from "./context/CartContext";
-import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./features/cart/context/CartContext";
+import { AuthProvider } from "./features/auth/context/AuthContext";
 import { Box, CssBaseline } from '@mui/material';
 
-import Navbar from "./components/Navbar";
-import LoginForm from "./components/LoginForm";
-import RegistrationForm from "./components/RegistrationForm";
-import ShoppingCartUI from "./components/ShoppingCartUI";
-import CategoryTestPage from "./components/CategoryTestPage";
-import AddressTestPage from "./components/AddressTestPage";
-import RestaurantsPage from "./components/RestaurantsPage";
-import RestaurantMenuPage from "./components/RestaurantMenuPage";
-import CheckoutPage from "./components/CheckoutPage";
-import OrdersHistoryPage from "./components/OrdersHistoryPage";
+import Navbar from "./components/Common/Navbar";
+import LoginForm from "./features/auth/LoginForm";
+import RegistrationForm from "./features/auth/RegistrationForm";
+import ShoppingCartUI from "./features/cart/ShoppingCartUI";
+import CategoryTestPage from "./features/categories/CategoryTestPage";
+import AddressTestPage from "./features/address/AddressTestPage";
+import RestaurantsPage from "./features/restaurants/RestaurantsPage";
+import RestaurantMenuPage from "./features/restaurants/RestaurantMenuPage";
+import CheckoutPage from "./features/cart/CheckoutPage";
+import OrdersHistoryPage from "./features/orders/OrdersHistoryPage";
 
 function App() {
   return (
