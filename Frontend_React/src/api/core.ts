@@ -1,4 +1,4 @@
-import type { UpdatePayload } from "../types/updatePayload";
+import type { UpdatePayload } from "../features/cart/types/updatePayload";
 import { API_BASE_URL } from "../config/api";
 
 function getFullUrl(url: string): string {

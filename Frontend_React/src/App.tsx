@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { CartProvider } from "./context/CartContext";
-import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./features/cart/context/CartContext";
+import { AuthProvider } from "./features/auth/context/AuthContext";
 import { Box, CssBaseline } from '@mui/material';
 
 import Navbar from "./components/Navbar";
