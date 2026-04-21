@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack"; // Import biblioteki
+import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const RegistrationForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar(); // Inicjalizacja toastów
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { register, loading } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,30 +36,20 @@ const RegistrationForm: React.FC = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      // Dodatkowy toast o błędach w walidacji (opcjonalnie)
       enqueueSnackbar("Please fix the errors in the form.", { variant: "warning" });
       return;
     }
 
     try {
-      // Zmieniono port na 5122, aby pasował do Twojego działającego Backendu
-      const response = await fetch("http://localhost:5122/api/Auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        enqueueSnackbar("Registration successful! You can now log in.", { variant: "success" });
-        // Możesz tutaj wyczyścić formularz
-        setFormData({ username: "", email: "", password: "", confirmPassword: "" });
-        setErrors({});
-      } else {
-        enqueueSnackbar("Registration failed. Email might be already taken.", { variant: "error" });
-      }
+      await register(formData.email, formData.password, formData.username);
+      enqueueSnackbar("Registration successful! You are now logged in.", { variant: "success" });
+      setFormData({ username: "", email: "", password: "", confirmPassword: "" });
+      setErrors({});
+      navigate("/restaurants");
     } catch (error) {
       console.error("Error:", error);
-      enqueueSnackbar("Could not connect to the server.", { variant: "error" });
+      const errorMsg = error instanceof Error ? error.message : "Registration failed. Email might be already taken.";
+      enqueueSnackbar(errorMsg, { variant: "error" });
     }
   };
 
@@ -74,6 +68,7 @@ const RegistrationForm: React.FC = () => {
           margin="normal"
           error={!!errors.username}
           helperText={errors.username}
+          disabled={loading}
         />
         <TextField
           fullWidth
@@ -85,6 +80,7 @@ const RegistrationForm: React.FC = () => {
           margin="normal"
           error={!!errors.email}
           helperText={errors.email}
+          disabled={loading}
         />
         <TextField
           fullWidth
@@ -96,6 +92,7 @@ const RegistrationForm: React.FC = () => {
           margin="normal"
           error={!!errors.password}
           helperText={errors.password}
+          disabled={loading}
         />
         <TextField
           fullWidth
@@ -107,14 +104,16 @@ const RegistrationForm: React.FC = () => {
           margin="normal"
           error={!!errors.confirmPassword}
           helperText={errors.confirmPassword}
+          disabled={loading}
         />
         <Button
           fullWidth
           type="submit"
           variant="contained"
           sx={{ mt: 2 }}
+          disabled={loading}
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </Button>
       </Box>
     </Paper>

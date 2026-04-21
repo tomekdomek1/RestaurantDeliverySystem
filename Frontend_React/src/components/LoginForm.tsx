@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack"; // Import biblioteki powiadomień
+import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const LoginForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar(); // Inicjalizacja toastów
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { login, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -20,30 +24,14 @@ const LoginForm: React.FC = () => {
     setError("");
 
     try {
-      // Zmieniono port na 5122, aby pasował do Twojego działającego Backendu
-      const response = await fetch("http://localhost:5122/api/Auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Login successful:", data);
-        
-        // Wyświetlenie zielonego powiadomienia zamiast alertu
-        enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });
-      } else {
-        const errorMsg = "Invalid email or password";
-        setError(errorMsg);
-        // Wyświetlenie czerwonego powiadomienia
-        enqueueSnackbar(errorMsg, { variant: "error" });
-      }
+      await login(formData.email, formData.password);
+      enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });
+      navigate("/restaurants");
     } catch (error) {
       console.error("Error:", error);
-      const catchMsg = "Something went wrong. Please try again later.";
-      setError(catchMsg);
-      enqueueSnackbar(catchMsg, { variant: "error" });
+      const errorMsg = error instanceof Error ? error.message : "Invalid email or password";
+      setError(errorMsg);
+      enqueueSnackbar(errorMsg, { variant: "error" });
     }
   };
 
@@ -61,6 +49,7 @@ const LoginForm: React.FC = () => {
           value={formData.email}
           onChange={handleChange}
           margin="normal"
+          disabled={loading}
         />
         <TextField
           fullWidth
@@ -70,6 +59,7 @@ const LoginForm: React.FC = () => {
           value={formData.password}
           onChange={handleChange}
           margin="normal"
+          disabled={loading}
         />
         {error && (
           <Typography color="error" variant="body2" mt={1}>
@@ -81,8 +71,9 @@ const LoginForm: React.FC = () => {
           type="submit"
           variant="contained"
           sx={{ mt: 2 }}
+          disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </Button>
       </Box>
     </Paper>
