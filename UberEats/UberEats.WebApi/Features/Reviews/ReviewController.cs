@@ -67,7 +67,7 @@ public class ReviewController : ControllerBase
             CreatedAt = review.CreatedAt
         };
 
-        return Created(string.Empty, response);
+        return CreatedAtAction(nameof(GetReviews), new { restaurantId }, response);
     }
 
     [HttpDelete("{reviewId:Guid}")]

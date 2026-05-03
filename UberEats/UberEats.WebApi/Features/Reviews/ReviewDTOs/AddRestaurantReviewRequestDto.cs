@@ -8,5 +8,6 @@ public class AddRestaurantReviewRequestDto
     [Range(1, 5)]
     public int Rating { get; set; }
 
+    [MaxLength(1000)]
     public string? Description { get; set; }
 }
