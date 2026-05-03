@@ -36,15 +36,6 @@ public class AppDbContext : IdentityDbContext
 
         modelBuilder.Entity<RestaurantReview>(builder =>
         {
-            builder.Property(r => r.AuthorUserId)
-                .IsRequired();
-
-            builder.Property(r => r.Rating)
-                .IsRequired();
-
-            builder.Property(r => r.CreatedAt)
-                .IsRequired();
-
             builder.Property(r => r.Description)
                 .HasMaxLength(1000);
 
