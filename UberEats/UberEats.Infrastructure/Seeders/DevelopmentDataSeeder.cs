@@ -74,7 +74,7 @@ public class DevelopmentDataSeeder : IHostedService
             await addressRepository.SaveChangesAsync();
             await restaurantRepository.SaveChangesAsync();
 
-            _logger.LogInformation($"Successfully asdded a new restaurant {newRestaurant.Name} with an Id:{newRestaurant.Id}");
+            _logger.LogInformation($"Successfully added a new restaurant {newRestaurant.Name} with an Id:{newRestaurant.Id}");
         }
         else
         {
