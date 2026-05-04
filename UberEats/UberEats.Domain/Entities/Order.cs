@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using UberEats.Domain.Common.Models;
 using UberEats.Domain.Enums;
 
@@ -10,25 +6,23 @@ namespace UberEats.Domain.Entities;
 
 public sealed class Order : Entity<Guid>
 {
-    // Fields
-    public string Notes { get; set; } = string.Empty;
+    public string? Notes { get; set; }
     public DateTime Date { get; set; }
     public TimeOnly DeliveryTime { get; set; }
     public OrderStatus OrderStatus { get; set; }
-    public decimal TotalAmount { get; set; } // probably can't be passed in the constructor, don't know if possible
-    // to automate the value, maybe just calculate in repo
+    public decimal TotalAmount { get; set; }
 
-    // References
+    // Atrybut [NotMapped] mówi EF Core: "Ignoruj to pole przy generowaniu SQL"
+    // Dzięki temu błąd "column o.CreatedAt does not exist" zniknie.
+    [NotMapped]
+    public DateTime CreatedAt { get; set; }
+    
     public Guid CustomerId { get; set; }
-    public Customer Customer { get; set; } = null!;
     public Guid RestaurantId { get; set; }
-    public Restaurant Restaurant { get; set; } = null!;
     public Guid DriverId { get; set; }
-    public Driver Driver { get; set; } = null!;
-    public OrderAddress OrderAddress { get; set; } = null!; // need to create a copy of an address during order creation in repo
-    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-    public Order(Guid id, string notes, DateTime date, TimeOnly deliveryTime, OrderStatus orderStatus,
-        Guid customerId, Guid restaurantId, Guid driverId) : base(id)
+
+    public Order(Guid id, string? notes, DateTime date, TimeOnly deliveryTime, OrderStatus orderStatus, 
+                 Guid customerId, Guid restaurantId, Guid driverId) : base(id)
     {
         Notes = notes;
         Date = date;
@@ -37,5 +31,11 @@ public sealed class Order : Entity<Guid>
         CustomerId = customerId;
         RestaurantId = restaurantId;
         DriverId = driverId;
+        
+        TotalAmount = 0; 
+        CreatedAt = DateTime.UtcNow;
     }
+
+    // Konstruktor dla EF Core
+    private Order() : base(Guid.Empty) { }
 }

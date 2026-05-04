@@ -5,6 +5,22 @@ import { useGetOrders } from "../hooks/restaurant/useGetOrders";
 export default function OrdersHistoryPage() {
   const { orders, isLoading, error } = useGetOrders();
 
+  // Funkcja pomocnicza do dobierania kolorów statusów
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'warning';   // Pomarańczowy/Żółty
+      case 'accepted':
+        return 'info';      // Niebieski
+      case 'delivered':
+        return 'success';   // Zielony
+      case 'rejected':
+        return 'error';     // Czerwony
+      default:
+        return 'primary';   // Domyślny fiolet/niebieski
+    }
+  };
+
   if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
   if (error) return <Typography color="error" align="center" mt={5}>Wystąpił błąd podczas ładowania historii.</Typography>;
 
@@ -22,7 +38,10 @@ export default function OrdersHistoryPage() {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {sortedOrders.map((order) => (
             <Box key={order.id}>
-              <Card sx={{ boxShadow: 2, borderLeft: '6px solid #1976d2' }}>
+              <Card sx={{ boxShadow: 2, borderLeft: `6px solid ${
+                order.status.toLowerCase() === 'delivered' ? '#2e7d32' : 
+                order.status.toLowerCase() === 'rejected' ? '#d32f2f' : '#1976d2'
+              }` }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box>
@@ -33,11 +52,11 @@ export default function OrdersHistoryPage() {
                         Razem: {order.totalAmount.toFixed(2)} zł
                       </Typography>
                     </Box>
+                    {/* zmieniajacy kolor */}
                     <Chip 
-                      label={order.status} 
-                      color="primary" 
-                      variant="outlined" 
-                      sx={{ fontWeight: 'bold' }} 
+                      label={order.status.toUpperCase()} 
+                      color={getStatusColor(order.status) as any} 
+                      sx={{ fontWeight: 'bold', minWidth: 100 }} 
                     />
                   </Box>
                   
