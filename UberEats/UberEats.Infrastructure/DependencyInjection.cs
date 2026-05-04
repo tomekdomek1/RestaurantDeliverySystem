@@ -22,9 +22,12 @@ namespace UberEats.Infrastructure
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+            services.AddScoped<IRestaurantReviewRepository, RestaurantReviewRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IFileStorage,FileSystemImageStorage>();
+            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+            services.AddHttpContextAccessor();
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()

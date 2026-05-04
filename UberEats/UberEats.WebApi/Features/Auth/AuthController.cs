@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UberEats.Domain.Entities;
+using UberEats.Domain.Roles;
 
 namespace UberEats.WebApi.Features.Auth
 {
@@ -34,18 +35,18 @@ namespace UberEats.WebApi.Features.Auth
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, UserRoles.User);
 
             return Ok(new { Message = "User registered successfully" });
         }
 
         [HttpPost("register-staff")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> RegisterStaff([FromBody] RegisterStaffDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var validRoles = new[] { "RestaurantOwner", "Deliverer", "Admin" };
+            var validRoles = new[] { UserRoles.RestaurantOwner, UserRoles.Deliverer, UserRoles.Admin };
             if (!validRoles.Contains(dto.Role)) return BadRequest("Invalid role selected");
 
             var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, FullName = dto.FullName, IsActive = true };

@@ -25,6 +25,7 @@ public class AppDbContext : IdentityDbContext
     public DbSet<OrderAddress> OrderAddresses { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Restaurant> Restaurants { get; set; }
+    public DbSet<RestaurantReview> RestaurantReviews { get; set; }
     public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
 
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
@@ -32,5 +33,21 @@ public class AppDbContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<RestaurantReview>(builder =>
+        {
+            builder.Property(r => r.Description)
+                .HasMaxLength(1000);
+
+            builder.HasIndex(r => new { r.RestaurantId, r.AuthorUserId, r.CreatedAt });
+            builder.HasIndex(r => new { r.RestaurantId, r.CreatedAt });
+
+            builder.HasOne(r => r.Restaurant)
+                .WithMany(r => r.Reviews)
+                .HasForeignKey(r => r.RestaurantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.ToTable(t => t.HasCheckConstraint("CK_RestaurantReviews_Rating", "\"Rating\" >= 1 AND \"Rating\" <= 5"));
+        });
     }
 }

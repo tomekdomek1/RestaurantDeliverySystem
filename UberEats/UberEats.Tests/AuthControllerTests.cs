@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using UberEats.Domain.Entities;
+using UberEats.Domain.Roles;
 using UberEats.WebApi.Features.Auth;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
@@ -32,7 +33,7 @@ public class AuthControllerTests
         _userManagerMock.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
             
-        _userManagerMock.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "User"))
+        _userManagerMock.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), UserRoles.User))
             .ReturnsAsync(IdentityResult.Success);
 
         // Act
