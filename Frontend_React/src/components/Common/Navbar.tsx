@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const totalItems = state.items.reduce((acc: number, item: any) => acc + item.quantity, 0);
+  const totalItems = state.items.reduce((acc: number, item) => acc + item.quantity, 0);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
