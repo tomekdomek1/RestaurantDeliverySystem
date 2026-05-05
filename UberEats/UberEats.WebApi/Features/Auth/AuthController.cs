@@ -37,6 +37,8 @@ namespace UberEats.WebApi.Features.Auth
 
             await _userManager.AddToRoleAsync(user, UserRoles.User);
 
+            var token = await GenerateJwtToken(user);
+            SetJwtCookie(token);
             return Ok(new { Message = "User registered successfully" });
         }
 
@@ -71,7 +73,23 @@ namespace UberEats.WebApi.Features.Auth
                 return Unauthorized(new { Error = "Account is inactive. Please contact support." });
 
             var token = await GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            SetJwtCookie(token);
+            return Ok(new { Message = "Login successful" });
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("auth_token", new Microsoft.AspNetCore.Http.CookieOptions
+            {
+                HttpOnly = true,
+                Secure = _configuration.GetValue<bool>("IsProduction"),
+                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+                Path = "/",
+                Expires = DateTime.UtcNow.AddHours(-1)
+            });
+            return Ok(new { Message = "Logged out successfully" });
         }
 
         private async Task<string> GenerateJwtToken(ApplicationUser user)
@@ -104,6 +122,20 @@ namespace UberEats.WebApi.Features.Auth
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private void SetJwtCookie(string token)
+        {
+            var isProduction = _configuration.GetValue<bool>("IsProduction");
+            
+            Response.Cookies.Append("auth_token", token, new Microsoft.AspNetCore.Http.CookieOptions
+            {
+                HttpOnly = true,
+                Secure = isProduction,
+                SameSite = isProduction ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+                Path = "/",
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
         }
     }
 

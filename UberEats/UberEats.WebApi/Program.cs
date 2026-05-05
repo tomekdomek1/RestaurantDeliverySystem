@@ -15,6 +15,26 @@ public class Program
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddApplication(); // MediatR
 
+        // Configure CORS to allow credentials with frontend
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policyBuilder =>
+            {
+                policyBuilder
+                    .WithOrigins(
+                        "http://localhost:5173",
+                        "http://localhost:3000",
+                        "http://localhost:5174",
+                        "https://localhost:5173",
+                        "https://localhost:3000",
+                        "https://localhost:5174"
+                    )
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
+        });
+
         builder.Services.AddControllers();
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
@@ -68,6 +88,7 @@ public class Program
 
         app.UseExceptionHandler();
         app.UseHttpsRedirection();
+        app.UseCors("AllowFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
 
