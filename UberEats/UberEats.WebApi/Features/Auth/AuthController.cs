@@ -81,7 +81,14 @@ namespace UberEats.WebApi.Features.Auth
         [Authorize]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("auth_token");
+            Response.Cookies.Delete("auth_token", new Microsoft.AspNetCore.Http.CookieOptions
+            {
+                HttpOnly = true,
+                Secure = _configuration.GetValue<bool>("IsProduction"),
+                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+                Path = "/",
+                Expires = DateTime.UtcNow.AddHours(-1)
+            });
             return Ok(new { Message = "Logged out successfully" });
         }
 
@@ -119,11 +126,14 @@ namespace UberEats.WebApi.Features.Auth
 
         private void SetJwtCookie(string token)
         {
+            var isProduction = _configuration.GetValue<bool>("IsProduction");
+            
             Response.Cookies.Append("auth_token", token, new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+                Secure = isProduction,
+                SameSite = isProduction ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+                Path = "/",
                 Expires = DateTime.UtcNow.AddHours(1)
             });
         }
