@@ -9,16 +9,16 @@ const RegistrationForm: React.FC = () => {
   const navigate = useNavigate();
   const { register, loading } = useAuth();
   const [formData, setFormData] = useState({
-    username: "",
+    fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string; confirmPassword?: string }>({});
 
   const validate = () => {
-    const validationErrors: { username?: string; email?: string; password?: string; confirmPassword?: string } = {};
-    if (!formData.username) validationErrors.username = "Username is required";
+    const validationErrors: { fullName?: string; email?: string; password?: string; confirmPassword?: string } = {};
+    if (!formData.fullName) validationErrors.fullName = "Full name is required";
     if (!formData.email) validationErrors.email = "Email is required";
     if (formData.password.length < 6) validationErrors.password = "Password must be at least 6 characters";
     if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = "Passwords do not match";
@@ -39,9 +39,9 @@ const RegistrationForm: React.FC = () => {
     }
 
     try {
-      await register(formData.email, formData.password, formData.username);
+      await register(formData.email, formData.password, formData.fullName);
       enqueueSnackbar("Registration successful! You are now logged in.", { variant: "success" });
-      setFormData({ username: "", email: "", password: "", confirmPassword: "" });
+      setFormData({ fullName: "", email: "", password: "", confirmPassword: "" });
       setErrors({});
       navigate("/restaurants");
     } catch (error) {
@@ -59,13 +59,13 @@ const RegistrationForm: React.FC = () => {
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
-          label="Username"
-          name="username"
-          value={formData.username}
+          label="Full Name"
+          name="fullName"
+          value={formData.fullName}
           onChange={handleChange}
           margin="normal"
-          error={!!errors.username}
-          helperText={errors.username}
+          error={!!errors.fullName}
+          helperText={errors.fullName}
           disabled={loading}
         />
         <TextField

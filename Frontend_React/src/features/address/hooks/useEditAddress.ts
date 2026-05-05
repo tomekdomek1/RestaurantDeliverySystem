@@ -1,6 +1,6 @@
 import useSWRMutation from "swr/mutation";
 import type { EditAddressDto, EditAddressResponseDto } from "../types/addressDtos";
-import type { UpdatePayload } from "../types/updatePayload";
+import type { UpdatePayload } from "../../../api/types/updatePayload";
 import { patchMutation } from "../../../api/core";
 
 export function useEditAddress() {

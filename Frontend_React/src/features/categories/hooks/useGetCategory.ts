@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import type { Guid } from "../types/guid";
+import type { Guid } from "../../../api/types/guid";
 import type { GetCategoryResponseDto } from "../types/categoryDtos";
 
 export function useGetCategory(id?: Guid | null) {

@@ -9,7 +9,7 @@ import { useGetAddress } from "./hooks/useGetAddress";
 import { useCreateAddress } from "./hooks/useCreateAddress";
 import { useEditAddress } from "./hooks/useEditAddress";
 import { useDeleteAddress } from "./hooks/useDeleteAddress";
-import type { Guid } from "./types/guid";
+import type { Guid } from "../../api/types/guid";
 
 /**
  * AddressTestPage component for testing CRUD operations on addresses.

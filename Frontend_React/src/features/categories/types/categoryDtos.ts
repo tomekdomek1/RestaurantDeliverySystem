@@ -1,4 +1,4 @@
-import type { Guid } from "./guid";
+import type { Guid } from "../../../api/types/guid";
 
 export interface CreateCategoryDto {
     name: string,

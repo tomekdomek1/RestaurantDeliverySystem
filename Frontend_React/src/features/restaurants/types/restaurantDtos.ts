@@ -1,4 +1,4 @@
-import type { Guid } from "./guid";
+import type { Guid } from "../../../api/types/guid";
 
 export interface CreateRestaurantDto {
     name: string,

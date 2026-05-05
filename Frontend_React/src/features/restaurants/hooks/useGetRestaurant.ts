@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import type { Guid } from "../types/guid";
+import type { Guid } from "../../../api/types/guid";
 import type { GetRestaurantResponseDto } from "../types/restaurantDtos";
 
 export function useGetRestaurant(id?: Guid | null) {

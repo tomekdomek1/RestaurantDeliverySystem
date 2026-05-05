@@ -1,5 +1,5 @@
 import useSWRMutation from "swr/mutation";
-import type { Guid } from "../types/guid";
+import type { Guid } from "../../../api/types/guid";
 import { deleteMutation } from "../../../api/core";
 
 export function useDeleteRestaurant() {

@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import type { Guid } from "../types/guid";
+import type { Guid } from "../../../api/types/guid";
 import type { GetAddressResponseDto } from "../types/addressDtos";
 
 export function useGetAddress(id?: Guid | null) {

@@ -9,7 +9,7 @@ import { useGetCategory } from "./hooks/useGetCategory";
 import { useCreateCategory } from "./hooks/useCreateCategory";
 import { useEditCategory } from "./hooks/useEditCategory";
 import { useDeleteCategory } from "./hooks/useDeleteCategory";
-import type { Guid } from "./types/guid";
+import type { Guid } from "../../api/types/guid";
 
 /**
  * CategoryTestPage component for testing CRUD operations on categories.

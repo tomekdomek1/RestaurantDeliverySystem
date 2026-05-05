@@ -1,6 +1,6 @@
 import useSWRMutation from "swr/mutation";
 import type { EditRestaurantDto, EditRestaurantResponseDto } from "../types/restaurantDtos";
-import type { UpdatePayload } from "../types/updatePayload";
+import type { UpdatePayload } from "../../../api/types/updatePayload";
 import { patchMutation } from "../../../api/core";
 
 export function useEditRestaurant() {
