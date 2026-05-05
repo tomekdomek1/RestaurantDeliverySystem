@@ -12,6 +12,7 @@ const LoginForm: React.FC = () => {
     email: "",
     password: "",
   });
+  const [error, setError] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,6 +20,7 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     try {
       await login(formData.email, formData.password);
       enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });

@@ -14,6 +14,16 @@ const RegistrationForm: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string; confirmPassword?: string }>({});
+
+  const validate = () => {
+    const validationErrors: { username?: string; email?: string; password?: string; confirmPassword?: string } = {};
+    if (!formData.username) validationErrors.username = "Username is required";
+    if (!formData.email) validationErrors.email = "Email is required";
+    if (formData.password.length < 6) validationErrors.password = "Password must be at least 6 characters";
+    if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = "Passwords do not match";
+    return validationErrors;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -106,4 +116,6 @@ const RegistrationForm: React.FC = () => {
       </Box>
     </Paper>
   );
-}
+};
+
+export default RegistrationForm;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography, Box, Button, Chip } from '@mui/material';
-import type { Dish } from '../types/dish';
+import type { Dish } from '../features/restaurants/types/dish';
 
 export default function AdminMenuPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);

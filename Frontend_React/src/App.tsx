@@ -3,30 +3,18 @@ import { CartProvider } from "./features/cart/context/CartContext";
 import { AuthProvider } from "./features/auth/context/AuthContext";
 import { Box, CssBaseline } from '@mui/material';
 
-import Navbar from "./components/Navbar";
-import LoginForm from "./components/LoginForm";
-import RegistrationForm from "./components/RegistrationForm";
-import ShoppingCartUI from "./components/ShoppingCartUI";
-import CategoryTestPage from "./components/CategoryTestPage";
-import AddressTestPage from "./components/AddressTestPage";
-import RestaurantsPage from "./components/RestaurantsPage";
-import RestaurantMenuPage from "./components/RestaurantMenuPage";
-import CheckoutPage from "./components/CheckoutPage";
-import OrdersHistoryPage from "./components/OrdersHistoryPage";
+import Navbar from "./components/Common/Navbar";
+import LoginForm from "./features/auth/LoginForm";
+import RegistrationForm from "./features/auth/RegistrationForm";
+import ShoppingCartUI from "./features/cart/ShoppingCartUI";
+import CategoryTestPage from "./features/categories/CategoryTestPage";
+import AddressTestPage from "./features/address/AddressTestPage";
+import RestaurantsPage from "./features/restaurants/RestaurantsPage";
+import RestaurantMenuPage from "./features/restaurants/RestaurantMenuPage";
+import CheckoutPage from "./features/cart/CheckoutPage";
+import OrdersHistoryPage from "./features/orders/OrdersHistoryPage";
 import RestaurantPanelLayout from "./components/RestaurantPanelLayout";
 import AdminMenuPage from "./components/AdminMenuPage";
-
-const ClientLayout = ({ children }: { children: React.ReactNode }) => (
-    <>
-        <Navbar />
-        <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, mt: 2, textAlign: 'right' }}>
-            <Button variant="outlined" size="small" href="/admin/menu">Panel CRM (Dev)</Button>
-        </Box>
-        <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 6 }}>
-            {children}
-        </Box>
-    </>
-);
 
 export default function App() {
     return (
@@ -61,5 +49,3 @@ export default function App() {
         </Router>
     );
 }
-
-export default App;
