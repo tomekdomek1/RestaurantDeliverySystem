@@ -12,6 +12,7 @@ const Navbar: React.FC = () => {
   const { isLoggedIn, user, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const isAdmin = user?.roles.includes('Admin') ?? false;
 
   const totalItems = state.items.reduce((acc: number, item) => acc + item.quantity, 0);
 
@@ -44,9 +45,11 @@ const Navbar: React.FC = () => {
           <Button color="inherit" component={Link} to="/orders">
             Moje Zamówienia
           </Button>
-          <Button color="inherit" component={Link} to="/categories-test" size="small" sx={{ opacity: 0.7 }}>
-            Panel Admina
-          </Button>
+          {isAdmin && (
+            <Button color="inherit" component={Link} to="/admin" size="small" sx={{ opacity: 0.7 }}>
+              Panel Admina
+            </Button>
+          )}
 
           <IconButton color="inherit" component={Link} to="/cart">
             <Badge badgeContent={totalItems} color="secondary">

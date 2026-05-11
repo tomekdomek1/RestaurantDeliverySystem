@@ -1,12 +1,13 @@
 import React, { createContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { API_BASE_URL } from '../../../config/api';
-import { getUidFromToken } from '../../../utils/jwt';
+import { getRolesFromToken, getUidFromToken } from '../../../utils/jwt';
 
 export interface User {
   id?: string;
   email: string;
   fullName?: string;
+  roles: string[];
 }
 
 export interface AuthContextType {
@@ -32,7 +33,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const userStr = localStorage.getItem('auth_user');
     if (token && userStr) {
       try {
-        const userData = JSON.parse(userStr);
+        const userData = JSON.parse(userStr) as User;
+        userData.roles = getRolesFromToken(token);
         setIsLoggedIn(true);
         setUser(userData);
       } catch (err) {
@@ -58,7 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       const data = await response.json();
-      const userData: User = { email };
+      const userData: User = { email, roles: [] };
       
       // Store token in localStorage for fallback (when cookies don't work)
       if (data.token) {
@@ -67,6 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (uid) {
           userData.id = uid;
         }
+        userData.roles = getRolesFromToken(data.token);
         
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('auth_user', JSON.stringify(userData));
@@ -94,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       const data = await response.json();
-      const userData: User = { email, fullName };
+      const userData: User = { email, fullName, roles: [] };
       
       // Store token in localStorage for fallback (when cookies don't work)
       if (data.token) {
@@ -103,6 +106,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (uid) {
           userData.id = uid;
         }
+        userData.roles = getRolesFromToken(data.token);
         
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('auth_user', JSON.stringify(userData));

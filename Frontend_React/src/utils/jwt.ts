@@ -11,7 +11,7 @@ export function decodeJwt(token: string): Record<string, any> | null {
     }
 
     // Decode the payload (second part)
-    const payload = parts[1];
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     
     // Add padding if needed
     const padding = 4 - (payload.length % 4);
@@ -40,4 +40,33 @@ export function getUidFromToken(token: string): string | null {
 export function getEmailFromToken(token: string): string | null {
   const payload = decodeJwt(token);
   return payload?.sub || null; // 'sub' claim typically contains email
+}
+
+/**
+ * Extract user roles from JWT token
+ */
+export function getRolesFromToken(token: string): string[] {
+  const payload = decodeJwt(token);
+  if (!payload) {
+    return [];
+  }
+
+  const roleClaimKeys = [
+    'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
+    'role',
+    'roles',
+  ];
+
+  const roles = roleClaimKeys.flatMap((key) => {
+    const value = payload[key];
+    if (typeof value === 'string') {
+      return [value];
+    }
+    if (Array.isArray(value)) {
+      return value.filter((entry): entry is string => typeof entry === 'string');
+    }
+    return [];
+  });
+
+  return Array.from(new Set(roles));
 }
