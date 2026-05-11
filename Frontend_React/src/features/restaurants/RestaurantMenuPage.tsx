@@ -7,6 +7,7 @@ import { useGetRestaurant } from "./hooks/useGetRestaurant";
 import { useGetDishes } from "./hooks/useGetDishes";
 import { useCart } from "../cart/context/CartContext";
 import RestaurantInfoHeader from "./RestaurantInfoHeader";
+import ReviewsSection from "../reviews/components/ReviewsSection";
 
 export default function RestaurantMenuPage() {
   const { id } = useParams();
@@ -81,6 +82,8 @@ export default function RestaurantMenuPage() {
           ))}
         </Box>
       )}
+
+      {id && <ReviewsSection restaurantId={id} />}
     </Box>
   );
 }
