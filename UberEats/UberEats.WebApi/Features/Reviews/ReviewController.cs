@@ -42,7 +42,8 @@ public class ReviewController : ControllerBase
                 Id = r.Id,
                 Rating = r.Rating,
                 Description = r.Description,
-                CreatedAt = r.CreatedAt
+                CreatedAt = r.CreatedAt,
+                AuthorUserId = r.AuthorUserId
             }).ToList()
         };
 

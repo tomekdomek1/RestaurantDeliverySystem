@@ -39,7 +39,7 @@ namespace UberEats.WebApi.Features.Auth
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
-            return Ok(new { Message = "User registered successfully" });
+            return Ok(new { Message = "User registered successfully", Token = token });
         }
 
         [HttpPost("register-staff")]
@@ -74,18 +74,20 @@ namespace UberEats.WebApi.Features.Auth
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
-            return Ok(new { Message = "Login successful" });
+            return Ok(new { Message = "Login successful", Token = token });
         }
 
         [HttpPost("logout")]
         [Authorize]
         public IActionResult Logout()
         {
+            var isHttps = Request.Scheme == "https";
+            
             Response.Cookies.Delete("auth_token", new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
-                Secure = _configuration.GetValue<bool>("IsProduction"),
-                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+                Secure = isHttps,
+                SameSite = isHttps ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
                 Path = "/",
                 Expires = DateTime.UtcNow.AddHours(-1)
             });
@@ -95,7 +97,7 @@ namespace UberEats.WebApi.Features.Auth
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key not configured")));
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -126,13 +128,14 @@ namespace UberEats.WebApi.Features.Auth
 
         private void SetJwtCookie(string token)
         {
-            var isProduction = _configuration.GetValue<bool>("IsProduction");
+            var isHttps = Request.Scheme == "https";
+            var isDevelopment = _configuration.GetValue<bool>("IsProduction") == false;
             
             Response.Cookies.Append("auth_token", token, new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
-                Secure = isProduction,
-                SameSite = isProduction ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+                Secure = isHttps,
+                SameSite = isDevelopment ? Microsoft.AspNetCore.Http.SameSiteMode.Lax : Microsoft.AspNetCore.Http.SameSiteMode.None,
                 Path = "/",
                 Expires = DateTime.UtcNow.AddHours(1)
             });

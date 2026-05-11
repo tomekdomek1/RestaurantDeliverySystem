@@ -7,4 +7,6 @@ public class GetRestaurantsResultDto
     public string PhoneNumber { get; set; } = string.Empty;
     public string Descrition { get; set; } = string.Empty;
     public Guid AddressId { get; set; }
+    public decimal AverageRating { get; set; }
+    public int TotalReviews { get; set; }
 }

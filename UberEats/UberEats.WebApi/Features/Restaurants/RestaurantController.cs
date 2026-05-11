@@ -8,6 +8,7 @@ using UberEats.Application.Restaurants.EditRestaurant;
 using UberEats.Application.Restaurants.GetRestaurantById;
 using UberEats.Application.Restaurants.GetRestaurants;
 using UberEats.Application.Restaurants.UploadImages;
+using UberEats.Domain.Repository;
 using UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
 
 namespace UberEats.WebApi.Features.Restaurants;
@@ -17,9 +18,12 @@ namespace UberEats.WebApi.Features.Restaurants;
 public class RestaurantController : ControllerBase
 {
     private readonly IMediator _mediator;
-    public RestaurantController(IMediator mediator)
+    private readonly IRestaurantReviewRepository _reviewRepository;
+
+    public RestaurantController(IMediator mediator, IRestaurantReviewRepository reviewRepository)
     {
         _mediator = mediator;
+        _reviewRepository = reviewRepository;
     }
 
     [HttpGet]
@@ -28,14 +32,21 @@ public class RestaurantController : ControllerBase
         var entities = await _mediator.Send(new GetRestaurantsQuery());
 
         // TODO: implement pagination
-        var resultDto = entities.Select(r => new GetRestaurantsResultDto
+        var resultDto = new List<GetRestaurantsResultDto>();
+        foreach (var r in entities)
         {
-            Id = r.Id,
-            Name = r.Name,
-            PhoneNumber = r.PhoneNumber,
-            Descrition = r.Descrition,
-            AddressId = r.AddressId
-        }).ToList();
+            var (averageRating, totalReviews) = await _reviewRepository.GetAverageRatingAndCountAsync(r.Id);
+            resultDto.Add(new GetRestaurantsResultDto
+            {
+                Id = r.Id,
+                Name = r.Name,
+                PhoneNumber = r.PhoneNumber,
+                Descrition = r.Descrition,
+                AddressId = r.AddressId,
+                AverageRating = averageRating,
+                TotalReviews = totalReviews
+            });
+        }
 
         return Ok(resultDto);
     }
@@ -50,13 +61,17 @@ public class RestaurantController : ControllerBase
             return NotFound();
         }
 
+        var (averageRating, totalReviews) = await _reviewRepository.GetAverageRatingAndCountAsync(id);
+
         var resultDto = new GetRestaurantsResultDto
         {
             Id = entity.Id,
             Name = entity.Name,
             PhoneNumber = entity.PhoneNumber,
             Descrition = entity.Descrition,
-            AddressId = entity.AddressId
+            AddressId = entity.AddressId,
+            AverageRating = averageRating,
+            TotalReviews = totalReviews
         };
 
         return Ok(resultDto);

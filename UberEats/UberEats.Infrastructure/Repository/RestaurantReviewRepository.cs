@@ -59,4 +59,21 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
 
         return (items, totalCount);
     }
+
+    public async Task<(decimal AverageRating, int TotalCount)> GetAverageRatingAndCountAsync(Guid restaurantId)
+    {
+        var query = _set.AsNoTracking()
+            .Where(r => r.RestaurantId == restaurantId && r.CreatedAt >= DateTime.UtcNow.AddMonths(-3));
+
+        var totalCount = await query.CountAsync();
+        
+        if (totalCount == 0)
+        {
+            return (0m, 0);
+        }
+
+        var averageRating = await query.AverageAsync(r => (decimal)r.Rating);
+        
+        return (averageRating, totalCount);
+    }
 }

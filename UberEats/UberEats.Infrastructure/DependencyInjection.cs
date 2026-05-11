@@ -58,10 +58,20 @@ namespace UberEats.Infrastructure
                 {
                     OnMessageReceived = context =>
                     {
+                        // First try to get token from cookie
                         if (context.Request.Cookies.TryGetValue("auth_token", out var token))
                         {
                             context.Token = token;
+                            return Task.CompletedTask;
                         }
+                        
+                        // Fallback: try to get token from Authorization header (for localStorage support)
+                        var authHeader = context.Request.Headers["Authorization"].ToString();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                        {
+                            context.Token = authHeader.Substring("Bearer ".Length);
+                        }
+                        
                         return Task.CompletedTask;
                     }
                 };

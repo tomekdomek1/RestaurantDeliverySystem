@@ -1,11 +1,11 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Roles;
 using UberEats.WebApi.Features.Auth;
-using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace UberEats.Tests;
 
@@ -20,6 +20,16 @@ public class AuthControllerTests
         var store = new Mock<IUserStore<ApplicationUser>>();
         _userManagerMock = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
         _configurationMock = new Mock<IConfiguration>();
+
+        // Setup JWT configuration
+        var jwtSettingsMock = new Mock<IConfigurationSection>();
+        jwtSettingsMock.Setup(x => x["Key"]).Returns("test-secret-key-that-is-long-enough-for-jwt-signing-purposes");
+        jwtSettingsMock.Setup(x => x["Issuer"]).Returns("http://localhost:7062");
+        jwtSettingsMock.Setup(x => x["Audience"]).Returns("http://localhost:5173");
+        jwtSettingsMock.Setup(x => x["ExpiryMinutes"]).Returns("60");
+        
+        _configurationMock.Setup(x => x.GetSection("JwtSettings"))
+            .Returns(jwtSettingsMock.Object);
 
         _controller = new AuthController(_userManagerMock.Object, _configurationMock.Object);
     }
