@@ -8,6 +8,20 @@ function getFullUrl(url: string): string {
     return `${API_BASE_URL}${url}`;
 }
 
+function getAuthHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+    };
+    
+    // Add Authorization header if token is in localStorage (fallback for httpOnly cookies)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+}
+
 async function parseResponse<T>(res: Response): Promise<T> {
     if (!res.ok) {
         const errorInfo = await res.json().catch(() => ({}));
@@ -29,9 +43,7 @@ export async function fetcher<TResponse>(url: string): Promise<TResponse> {
     const fullUrl = getFullUrl(url);
     const res = await fetch(fullUrl, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         credentials: 'include',
     });
 
@@ -45,7 +57,7 @@ export async function postMutation<TResponse, TArg>(
     const fullUrl = getFullUrl(url);
     const res = await fetch(fullUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         credentials: 'include',
         body: JSON.stringify(arg),
     });
@@ -64,7 +76,7 @@ function createUpdateMutator(method: 'PUT' | 'PATCH') {
 
         const res = await fetch(targetUrl, {
             method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             credentials: 'include',
             body: JSON.stringify(arg.data),
         });
@@ -85,7 +97,7 @@ export async function deleteMutation<TResponse, TArg extends string>(
 
     const res = await fetch(targetUrl, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         credentials: 'include',
     });
 
