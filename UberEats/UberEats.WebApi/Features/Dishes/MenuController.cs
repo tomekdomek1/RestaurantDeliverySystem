@@ -1,10 +1,12 @@
-﻿using MediatR;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UberEats.Application.Restaurants.Dishes.AddDishToMenu;
 using UberEats.Application.Restaurants.Dishes.DeleteDish;
 using UberEats.Application.Restaurants.Dishes.EditDish;
 using UberEats.Application.Restaurants.Dishes.GetDishes;
+using UberEats.Domain.Roles;
 using UberEats.WebApi.Features.Dishes.DishDTOs;
 
 namespace UberEats.WebApi.Features.Dishes;
@@ -38,6 +40,7 @@ public class MenuController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> AddDishToMenu(Guid restaurantId, [FromBody] AddDishRequestDto request)
     {
         var command = new AddDishToMenuCommand(
@@ -63,6 +66,7 @@ public class MenuController : ControllerBase
 
     // TODO: Seems to delete strings that are not provided in the body of the request. It's most likely an issue with the MapObjects.Map() function.
     [HttpPatch("{dishId:Guid}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> EditDish(Guid restaurantId, Guid dishId, [FromBody] EditDishRequestDto request)
     {
         if (request == null)
@@ -98,6 +102,7 @@ public class MenuController : ControllerBase
     }
 
     [HttpDelete("{dishId:Guid}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> DeleteDish(Guid restaurantId, Guid dishId)
     {
         await _mediator.Send(new DeleteDishCommand(dishId, restaurantId));
