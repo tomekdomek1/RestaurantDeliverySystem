@@ -21,6 +21,9 @@ public sealed class Order : Entity<Guid>
     public Guid RestaurantId { get; set; }
     public Guid DriverId { get; set; }
 
+    public OrderAddress OrderAddress { get; set; } = null!;
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
     public Order(Guid id, string? notes, DateTime date, TimeOnly deliveryTime, OrderStatus orderStatus, 
                  Guid customerId, Guid restaurantId, Guid driverId) : base(id)
     {
