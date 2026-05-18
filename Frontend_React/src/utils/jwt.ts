@@ -1,3 +1,5 @@
+import { jwtDecode } from 'jwt-decode';
+
 /**
  * Decode JWT token and extract claims
  * Note: Does NOT validate signature - only decodes the payload
@@ -5,21 +7,7 @@
  */
 export function decodeJwt(token: string): Record<string, any> | null {
   try {
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      return null;
-    }
-
-    // Decode the payload (second part)
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    
-    // Add padding if needed
-    const padding = 4 - (payload.length % 4);
-    const paddedPayload = payload + (padding < 4 ? '='.repeat(padding) : '');
-    
-    // Decode from base64url
-    const decoded = atob(paddedPayload);
-    return JSON.parse(decoded);
+    return jwtDecode<Record<string, any>>(token);
   } catch (error) {
     console.error('Failed to decode JWT:', error);
     return null;
@@ -39,7 +27,8 @@ export function getUidFromToken(token: string): string | null {
  */
 export function getEmailFromToken(token: string): string | null {
   const payload = decodeJwt(token);
-  return payload?.sub || null; // 'sub' claim typically contains email
+  // 'sub' claim typically contains email, but check for other common email claim names too
+  return payload?.sub || payload?.email || payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || null;
 }
 
 /**
