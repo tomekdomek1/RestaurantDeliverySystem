@@ -109,16 +109,7 @@ namespace UberEats.WebApi.Features.Auth
         [Authorize]
         public IActionResult Logout()
         {
-            var isHttps = Request.Scheme == "https";
-            
-            Response.Cookies.Delete("auth_token", new Microsoft.AspNetCore.Http.CookieOptions
-            {
-                HttpOnly = true,
-                Secure = isHttps,
-                SameSite = isHttps ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTime.UtcNow.AddHours(-1)
-            });
+            Response.Cookies.Delete("auth_token", GetCookieOptions(isLogout: true));
             return Ok(new { Message = "Logged out successfully" });
         }
 
@@ -156,17 +147,26 @@ namespace UberEats.WebApi.Features.Auth
 
         private void SetJwtCookie(string token)
         {
+            Response.Cookies.Append("auth_token", token, GetCookieOptions());
+        }
+
+        private Microsoft.AspNetCore.Http.CookieOptions GetCookieOptions(bool isLogout = false)
+        {
+            // For security, assume production (secure cookies) if not explicitly set to false
+            var isProduction = _configuration.GetValue<bool?>("IsProduction") ?? true;
             var isHttps = Request.Scheme == "https";
-            var isDevelopment = _configuration.GetValue<bool>("IsProduction") == false;
             
-            Response.Cookies.Append("auth_token", token, new Microsoft.AspNetCore.Http.CookieOptions
+            // SameSite=None requires Secure=true
+            var useSecure = isHttps || isProduction;
+            
+            return new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
-                Secure = isHttps,
-                SameSite = isDevelopment ? Microsoft.AspNetCore.Http.SameSiteMode.Lax : Microsoft.AspNetCore.Http.SameSiteMode.None,
+                Secure = useSecure,
+                SameSite = useSecure ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
                 Path = "/",
-                Expires = DateTime.UtcNow.AddHours(1)
-            });
+                Expires = isLogout ? DateTime.UtcNow.AddHours(-1) : DateTime.UtcNow.AddHours(1)
+            };
         }
     }
 
