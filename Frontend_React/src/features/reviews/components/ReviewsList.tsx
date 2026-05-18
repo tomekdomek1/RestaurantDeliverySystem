@@ -16,13 +16,11 @@ import type { ReviewsFilter } from "../types/review";
 
 interface ReviewsListProps {
   restaurantId: string;
-  currentUserId?: string;
   onReviewDeleted?: () => void;
 }
 
 export default function ReviewsList({
   restaurantId,
-  currentUserId,
   onReviewDeleted,
 }: ReviewsListProps) {
   const [filters, setFilters] = useState<Partial<ReviewsFilter>>({
@@ -96,7 +94,7 @@ export default function ReviewsList({
             label="Sortuj po"
           >
             <MenuItem value="createdAt">Najnowsze</MenuItem>
-            <MenuItem value="rating">Ocenie</MenuItem>
+            <MenuItem value="rating">Ocena</MenuItem>
           </Select>
         </FormControl>
 
@@ -175,7 +173,6 @@ export default function ReviewsList({
                     key={review.id}
                     review={review}
                     restaurantId={restaurantId}
-                    currentUserId={currentUserId}
                     onDeleted={() => {
                       refreshReviews();
                       onReviewDeleted?.();

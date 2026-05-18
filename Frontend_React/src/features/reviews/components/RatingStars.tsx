@@ -17,10 +17,12 @@ export default function RatingStars({
   size = "medium",
   showLabel = true,
 }: RatingStarsProps) {
+  const roundedRating = Math.round(rating * 2) / 2;
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <MuiRating
-        value={rating}
+        value={roundedRating}
         readOnly={readOnly}
         onChange={(_, value) => onChange?.(value || 0)}
         size={size}
@@ -28,7 +30,7 @@ export default function RatingStars({
       />
       {showLabel && (
         <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
-          {rating.toFixed(1)}
+          {roundedRating.toFixed(1)}
           {count !== undefined && <span> ({count})</span>}
         </Typography>
       )}
