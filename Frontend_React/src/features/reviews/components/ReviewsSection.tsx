@@ -11,7 +11,7 @@ interface ReviewsSectionProps {
 
 export default function ReviewsSection({ restaurantId }: ReviewsSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn } = useAuth();
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleOpenDialog = () => {
@@ -60,7 +60,6 @@ export default function ReviewsSection({ restaurantId }: ReviewsSectionProps) {
       <ReviewsList
         key={refreshKey}
         restaurantId={restaurantId}
-        currentUserId={user?.id}
         onReviewDeleted={handleReviewAdded}
       />
     </Box>

@@ -14,5 +14,5 @@ public class GetRestaurantReviewItemDto
     public int Rating { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
-    public string AuthorUserId { get; set; } = string.Empty;
+    public bool IsOwnedByCurrentUser { get; set; }
 }

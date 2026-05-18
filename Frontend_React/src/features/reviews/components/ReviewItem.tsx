@@ -8,14 +8,12 @@ import type { Review } from "../types/review";
 interface ReviewItemProps {
   review: Review;
   restaurantId: string;
-  currentUserId?: string;
   onDeleted?: () => void;
 }
 
 export default function ReviewItem({
   review,
   restaurantId,
-  currentUserId,
   onDeleted,
 }: ReviewItemProps) {
   const { deleteReview, isLoading: isDeleting } = useDeleteRestaurantReview(restaurantId);
@@ -55,7 +53,7 @@ export default function ReviewItem({
               </Typography>
             )}
           </Box>
-          {currentUserId && review.authorUserId === currentUserId && (
+          {review.isOwnedByCurrentUser && (
             <Box sx={{ ml: 1 }}>
               <IconButton
                 size="small"

@@ -3,7 +3,7 @@ export interface Review {
   rating: number;
   description?: string;
   createdAt: string;
-  authorUserId: string;
+  isOwnedByCurrentUser: boolean;
 }
 
 export interface ReviewsFilter {
