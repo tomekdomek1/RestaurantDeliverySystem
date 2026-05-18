@@ -8,6 +8,7 @@ using UberEats.Application.Restaurants.EditRestaurant;
 using UberEats.Application.Restaurants.GetRestaurantById;
 using UberEats.Application.Restaurants.GetRestaurants;
 using UberEats.Application.Restaurants.UploadImages;
+using UberEats.Domain.Constants;
 using UberEats.Domain.Repository;
 using UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
 
@@ -32,7 +33,7 @@ public class RestaurantController : ControllerBase
         var entities = await _mediator.Send(new GetRestaurantsQuery());
         var ratingsByRestaurantId = await _reviewRepository.GetAverageRatingsAndCountsAsync(
             entities.Select(r => r.Id),
-            DateTime.UtcNow.AddMonths(-3));
+            ReviewConstants.GetReviewCutoffDate());
 
         // TODO: implement pagination
         var resultDto = entities.Select(r =>

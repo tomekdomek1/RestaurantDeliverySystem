@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using UberEats.Domain.Constants;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Repository;
 using UberEats.Infrastructure.Databases;
@@ -77,7 +78,7 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
             {
                 RestaurantId = g.Key,
                 TotalCount = g.Count(),
-                AverageRating = g.Average(r => (decimal)r.Rating)
+                AverageRating = Math.Round(g.Average(r => (decimal)r.Rating), 1)
             })
             .ToListAsync();
 
@@ -93,14 +94,14 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
     public async Task<(decimal AverageRating, int TotalCount)> GetAverageRatingAndCountAsync(Guid restaurantId)
     {
         var query = _set.AsNoTracking()
-            .Where(r => r.RestaurantId == restaurantId && r.CreatedAt >= DateTime.UtcNow.AddMonths(-3));
+            .Where(r => r.RestaurantId == restaurantId && r.CreatedAt >= ReviewConstants.GetReviewCutoffDate());
 
         var aggregate = await query
             .GroupBy(_ => 1)
             .Select(g => new
             {
                 TotalCount = g.Count(),
-                AverageRating = g.Average(r => (decimal)r.Rating)
+                AverageRating = Math.Round(g.Average(r => (decimal)r.Rating), 1)
             })
             .FirstOrDefaultAsync();
 
