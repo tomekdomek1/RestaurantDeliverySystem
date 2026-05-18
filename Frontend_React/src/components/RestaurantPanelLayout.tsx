@@ -2,16 +2,18 @@ import { Box, Drawer, List, Typography, Divider, ListItem, ListItemButton, ListI
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation, useParams } from 'react-router-dom'; 
 
 const drawerWidth = 280;
 
 export default function RestaurantPanelLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { restaurantId } = useParams<{ restaurantId: string }>(); // 
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/reports' },
+    { text: 'Zamówienia', icon: <DashboardIcon />, path: `/admin/restaurant/${restaurantId}/orders` }, 
     { text: 'Moje Menu', icon: <RestaurantMenuIcon />, path: '/admin/menu' },
   ];
 

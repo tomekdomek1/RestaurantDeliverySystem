@@ -12,6 +12,7 @@ import CheckoutPage from "./components/CheckoutPage";
 import OrdersHistoryPage from "./components/OrdersHistoryPage";
 import RestaurantPanelLayout from "./components/RestaurantPanelLayout";
 import AdminMenuPage from "./components/AdminMenuPage";
+import IncomingOrdersPage from "./components/IncomingOrdersPage";
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -39,10 +40,10 @@ export default function App() {
           <Route path="/cart" element={<ClientLayout><ShoppingCartUI /></ClientLayout>} />
           <Route path="/checkout" element={<ClientLayout><CheckoutPage /></ClientLayout>} />
           <Route path="/orders" element={<ClientLayout><OrdersHistoryPage /></ClientLayout>} />
-
           <Route path="/admin" element={<RestaurantPanelLayout />}>
             <Route index element={<Navigate to="/admin/menu" />} />
             <Route path="menu" element={<AdminMenuPage />} />
+            <Route path="restaurant/:restaurantId/orders" element={<IncomingOrdersPage />} />
           </Route>
         </Routes>
       </CartProvider>
