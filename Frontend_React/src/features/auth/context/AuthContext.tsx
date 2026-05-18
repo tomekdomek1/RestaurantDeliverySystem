@@ -35,31 +35,29 @@ interface AuthResponse {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const isDevEnv = import.meta.env.DEV;
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!isDevEnv) {
-      return;
-    }
-
+  
+  // Initialize state from localStorage if available (DEV only)
+  const getInitialState = () => {
+    if (!isDevEnv) return { isLoggedIn: false, user: null };
+    
     const token = localStorage.getItem('auth_token');
     const userStr = localStorage.getItem('auth_user');
-    if (!token || !userStr) {
-      return;
+    
+    if (token && userStr) {
+      try {
+        return { isLoggedIn: true, user: JSON.parse(userStr) as User };
+      } catch {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+      }
     }
+    return { isLoggedIn: false, user: null };
+  };
 
-    try {
-      const restoredUser = JSON.parse(userStr) as User;
-      setUser(restoredUser);
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.error('Failed to restore auth from localStorage', error);
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-    }
-  }, [isDevEnv]);
+  const initialState = getInitialState();
+  const [isLoggedIn, setIsLoggedIn] = useState(initialState.isLoggedIn);
+  const [user, setUser] = useState<User | null>(initialState.user);
+  const [loading, setLoading] = useState(false);
 
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);

@@ -25,6 +25,12 @@ function getAuthHeaders(): Record<string, string> {
 
 async function parseResponse<T>(res: Response): Promise<T> {
     if (!res.ok) {
+        if (res.status === 401) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            // We can't easily trigger a state change in AuthContext from here without a global event or similar
+            // but clearing storage will prevent subsequent requests from using stale data in DEV.
+        }
         const errorInfo = await res.json().catch(() => ({}));
         throw {
             status: res.status,
