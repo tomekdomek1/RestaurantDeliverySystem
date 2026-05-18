@@ -1,7 +1,9 @@
 using UberEats.Application;
 using UberEats.Infrastructure;
+using UberEats.Infrastructure.Databases;
 using UberEats.Infrastructure.Seeders;
 using UberEats.WebApi.Middlewares;
+using Microsoft.EntityFrameworkCore;
 
 namespace UberEats.WebApi;
 
@@ -78,6 +80,12 @@ public class Program
         }
         
         var app = builder.Build();
+        
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            dbContext.Database.Migrate();
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
