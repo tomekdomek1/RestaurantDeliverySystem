@@ -1,9 +1,23 @@
 import { useState } from "react";
-import { Box, Card, CardContent, Typography, IconButton, CircularProgress } from "@mui/material";
+import { 
+  Box, 
+  Card, 
+  CardContent, 
+  Typography, 
+  IconButton, 
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDeleteRestaurantReview } from "../hooks/useDeleteRestaurantReview";
 import RatingStars from "./RatingStars";
 import type { Review } from "../types/review";
+import { useSnackbar } from "notistack";
 
 interface ReviewItemProps {
   review: Review;
@@ -17,17 +31,19 @@ export default function ReviewItem({
   onDeleted,
 }: ReviewItemProps) {
   const { deleteReview, isLoading: isDeleting } = useDeleteRestaurantReview(restaurantId);
-  const [error, setError] = useState<string | null>(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleDelete = async () => {
-    if (!confirm("Czy na pewno chcesz usunąć tę recenzję?")) return;
-
     try {
-      setError(null);
       await deleteReview(review.id);
+      enqueueSnackbar("Recenzja została usunięta", { variant: "info" });
       onDeleted?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się usunąć recenzji");
+      const message = err instanceof Error ? err.message : "Nie udało się usunąć recenzji";
+      enqueueSnackbar(message, { variant: "error" });
+    } finally {
+      setOpenDeleteDialog(false);
     }
   };
 
@@ -47,17 +63,12 @@ export default function ReviewItem({
                 {review.description}
               </Typography>
             )}
-            {error && (
-              <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
-                {error}
-              </Typography>
-            )}
           </Box>
           {review.isOwnedByCurrentUser && (
             <Box sx={{ ml: 1 }}>
               <IconButton
                 size="small"
-                onClick={handleDelete}
+                onClick={() => setOpenDeleteDialog(true)}
                 disabled={isDeleting}
                 color="error"
               >
@@ -67,6 +78,19 @@ export default function ReviewItem({
           )}
         </Box>
       </CardContent>
+
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Usuń recenzję</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Czy na pewno chcesz usunąć tę recenzję? Tej operacji nie można cofnąć.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Anuluj</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">Usuń</Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 }

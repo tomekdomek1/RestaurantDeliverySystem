@@ -3,12 +3,27 @@ import CategoryList from "./CategoryList";
 import CategoryForm from "./CategoryForm";
 import type { Category } from "./types/category";
 import { CategoryService } from "./services/CategoryService";
+import { useSnackbar } from "notistack";
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogContentText, 
+  DialogActions, 
+  Button,
+  Typography,
+  CircularProgress,
+  Box
+} from "@mui/material";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     loadCategories();
@@ -19,8 +34,10 @@ export default function CategoriesPage() {
       setLoading(true);
       const data = await CategoryService.getAll();
       setCategories(data);
-    } catch (err: any) {
-      setError(err.message || "Error loading categories");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error loading categories";
+      setError(message);
+      enqueueSnackbar(message, { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -30,8 +47,10 @@ export default function CategoriesPage() {
     try {
       const created = await CategoryService.create({ name });
       setCategories((prev) => [...prev, created]);
-    } catch (err: any) {
-      alert(err.message);
+      enqueueSnackbar("Category added successfully", { variant: "success" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error adding category";
+      enqueueSnackbar(message, { variant: "error" });
     }
   }
 
@@ -42,35 +61,43 @@ export default function CategoriesPage() {
         prev.map((cat) => (cat.id === id ? updated : cat))
       );
       setEditingCategory(null);
-    } catch (err: any) {
-      alert(err.message);
+      enqueueSnackbar("Category updated successfully", { variant: "success" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error updating category";
+      enqueueSnackbar(message, { variant: "error" });
     }
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm("Delete this category?")) return;
+  async function confirmDelete() {
+    if (deleteId === null) return;
     try {
-      await CategoryService.remove(id);
-      setCategories((prev) => prev.filter((cat) => cat.id !== id));
-    } catch (err: any) {
-      alert(err.message);
+      await CategoryService.remove(deleteId);
+      setCategories((prev) => prev.filter((cat) => cat.id !== deleteId));
+      enqueueSnackbar("Category deleted successfully", { variant: "info" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error deleting category";
+      enqueueSnackbar(message, { variant: "error" });
+    } finally {
+      setDeleteId(null);
     }
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Categories</h2>
+    <Box sx={{ padding: 4 }}>
+      <Typography variant="h4" gutterBottom>Categories</Typography>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <CircularProgress />}
+      {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
 
       <CategoryList
         categories={categories}
         onEdit={setEditingCategory}
-        onDelete={handleDelete}
+        onDelete={(id) => setDeleteId(id)}
       />
 
-      <h3>{editingCategory ? "Edit category" : "Add category"}</h3>
+      <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+        {editingCategory ? "Edit category" : "Add category"}
+      </Typography>
 
       <CategoryForm
         initialValue={editingCategory?.name || ""}
@@ -81,6 +108,19 @@ export default function CategoriesPage() {
         }
         onCancel={() => setEditingCategory(null)}
       />
-    </div>
+
+      <Dialog open={deleteId !== null} onClose={() => setDeleteId(null)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this category? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
