@@ -30,23 +30,25 @@ public class RestaurantController : ControllerBase
     public async Task<IActionResult> GetRestaurants()
     {
         var entities = await _mediator.Send(new GetRestaurantsQuery());
+        var ratingsByRestaurantId = await _reviewRepository.GetAverageRatingsAndCountsAsync(
+            entities.Select(r => r.Id),
+            DateTime.UtcNow.AddMonths(-3));
 
         // TODO: implement pagination
-        var resultDto = new List<GetRestaurantsResultDto>();
-        foreach (var r in entities)
+        var resultDto = entities.Select(r =>
         {
-            var (averageRating, totalReviews) = await _reviewRepository.GetAverageRatingAndCountAsync(r.Id);
-            resultDto.Add(new GetRestaurantsResultDto
+            var ratingStats = ratingsByRestaurantId.GetValueOrDefault(r.Id, (AverageRating: 0m, TotalCount: 0));
+            return new GetRestaurantsResultDto
             {
                 Id = r.Id,
                 Name = r.Name,
                 PhoneNumber = r.PhoneNumber,
                 Descrition = r.Descrition,
                 AddressId = r.AddressId,
-                AverageRating = averageRating,
-                TotalReviews = totalReviews
-            });
-        }
+                AverageRating = ratingStats.AverageRating,
+                TotalReviews = ratingStats.TotalCount
+            };
+        }).ToList();
 
         return Ok(resultDto);
     }

@@ -60,20 +60,55 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
         return (items, totalCount);
     }
 
+    public async Task<Dictionary<Guid, (decimal AverageRating, int TotalCount)>> GetAverageRatingsAndCountsAsync(
+        IEnumerable<Guid> restaurantIds,
+        DateTime sinceUtc)
+    {
+        var restaurantIdList = restaurantIds.Distinct().ToList();
+        if (restaurantIdList.Count == 0)
+        {
+            return new Dictionary<Guid, (decimal AverageRating, int TotalCount)>();
+        }
+
+        var aggregates = await _set.AsNoTracking()
+            .Where(r => restaurantIdList.Contains(r.RestaurantId) && r.CreatedAt >= sinceUtc)
+            .GroupBy(r => r.RestaurantId)
+            .Select(g => new
+            {
+                RestaurantId = g.Key,
+                TotalCount = g.Count(),
+                AverageRating = g.Average(r => (decimal)r.Rating)
+            })
+            .ToListAsync();
+
+        var result = restaurantIdList.ToDictionary(id => id, _ => (AverageRating: 0m, TotalCount: 0));
+        foreach (var aggregate in aggregates)
+        {
+            result[aggregate.RestaurantId] = (aggregate.AverageRating, aggregate.TotalCount);
+        }
+
+        return result;
+    }
+
     public async Task<(decimal AverageRating, int TotalCount)> GetAverageRatingAndCountAsync(Guid restaurantId)
     {
         var query = _set.AsNoTracking()
             .Where(r => r.RestaurantId == restaurantId && r.CreatedAt >= DateTime.UtcNow.AddMonths(-3));
 
-        var totalCount = await query.CountAsync();
-        
-        if (totalCount == 0)
+        var aggregate = await query
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                TotalCount = g.Count(),
+                AverageRating = g.Average(r => (decimal)r.Rating)
+            })
+            .FirstOrDefaultAsync();
+
+        if (aggregate is null)
         {
             return (0m, 0);
         }
 
-        var averageRating = await query.AverageAsync(r => (decimal)r.Rating);
-        
-        return (averageRating, totalCount);
+        return (aggregate.AverageRating, aggregate.TotalCount);
     }
 }
