@@ -10,6 +10,7 @@ import {
   InputLabel,
   Button,
 } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material";
 import { useGetRestaurantReviews } from "../hooks/useGetRestaurantReviews";
 import ReviewItem from "./ReviewItem";
 import type { ReviewsFilter } from "../types/review";
@@ -36,20 +37,29 @@ export default function ReviewsList({
     setFilters((prev) => ({ ...prev, pageNumber: page }));
   };
 
-  const handleSortChange = (e: any) => {
-    setFilters((prev) => ({ ...prev, sortBy: e.target.value as any, pageNumber: 1 }));
+  const handleSortChange = (e: SelectChangeEvent<string>) => {
+    setFilters((prev) => ({ 
+      ...prev, 
+      sortBy: e.target.value as ReviewsFilter["sortBy"], 
+      pageNumber: 1 
+    }));
   };
 
-  const handleDirectionChange = (e: any) => {
-    setFilters((prev) => ({ ...prev, sortDirection: e.target.value as any, pageNumber: 1 }));
+  const handleDirectionChange = (e: SelectChangeEvent<string>) => {
+    setFilters((prev) => ({ 
+      ...prev, 
+      sortDirection: e.target.value as ReviewsFilter["sortDirection"], 
+      pageNumber: 1 
+    }));
   };
 
-  const handleRatingFilterChange = (e: any) => {
+  const handleRatingFilterChange = (e: SelectChangeEvent<string>) => {
     const value = e.target.value;
     if (value === "all") {
       setFilters((prev) => ({ ...prev, minRating: undefined, maxRating: undefined, pageNumber: 1 }));
     } else {
-      setFilters((prev) => ({ ...prev, minRating: parseInt(value), maxRating: parseInt(value), pageNumber: 1 }));
+      const rating = parseInt(value);
+      setFilters((prev) => ({ ...prev, minRating: rating, maxRating: rating, pageNumber: 1 }));
     }
   };
 
