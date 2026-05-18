@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -27,11 +28,24 @@ public class AuthControllerTests
         jwtSettingsMock.Setup(x => x["Issuer"]).Returns("http://localhost:7062");
         jwtSettingsMock.Setup(x => x["Audience"]).Returns("http://localhost:5173");
         jwtSettingsMock.Setup(x => x["ExpiryMinutes"]).Returns("60");
+
+        var isProductionMock = new Mock<IConfigurationSection>();
+        isProductionMock.SetupGet(x => x.Value).Returns("false");
         
         _configurationMock.Setup(x => x.GetSection("JwtSettings"))
             .Returns(jwtSettingsMock.Object);
+        _configurationMock.Setup(x => x.GetSection("IsProduction"))
+            .Returns(isProductionMock.Object);
+
+        _userManagerMock.Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>()))
+            .ReturnsAsync([]);
 
         _controller = new AuthController(_userManagerMock.Object, _configurationMock.Object);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        _controller.ControllerContext.HttpContext.Request.Scheme = "https";
     }
 
     [Fact]

@@ -39,7 +39,21 @@ namespace UberEats.WebApi.Features.Auth
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
-            return Ok(new { Message = "User registered successfully", Token = token });
+            var roles = await _userManager.GetRolesAsync(user);
+            var isProduction = _configuration.GetValue<bool>("IsProduction");
+
+            return Ok(new
+            {
+                Message = "User registered successfully",
+                Token = isProduction ? null : token,
+                User = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Roles = roles
+                }
+            });
         }
 
         [HttpPost("register-staff")]
@@ -74,7 +88,21 @@ namespace UberEats.WebApi.Features.Auth
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
-            return Ok(new { Message = "Login successful", Token = token });
+            var roles = await _userManager.GetRolesAsync(user);
+            var isProduction = _configuration.GetValue<bool>("IsProduction");
+
+            return Ok(new
+            {
+                Message = "Login successful",
+                Token = isProduction ? null : token,
+                User = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Roles = roles
+                }
+            });
         }
 
         [HttpPost("logout")]

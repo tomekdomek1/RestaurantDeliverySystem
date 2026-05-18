@@ -8,17 +8,18 @@ function getFullUrl(url: string): string {
     return `${API_BASE_URL}${url}`;
 }
 
-function getAuthHeaders(): HeadersInit {
-    const headers: HeadersInit = {
+function getAuthHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
     };
-    
-    // Add Authorization header if token is in localStorage (fallback for httpOnly cookies)
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+
+    if (import.meta.env.DEV) {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
     }
-    
+
     return headers;
 }
 
