@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,8 +19,19 @@ namespace UberEats.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            var databaseFilePath = configuration["Database:FilePath"];
+            if (string.IsNullOrWhiteSpace(databaseFilePath))
+            {
+                databaseFilePath = "ubereats.db";
+            }
+            
+            var sqliteConnectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = databaseFilePath
+            }.ToString();
+
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(sqliteConnectionString));
 
             services.AddScoped<IRestaurantRepository, RestaurantRepository>();
             services.AddScoped<IRestaurantReviewRepository, RestaurantReviewRepository>();
