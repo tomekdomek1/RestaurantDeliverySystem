@@ -47,6 +47,7 @@ namespace UberEats.Infrastructure
             
             var jwtSettings = configuration.GetSection("JwtSettings");
             var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+            var allowAuthorizationHeaderFallback = configuration.GetValue<bool>("Auth:AllowAuthorizationHeaderFallback");
 
             services.AddAuthentication(options =>
             {
@@ -70,10 +71,26 @@ namespace UberEats.Infrastructure
                 {
                     OnMessageReceived = context =>
                     {
+                        // First try to get token from cookie
                         if (context.Request.Cookies.TryGetValue("auth_token", out var token))
                         {
                             context.Token = token;
+                            return Task.CompletedTask;
                         }
+                        
+                        // Optional fallback: allow Authorization header only when explicitly enabled.
+                        var authHeader = context.Request.Headers["Authorization"].ToString();
+                        if (allowAuthorizationHeaderFallback && !string.IsNullOrWhiteSpace(authHeader))
+                        {
+                            var parts = authHeader.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length == 2
+                                && parts[0].Equals("Bearer", StringComparison.OrdinalIgnoreCase)
+                                && !string.IsNullOrWhiteSpace(parts[1]))
+                            {
+                                context.Token = parts[1].Trim();
+                            }
+                        }
+                        
                         return Task.CompletedTask;
                     }
                 };

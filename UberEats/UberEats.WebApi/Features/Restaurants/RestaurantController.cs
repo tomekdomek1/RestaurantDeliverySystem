@@ -8,6 +8,8 @@ using UberEats.Application.Restaurants.EditRestaurant;
 using UberEats.Application.Restaurants.GetRestaurantById;
 using UberEats.Application.Restaurants.GetRestaurants;
 using UberEats.Application.Restaurants.UploadImages;
+using UberEats.Domain.Constants;
+using UberEats.Domain.Repository;
 using UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
 
 namespace UberEats.WebApi.Features.Restaurants;
@@ -17,24 +19,36 @@ namespace UberEats.WebApi.Features.Restaurants;
 public class RestaurantController : ControllerBase
 {
     private readonly IMediator _mediator;
-    public RestaurantController(IMediator mediator)
+    private readonly IRestaurantReviewRepository _reviewRepository;
+
+    public RestaurantController(IMediator mediator, IRestaurantReviewRepository reviewRepository)
     {
         _mediator = mediator;
+        _reviewRepository = reviewRepository;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetRestaurants()
     {
         var entities = await _mediator.Send(new GetRestaurantsQuery());
+        var ratingsByRestaurantId = await _reviewRepository.GetAverageRatingsAndCountsAsync(
+            entities.Select(r => r.Id),
+            ReviewConstants.GetReviewCutoffDate());
 
         // TODO: implement pagination
-        var resultDto = entities.Select(r => new GetRestaurantsResultDto
+        var resultDto = entities.Select(r =>
         {
-            Id = r.Id,
-            Name = r.Name,
-            PhoneNumber = r.PhoneNumber,
-            Descrition = r.Descrition,
-            AddressId = r.AddressId
+            var ratingStats = ratingsByRestaurantId.GetValueOrDefault(r.Id, (AverageRating: 0m, TotalCount: 0));
+            return new GetRestaurantsResultDto
+            {
+                Id = r.Id,
+                Name = r.Name,
+                PhoneNumber = r.PhoneNumber,
+                Descrition = r.Descrition,
+                AddressId = r.AddressId,
+                AverageRating = ratingStats.AverageRating,
+                TotalReviews = ratingStats.TotalCount
+            };
         }).ToList();
 
         return Ok(resultDto);
@@ -50,13 +64,17 @@ public class RestaurantController : ControllerBase
             return NotFound();
         }
 
+        var (averageRating, totalReviews) = await _reviewRepository.GetAverageRatingAndCountAsync(id);
+
         var resultDto = new GetRestaurantsResultDto
         {
             Id = entity.Id,
             Name = entity.Name,
             PhoneNumber = entity.PhoneNumber,
             Descrition = entity.Descrition,
-            AddressId = entity.AddressId
+            AddressId = entity.AddressId,
+            AverageRating = averageRating,
+            TotalReviews = totalReviews
         };
 
         return Ok(resultDto);

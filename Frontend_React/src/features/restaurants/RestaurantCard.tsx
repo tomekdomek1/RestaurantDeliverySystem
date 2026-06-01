@@ -1,6 +1,7 @@
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Link } from "react-router-dom";
+import RatingStars from "../reviews/components/RatingStars";
 import type { GetRestaurantResponseDto } from "./types/restaurantDtos";
 
 interface Props {
@@ -28,6 +29,15 @@ export default function RestaurantCard({ restaurant }: Props) {
         <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1, mb: 2 }}>
           {restaurant.descrition}
         </Typography>
+        <Box sx={{ mb: 2 }}>
+          <RatingStars 
+            rating={restaurant.averageRating} 
+            count={restaurant.totalReviews}
+            readOnly
+            size="small"
+            showLabel
+          />
+        </Box>
         <Button 
           component={Link} 
           to={`/restaurants/${restaurant.id}`} 

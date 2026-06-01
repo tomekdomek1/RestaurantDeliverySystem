@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using UberEats.Application.Restaurants.Reviews.AddRestaurantReview;
 using UberEats.Application.Restaurants.Reviews.DeleteRestaurantReview;
 using UberEats.Application.Restaurants.Reviews.GetRestaurantReviews;
@@ -23,6 +24,8 @@ public class ReviewController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetReviews(Guid restaurantId, [FromQuery] GetRestaurantReviewsRequestDto request)
     {
+        var currentUserId = User.FindFirstValue("uid") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         var result = await _mediator.Send(new GetRestaurantReviewsQuery(
             restaurantId,
             request.PageNumber,
@@ -42,7 +45,8 @@ public class ReviewController : ControllerBase
                 Id = r.Id,
                 Rating = r.Rating,
                 Description = r.Description,
-                CreatedAt = r.CreatedAt
+                CreatedAt = r.CreatedAt,
+                IsOwnedByCurrentUser = !string.IsNullOrWhiteSpace(currentUserId) && r.AuthorUserId == currentUserId
             }).ToList()
         };
 

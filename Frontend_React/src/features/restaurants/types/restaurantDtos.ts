@@ -15,8 +15,11 @@ export interface CreateRestaurantResponseDto {
     addressId: Guid
 }
 
+export interface GetRestaurantResponseDto extends CreateRestaurantResponseDto {
+    averageRating: number;
+    totalReviews: number;
+}
+
 export type EditRestaurantDto = Partial<CreateRestaurantDto>;
 
 export type EditRestaurantResponseDto = CreateRestaurantResponseDto;
-
-export type GetRestaurantResponseDto = CreateRestaurantResponseDto;

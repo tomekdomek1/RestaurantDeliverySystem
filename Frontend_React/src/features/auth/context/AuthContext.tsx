@@ -1,10 +1,12 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { API_BASE_URL } from '../../../config/api';
 
 export interface User {
+  id?: string;
   email: string;
   fullName?: string;
+  roles: string[];
 }
 
 export interface AuthContextType {
@@ -19,9 +21,42 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+interface AuthResponseUser {
+  id?: string;
+  email: string;
+  fullName?: string;
+  roles?: string[];
+}
+
+interface AuthResponse {
+  user?: AuthResponseUser;
+  token?: string | null;
+}
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const isDevEnv = import.meta.env.DEV;
+  
+  // Initialize state from localStorage if available (DEV only)
+  const getInitialState = () => {
+    if (!isDevEnv) return { isLoggedIn: false, user: null };
+    
+    const token = localStorage.getItem('auth_token');
+    const userStr = localStorage.getItem('auth_user');
+    
+    if (token && userStr) {
+      try {
+        return { isLoggedIn: true, user: JSON.parse(userStr) as User };
+      } catch {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+      }
+    }
+    return { isLoggedIn: false, user: null };
+  };
+
+  const initialState = getInitialState();
+  const [isLoggedIn, setIsLoggedIn] = useState(initialState.isLoggedIn);
+  const [user, setUser] = useState<User | null>(initialState.user);
   const [loading, setLoading] = useState(false);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -38,12 +73,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw new Error('Login failed');
       }
 
+      const data = await response.json() as AuthResponse;
+      const userData: User = {
+        id: data.user?.id,
+        email: data.user?.email ?? email,
+        fullName: data.user?.fullName,
+        roles: data.user?.roles ?? [],
+      };
+
+      if (isDevEnv && data.token) {
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('auth_user', JSON.stringify(userData));
+      }
+
       setIsLoggedIn(true);
-      setUser({ email });
+      setUser(userData);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isDevEnv]);
 
   const register = useCallback(async (email: string, password: string, fullName: string) => {
     setLoading(true);
@@ -59,12 +107,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw new Error('Registration failed');
       }
 
+      const data = await response.json() as AuthResponse;
+      const userData: User = {
+        id: data.user?.id,
+        email: data.user?.email ?? email,
+        fullName: data.user?.fullName ?? fullName,
+        roles: data.user?.roles ?? [],
+      };
+
+      if (isDevEnv && data.token) {
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('auth_user', JSON.stringify(userData));
+      }
+
       setIsLoggedIn(true);
-      setUser({ email, fullName });
+      setUser(userData);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isDevEnv]);
 
   const logout = useCallback(async () => {
     setLoading(true);
@@ -75,6 +136,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         credentials: 'include',
       });
     } finally {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
       setIsLoggedIn(false);
       setUser(null);
       setLoading(false);

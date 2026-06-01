@@ -1,7 +1,8 @@
 import { useState } from "react";
 import {
   Box, Button, Typography, TextField, List, ListItem,
-  ListItemText, Divider, CircularProgress, Paper, Stack
+  ListItemText, Divider, CircularProgress, Paper, Stack,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useGetAddresses } from "./hooks/useGetAddresses";
@@ -33,9 +34,10 @@ export default function AddressTestPage() {
 
   // --- State for Detail View ---
   const [selectedId, setSelectedId] = useState<Guid | null>(null);
+  const [deleteId, setDeleteId] = useState<Guid | null>(null);
 
   // --- API Hooks (SWR) ---
-  const { addresses, isLoading: isListLoading, error: listError, refreshAddresses } = useGetAddresses();
+  const { addresses = [], isLoading: isListLoading, error: listError, refreshAddresses } = useGetAddresses();
   const { address: detail, isLoading: isDetailLoading } = useGetAddress(selectedId);
   const { createAddress, isCreating } = useCreateAddress();
   const { editAddress, isSaving } = useEditAddress();
@@ -58,8 +60,9 @@ export default function AddressTestPage() {
       setNewApartment("");
       setNewCity("");
       refreshAddresses();
-    } catch (e: any) {
-      enqueueSnackbar(`Creation failed: ${e.message}`, { variant: "error" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Creation failed";
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
 
@@ -75,7 +78,7 @@ export default function AddressTestPage() {
     if (!editingId) return;
     try {
       // Build PATCH payload dynamically
-      const payload: any = {};
+      const payload: Record<string, unknown> = {};
       if (editStreet.trim()) payload.street = editStreet;
       if (editBuilding !== "") payload.buildingNumber = Number(editBuilding);
       if (editApartment !== "") payload.appartmentNumber = Number(editApartment);
@@ -89,19 +92,23 @@ export default function AddressTestPage() {
       enqueueSnackbar("Address updated successfully!", { variant: "info" });
       setEditingId(null);
       refreshAddresses();
-    } catch (e: any) {
-      enqueueSnackbar(`Update failed: ${e.message}`, { variant: "error" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Update failed";
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
 
-  const handleDelete = async (id: Guid) => {
-    if (!window.confirm("Are you sure you want to delete this address?")) return;
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteAddress(id);
+      await deleteAddress(deleteId);
       enqueueSnackbar("Address removed.", { variant: "warning" });
       refreshAddresses();
-    } catch (e: any) {
-      enqueueSnackbar(`Deletion failed: ${e.message}`, { variant: "error" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Deletion failed";
+      enqueueSnackbar(message, { variant: "error" });
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -138,7 +145,7 @@ export default function AddressTestPage() {
         {listError && <Typography color="error">Error loading list: {listError.message}</Typography>}
 
         <List sx={{ width: '100%' }}>
-          {addresses.map((addr) => (
+          {addresses.map((addr: any) => (
             <ListItem
               key={addr.id}
               divider
@@ -173,13 +180,13 @@ export default function AddressTestPage() {
                 /* --- Standard List Item View --- */
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   <ListItemText
-                    primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{addr.street} {addr.buildingNumber}{addr.appartmentNumber ? `/${addr.appartmentNumber}` : ""}</Typography>}
+                    primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{addr.street} {addr.buildingNumber}{addr.appartmentNumber ? `/${addr.buildingNumber}` : ""}</Typography>}
                     secondary={`${addr.city} | ID: ${addr.id}`}
                   />
                   <Stack direction="row" spacing={1}>
                     <Button size="small" variant="text" onClick={() => setSelectedId(addr.id)}>Details</Button>
                     <Button size="small" variant="outlined" onClick={() => startEditing(addr)}>Edit</Button>
-                    <Button size="small" variant="outlined" color="error" onClick={() => handleDelete(addr.id)} disabled={isDeleting}>Delete</Button>
+                    <Button size="small" variant="outlined" color="error" onClick={() => setDeleteId(addr.id)} disabled={isDeleting}>Delete</Button>
                   </Stack>
                 </Box>
               )}
@@ -199,7 +206,7 @@ export default function AddressTestPage() {
               <CircularProgress size={30} />
             ) : detail ? (
               <Box>
-                <Typography variant="h5" sx={{ mb: 1 }}>{detail.street} {detail.buildingNumber}{detail.appartmentNumber ? `/${detail.appartmentNumber}` : ""}</Typography>
+                <Typography variant="h5" sx={{ mb: 1 }}>{detail.street} {detail.buildingNumber}{detail.appartmentNumber ? `/${detail.buildingNumber}` : ""}</Typography>
                 <Typography variant="body1">{detail.city}</Typography>
                 <Typography variant="caption" sx={{ display: 'block', mt: 3, color: 'text.secondary' }}>Backend ID: {detail.id}</Typography>
               </Box>
@@ -209,6 +216,17 @@ export default function AddressTestPage() {
           </Paper>
         )}
       </Box>
+
+      <Dialog open={deleteId !== null} onClose={() => setDeleteId(null)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Are you sure you want to delete this address?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
