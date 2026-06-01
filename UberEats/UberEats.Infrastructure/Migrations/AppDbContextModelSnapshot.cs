@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UberEats.Infrastructure.Databases;
@@ -12,11 +11,9 @@ using UberEats.Infrastructure.Databases;
 namespace UberEats.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251117224016_InitPostgres")]
-    partial class InitPostgres
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,6 +21,21 @@ namespace UberEats.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AllergyDish", b =>
+                {
+                    b.Property<Guid>("AllergiesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DishesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("AllergiesId", "DishesId");
+
+                    b.HasIndex("DishesId");
+
+                    b.ToTable("AllergyDish");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -255,6 +267,40 @@ namespace UberEats.Infrastructure.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("UberEats.Domain.Entities.Allergy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Allergies");
+                });
+
+            modelBuilder.Entity("UberEats.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("UberEats.Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -293,6 +339,9 @@ namespace UberEats.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -308,6 +357,8 @@ namespace UberEats.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("RestaurantId");
 
@@ -410,7 +461,6 @@ namespace UberEats.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("OrderStatus")
@@ -523,6 +573,41 @@ namespace UberEats.Infrastructure.Migrations
                     b.ToTable("Restaurants");
                 });
 
+            modelBuilder.Entity("UberEats.Domain.Entities.RestaurantReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthorUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId", "CreatedAt");
+
+                    b.HasIndex("RestaurantId", "AuthorUserId", "CreatedAt");
+
+                    b.ToTable("RestaurantReviews", t =>
+                        {
+                            t.HasCheckConstraint("CK_RestaurantReviews_Rating", "\"Rating\" >= 1 AND \"Rating\" <= 5");
+                        });
+                });
+
             modelBuilder.Entity("UberEats.Domain.Entities.ShoppingCartItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -558,7 +643,25 @@ namespace UberEats.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.HasDiscriminator().HasValue("ApplicationUser");
+                });
+
+            modelBuilder.Entity("AllergyDish", b =>
+                {
+                    b.HasOne("UberEats.Domain.Entities.Allergy", null)
+                        .WithMany()
+                        .HasForeignKey("AllergiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("UberEats.Domain.Entities.Dish", null)
+                        .WithMany()
+                        .HasForeignKey("DishesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -625,11 +728,19 @@ namespace UberEats.Infrastructure.Migrations
 
             modelBuilder.Entity("UberEats.Domain.Entities.Dish", b =>
                 {
+                    b.HasOne("UberEats.Domain.Entities.Category", "Category")
+                        .WithMany("Dishes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
                         .WithMany("Dishes")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Restaurant");
                 });
@@ -665,13 +776,13 @@ namespace UberEats.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("UberEats.Domain.Entities.Driver", "Driver")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -724,6 +835,17 @@ namespace UberEats.Infrastructure.Migrations
                     b.Navigation("Address");
                 });
 
+            modelBuilder.Entity("UberEats.Domain.Entities.RestaurantReview", b =>
+                {
+                    b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
+                        .WithMany("Reviews")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("UberEats.Domain.Entities.ShoppingCartItem", b =>
                 {
                     b.HasOne("UberEats.Domain.Entities.Customer", "Customer")
@@ -750,6 +872,11 @@ namespace UberEats.Infrastructure.Migrations
                     b.Navigation("Restaurants");
                 });
 
+            modelBuilder.Entity("UberEats.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Dishes");
+                });
+
             modelBuilder.Entity("UberEats.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Orders");
@@ -762,6 +889,8 @@ namespace UberEats.Infrastructure.Migrations
                     b.Navigation("DriverLocation");
 
                     b.Navigation("DriverShifts");
+
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("UberEats.Domain.Entities.Order", b =>
@@ -775,6 +904,10 @@ namespace UberEats.Infrastructure.Migrations
             modelBuilder.Entity("UberEats.Domain.Entities.Restaurant", b =>
                 {
                     b.Navigation("Dishes");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

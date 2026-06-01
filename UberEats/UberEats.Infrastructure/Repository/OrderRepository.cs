@@ -19,4 +19,15 @@ public class OrderRepository : RepositoryBase<Order>, IOrderRepository
             .Where(o => o.RestaurantId == restaurantId && o.OrderStatus != OrderStatus.Delivered)
             .ToListAsync();
     }
+
+    public async Task<List<Order>> GetForCustomerAsync(Guid customerId)
+    {
+        return await _set
+            .AsNoTracking()
+            .Include(o => o.OrderItems)
+            .Include(o => o.OrderAddress)
+            .Where(o => o.CustomerId == customerId)
+            .OrderByDescending(o => o.Date)
+            .ToListAsync();
+    }
 }

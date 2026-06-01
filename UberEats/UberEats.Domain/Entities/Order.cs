@@ -18,8 +18,11 @@ public sealed class Order : Entity<Guid>
     public DateTime CreatedAt { get; set; }
     
     public Guid CustomerId { get; set; }
+    public Customer Customer { get; set; } = null!;
     public Guid RestaurantId { get; set; }
+    public Restaurant Restaurant { get; set; } = null!;
     public Guid DriverId { get; set; }
+    public Driver Driver { get; set; } = null!;
 
     public OrderAddress OrderAddress { get; set; } = null!;
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

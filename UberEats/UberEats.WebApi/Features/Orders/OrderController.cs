@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UberEats.Application.Orders.CreateOrder;
 using UberEats.Application.Orders.GetActiveOrdersByRestaurant;
+using UberEats.Application.Orders.GetMyOrders;
 using UberEats.Application.Orders.UpdateOrderStatus;
 using UberEats.WebApi.Features.Orders.OrderDTOs;
 
@@ -16,6 +18,43 @@ public class OrderController : ControllerBase
     public OrderController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [Authorize]
+    [HttpGet("my-orders")]
+    public async Task<IActionResult> GetMyOrders()
+    {
+        var orders = await _mediator.Send(new GetMyOrdersQuery());
+
+        var resultDto = orders.Select(order => new GetMyOrdersResultDto
+        {
+            Id = order.Id,
+            RestaurantId = order.RestaurantId,
+            Date = order.Date,
+            DeliveryTime = order.DeliveryTime,
+            Notes = order.Notes,
+            Status = order.OrderStatus.ToString(),
+            TotalAmount = order.TotalAmount,
+            Address = order.OrderAddress == null
+                ? new OrderAddressResultDto()
+                : new OrderAddressResultDto
+                {
+                    Street = order.OrderAddress.Street,
+                    BuildingNumber = order.OrderAddress.BuildingNumber,
+                    AppartmentNumber = order.OrderAddress.AppartmentNumber,
+                    City = order.OrderAddress.City
+                },
+            Items = order.OrderItems.Select(item => new OrderItemResultDto
+            {
+                Id = item.Id,
+                DishId = item.DishId,
+                Name = item.DishNameAtPurchase,
+                Price = item.PriceAtPurchase,
+                Quantity = item.Quantity
+            }).ToList()
+        }).ToList();
+
+        return Ok(resultDto);
     }
 
     [HttpGet("restaurant/{restaurantId:Guid}/active")]

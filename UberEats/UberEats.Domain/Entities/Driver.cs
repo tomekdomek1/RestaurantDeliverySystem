@@ -15,6 +15,7 @@ public sealed class Driver : Entity<Guid>
     public string PhoneNumber { get; set; } = string.Empty;
 
     // References
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<DriverShift> DriverShifts { get; set; } = new List<DriverShift>();
     public DriverLocation? DriverLocation { get; set; } // Nullable because we remove a DriverLocation of an off-duty Driver
 
