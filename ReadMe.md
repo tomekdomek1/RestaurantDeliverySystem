@@ -20,6 +20,8 @@ Projekt został skonfigurowany tak, aby całą aplikację można było uruchomi�
     npm run setup
     ```
 
+    Backend używa SQLite (bez wymagania lokalnego PostgreSQL). Plik bazy tworzy się automatycznie przy pierwszym uruchomieniu API.
+
 4.  **Uruchomienie aplikacji:**
     Uruchamia jednocześnie serwer API oraz Frontend.
     ```bash
@@ -56,7 +58,7 @@ Projekt został skonfigurowany tak, aby całą aplikację można było uruchomi�
 
 - **Backend**: C#, ASP.NET Core 6, 
 - **Frontend**: 
-- **Baza danych**: 
+- **Baza danych**: SQLite
 - **Autoryzacja**: 
 - **Płatności**: 
 - **Logowanie**: 
@@ -79,4 +81,3 @@ Projekt został skonfigurowany tak, aby całą aplikację można było uruchomi�
    cd C:\VSProjects\PZ_UberEats\pz_ubereats\UberEats\UberEats.WebApi\
    dotnet run
    Aplikacja będzie dostępna pod adresem: "http://localhost:5122/swagger",
-

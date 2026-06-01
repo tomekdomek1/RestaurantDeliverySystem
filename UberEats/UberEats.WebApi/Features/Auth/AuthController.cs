@@ -39,7 +39,21 @@ namespace UberEats.WebApi.Features.Auth
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
-            return Ok(new { Message = "User registered successfully" });
+            var roles = await _userManager.GetRolesAsync(user);
+            var isProduction = _configuration.GetValue<bool>("IsProduction");
+
+            return Ok(new
+            {
+                Message = "User registered successfully",
+                Token = isProduction ? null : token,
+                User = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Roles = roles
+                }
+            });
         }
 
         [HttpPost("register-staff")]
@@ -74,28 +88,35 @@ namespace UberEats.WebApi.Features.Auth
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
-            return Ok(new { Message = "Login successful" });
+            var roles = await _userManager.GetRolesAsync(user);
+            var isProduction = _configuration.GetValue<bool>("IsProduction");
+
+            return Ok(new
+            {
+                Message = "Login successful",
+                Token = isProduction ? null : token,
+                User = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Roles = roles
+                }
+            });
         }
 
         [HttpPost("logout")]
         [Authorize]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("auth_token", new Microsoft.AspNetCore.Http.CookieOptions
-            {
-                HttpOnly = true,
-                Secure = _configuration.GetValue<bool>("IsProduction"),
-                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                Path = "/",
-                Expires = DateTime.UtcNow.AddHours(-1)
-            });
+            Response.Cookies.Delete("auth_token", GetCookieOptions(isLogout: true));
             return Ok(new { Message = "Logged out successfully" });
         }
 
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key not configured")));
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -126,16 +147,26 @@ namespace UberEats.WebApi.Features.Auth
 
         private void SetJwtCookie(string token)
         {
-            var isProduction = _configuration.GetValue<bool>("IsProduction");
+            Response.Cookies.Append("auth_token", token, GetCookieOptions());
+        }
+
+        private Microsoft.AspNetCore.Http.CookieOptions GetCookieOptions(bool isLogout = false)
+        {
+            // For security, assume production (secure cookies) if not explicitly set to false
+            var isProduction = _configuration.GetValue<bool?>("IsProduction") ?? true;
+            var isHttps = Request.Scheme == "https";
             
-            Response.Cookies.Append("auth_token", token, new Microsoft.AspNetCore.Http.CookieOptions
+            // SameSite=None requires Secure=true
+            var useSecure = isHttps || isProduction;
+            
+            return new Microsoft.AspNetCore.Http.CookieOptions
             {
                 HttpOnly = true,
-                Secure = isProduction,
-                SameSite = isProduction ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+                Secure = useSecure,
+                SameSite = useSecure ? Microsoft.AspNetCore.Http.SameSiteMode.None : Microsoft.AspNetCore.Http.SameSiteMode.Lax,
                 Path = "/",
-                Expires = DateTime.UtcNow.AddHours(1)
-            });
+                Expires = isLogout ? DateTime.UtcNow.AddHours(-1) : DateTime.UtcNow.AddHours(1)
+            };
         }
     }
 

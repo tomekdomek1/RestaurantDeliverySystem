@@ -2,7 +2,7 @@ using MediatR;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Enums;
 using UberEats.Domain.Repository;
-
+using System.Threading.Tasks;
 namespace UberEats.Application.Orders.CreateOrder;
 
 public sealed record CreateOrderItem(
@@ -72,4 +72,5 @@ public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderComma
 
         return order;
     }
+}
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import {
   Box, Button, Typography, TextField, List, ListItem,
-  ListItemText, Divider, CircularProgress, Paper, Stack
+  ListItemText, Divider, CircularProgress, Paper, Stack,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useGetCategories } from "./hooks/useGetCategories";
@@ -29,9 +30,10 @@ export default function CategoryTestPage() {
 
   // --- State for Detail View ---
   const [selectedId, setSelectedId] = useState<Guid | null>(null);
+  const [deleteId, setDeleteId] = useState<Guid | null>(null);
 
   // --- API Hooks (SWR) ---
-  const { categories, isLoading: isListLoading, error: listError, refreshCategories } = useGetCategories();
+  const { categories = [], isLoading: isListLoading, error: listError, refreshCategories } = useGetCategories();
   const { category: detail, isLoading: isDetailLoading } = useGetCategory(selectedId);
   const { createCategory, isCreating } = useCreateCategory();
   const { editCategory, isSaving } = useEditCategory();
@@ -47,8 +49,9 @@ export default function CategoryTestPage() {
       setNewName("");
       setNewDesc("");
       refreshCategories(); // Revalidate SWR cache
-    } catch (e: any) {
-      enqueueSnackbar(`Creation failed: ${e.message}`, { variant: "error" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Creation failed";
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
 
@@ -63,7 +66,7 @@ export default function CategoryTestPage() {
     try {
       // Build the update payload dynamically.
       // In PATCH requests, we only send fields that we want to change.
-      const payload: any = {};
+      const payload: Record<string, unknown> = {};
       if (editName.trim()) payload.name = editName;
       if (editDesc.trim()) payload.description = editDesc;
 
@@ -75,18 +78,23 @@ export default function CategoryTestPage() {
       enqueueSnackbar("Category updated successfully!", { variant: "info" });
       setEditingId(null);
       refreshCategories();
-    } catch (e: any) {
-      enqueueSnackbar(`Update failed: ${e.message}`, { variant: "error" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Update failed";
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
-  const handleDelete = async (id: Guid) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+  
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteCategoy(id);
+      await deleteCategoy(deleteId);
       enqueueSnackbar("Category removed.", { variant: "warning" });
       refreshCategories();
-    } catch (e: any) {
-      enqueueSnackbar(`Deletion failed: ${e.message}`, { variant: "error" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Deletion failed";
+      enqueueSnackbar(message, { variant: "error" });
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -134,7 +142,7 @@ export default function CategoryTestPage() {
         {listError && <Typography color="error">Error loading list: {listError.message}</Typography>}
 
         <List sx={{ width: '100%' }}>
-          {categories.map((cat) => (
+          {categories.map((cat: any) => (
             <ListItem
               key={cat.id}
               divider
@@ -206,7 +214,7 @@ export default function CategoryTestPage() {
                       size="small"
                       variant="outlined"
                       color="error"
-                      onClick={() => handleDelete(cat.id)}
+                      onClick={() => setDeleteId(cat.id)}
                       disabled={isDeleting}
                     >
                       Delete
@@ -253,6 +261,17 @@ export default function CategoryTestPage() {
           )}
         </Box>
       </Box>
+
+      <Dialog open={deleteId !== null} onClose={() => setDeleteId(null)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Are you sure you want to delete this category?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

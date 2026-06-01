@@ -15,4 +15,8 @@ public interface IRestaurantReviewRepository : IRepository<RestaurantReview>
         int? maxRating,
         bool sortByRating,
         bool sortDescending);
+    Task<Dictionary<Guid, (decimal AverageRating, int TotalCount)>> GetAverageRatingsAndCountsAsync(
+        IEnumerable<Guid> restaurantIds,
+        DateTime sinceUtc);
+    Task<(decimal AverageRating, int TotalCount)> GetAverageRatingAndCountAsync(Guid restaurantId);
 }

@@ -1,4 +1,5 @@
 using MediatR;
+using UberEats.Domain.Constants;
 using UberEats.Domain.Entities;
     using UberEats.Domain.Interfaces;
 using UberEats.Domain.Roles;
@@ -51,11 +52,10 @@ public sealed class AddRestaurantReviewCommandHandler : IRequestHandler<AddResta
             throw new KeyNotFoundException("Restaurant not found.");
         }
 
-        var minimumAllowedDate = DateTime.UtcNow.AddMonths(-3);
         var hasRecentReview = await _restaurantReviewRepository.ExistsForAuthorRestaurantSinceAsync(
             userId,
             request.RestaurantId,
-            minimumAllowedDate);
+            ReviewConstants.GetReviewCutoffDate());
 
         if (hasRecentReview)
         {
