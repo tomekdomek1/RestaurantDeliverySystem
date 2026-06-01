@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
 
-namespace UberEats.Application.Orders.CreateOrder
+namespace UberEats.Application.Orders.CreateOrder;
+
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
 {
-    internal class CreateOrderCommandHandler
+    public Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
+        return Task.FromResult(Guid.Empty);
     }
 }

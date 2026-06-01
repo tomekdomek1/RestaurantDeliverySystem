@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
 
-namespace UberEats.Application.Orders.CreateOrder
-{
-    internal class CreateOrderCommand
-    {
-    }
-}
+namespace UberEats.Application.Orders.CreateOrder;
+
+public record CreateOrderCommand() : IRequest<Guid>;

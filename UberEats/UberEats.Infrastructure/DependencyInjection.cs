@@ -37,6 +37,7 @@ namespace UberEats.Infrastructure
             services.AddScoped<IRestaurantReviewRepository, RestaurantReviewRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IFileStorage,FileSystemImageStorage>();
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
             services.AddHttpContextAccessor();
