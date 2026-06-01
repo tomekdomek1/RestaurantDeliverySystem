@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UberEats.Application.Orders.CreateOrder;
 using UberEats.Application.Orders.GetActiveOrdersByRestaurant;
 using UberEats.Application.Orders.GetMyOrders;
+using UberEats.Application.Orders.GetOrderById;
 using UberEats.Application.Orders.UpdateOrderStatus;
 using UberEats.WebApi.Features.Orders.OrderDTOs;
 
@@ -89,7 +90,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         var result = await _mediator.Send(new GetOrderByIdQuery(id));
-        var entity = result.Order;
+        var entity = result;
 
         var resultDto = new GetOrderByIdResultDto
         {
@@ -102,12 +103,12 @@ public class OrderController : ControllerBase
             CustomerId = entity.CustomerId,
             RestaurantId = entity.RestaurantId,
             DriverId = entity.DriverId,
-            Address = entity.Address != null ? new OrderAddressDto
+            Address = entity.OrderAddress != null ? new OrderAddressDto
             {
-                Street = entity.Address.Street,
-                City = entity.Address.City,
-                BuildingNumber = entity.Address.BuildingNumber,
-                AppartmentNumber = entity.Address.AppartmentNumber
+                Street = entity.OrderAddress.Street,
+                City = entity.OrderAddress.City,
+                BuildingNumber = entity.OrderAddress.BuildingNumber,
+                AppartmentNumber = entity.OrderAddress.AppartmentNumber
             } : null,
             Driver = entity.Driver != null ? new OrderDriverDto
             {
@@ -115,7 +116,7 @@ public class OrderController : ControllerBase
                 Surname = entity.Driver.Surname,
                 PhoneNumber = entity.Driver.PhoneNumber
             } : null,
-            Items = entity.Items.Select(i => new OrderItemDto
+            Items = entity.OrderItems.Select(i => new OrderItemDto
             {
                 Id = i.Id,
                 DishNameAtPurchase = i.DishNameAtPurchase,

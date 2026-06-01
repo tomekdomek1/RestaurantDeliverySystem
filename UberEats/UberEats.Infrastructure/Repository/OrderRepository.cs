@@ -39,9 +39,9 @@ public class OrderRepository : RepositoryBase<Order>, IOrderRepository
     public async Task<Order?> GetOrderWithDetailsAsync(Guid id)
     {
         return await _set
-            .Include(o => o.Address)
+            .Include(o => o.OrderAddress)
             .Include(o => o.Driver)
-            .Include(o => o.Items)
+            .Include(o => o.OrderItems)
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 }

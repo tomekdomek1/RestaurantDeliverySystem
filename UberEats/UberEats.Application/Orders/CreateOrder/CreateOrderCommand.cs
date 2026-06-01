@@ -73,4 +73,3 @@ public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderComma
         return order;
     }
 }
-}
