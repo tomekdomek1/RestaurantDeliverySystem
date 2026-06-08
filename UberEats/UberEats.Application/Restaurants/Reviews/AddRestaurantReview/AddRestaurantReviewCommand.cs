@@ -1,8 +1,7 @@
 using MediatR;
 using UberEats.Domain.Constants;
 using UberEats.Domain.Entities;
-    using UberEats.Domain.Interfaces;
-using UberEats.Domain.Roles;
+using UberEats.Domain.Interfaces;
 using UberEats.Domain.Repository;
 
 namespace UberEats.Application.Restaurants.Reviews.AddRestaurantReview;

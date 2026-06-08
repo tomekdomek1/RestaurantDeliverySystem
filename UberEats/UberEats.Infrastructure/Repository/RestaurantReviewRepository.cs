@@ -78,14 +78,14 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
             {
                 RestaurantId = g.Key,
                 TotalCount = g.Count(),
-                AverageRating = Math.Round(g.Average(r => (decimal)r.Rating), 1)
+                AverageRating = g.Average(r => r.Rating)
             })
             .ToListAsync();
 
         var result = restaurantIdList.ToDictionary(id => id, _ => (AverageRating: 0m, TotalCount: 0));
         foreach (var aggregate in aggregates)
         {
-            result[aggregate.RestaurantId] = (aggregate.AverageRating, aggregate.TotalCount);
+            result[aggregate.RestaurantId] = ((decimal)Math.Round(aggregate.AverageRating, 1), aggregate.TotalCount);
         }
 
         return result;
@@ -101,7 +101,7 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
             .Select(g => new
             {
                 TotalCount = g.Count(),
-                AverageRating = Math.Round(g.Average(r => (decimal)r.Rating), 1)
+                AverageRating = g.Average(r => r.Rating)
             })
             .FirstOrDefaultAsync();
 
@@ -110,6 +110,6 @@ public class RestaurantReviewRepository : RepositoryBase<RestaurantReview>, IRes
             return (0m, 0);
         }
 
-        return (aggregate.AverageRating, aggregate.TotalCount);
+        return ((decimal)Math.Round(aggregate.AverageRating, 1), aggregate.TotalCount);
     }
 }

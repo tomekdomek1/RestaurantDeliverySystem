@@ -2,20 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UberEats.Infrastructure.Databases;
 
 #nullable disable
 
-namespace UberEats.Infrastructure.Databases.Migrations
+namespace UberEats.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260518173847_InitialSqlite")]
-    partial class InitialSqlite
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.21");
@@ -470,6 +467,10 @@ namespace UberEats.Infrastructure.Databases.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("DriverId");
+
+                    b.HasIndex("RestaurantId");
+
                     b.ToTable("Orders");
                 });
 
@@ -498,7 +499,8 @@ namespace UberEats.Infrastructure.Databases.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.ToTable("OrderAddresses");
                 });
@@ -758,18 +760,36 @@ namespace UberEats.Infrastructure.Databases.Migrations
 
             modelBuilder.Entity("UberEats.Domain.Entities.Order", b =>
                 {
-                    b.HasOne("UberEats.Domain.Entities.Customer", null)
+                    b.HasOne("UberEats.Domain.Entities.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("UberEats.Domain.Entities.Driver", "Driver")
+                        .WithMany("Orders")
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
+                        .WithMany("Orders")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Driver");
+
+                    b.Navigation("Restaurant");
                 });
 
             modelBuilder.Entity("UberEats.Domain.Entities.OrderAddress", b =>
                 {
                     b.HasOne("UberEats.Domain.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
+                        .WithOne("OrderAddress")
+                        .HasForeignKey("UberEats.Domain.Entities.OrderAddress", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -785,7 +805,7 @@ namespace UberEats.Infrastructure.Databases.Migrations
                         .IsRequired();
 
                     b.HasOne("UberEats.Domain.Entities.Order", "Order")
-                        .WithMany()
+                        .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -860,11 +880,23 @@ namespace UberEats.Infrastructure.Databases.Migrations
                     b.Navigation("DriverLocation");
 
                     b.Navigation("DriverShifts");
+
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("UberEats.Domain.Entities.Order", b =>
+                {
+                    b.Navigation("OrderAddress")
+                        .IsRequired();
+
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("UberEats.Domain.Entities.Restaurant", b =>
                 {
                     b.Navigation("Dishes");
+
+                    b.Navigation("Orders");
 
                     b.Navigation("Reviews");
                 });
