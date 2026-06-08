@@ -1,0 +1,439 @@
+Struktura projektu: RestaurantDeliverySystem
+==================================================
+
+[RestaurantDeliverySystem/]
+    - ReadMe.md
+    - package-lock.json
+    - package.json
+    - zbieracz.py
+    [UberEats/]
+        - UberEats.sln
+        - docker-compose.yml
+        [UberEats.WebApi/]
+            - appsettings.json
+            - ubereats.dev.db-shm
+            - ubereats.dev.db-wal
+            - appsettings.Development.json
+            - UberEats.WebApi.csproj
+            - ubereats.dev.db
+            - UberEats.WebApi.http
+            - Program.cs
+            [obj/]
+                - UberEats.WebApi.csproj.nuget.dgspec.json
+                - UberEats.WebApi.csproj.nuget.g.targets
+                - UberEats.WebApi.csproj.nuget.g.props
+                - project.nuget.cache
+                - project.assets.json
+                [Debug/]
+                    [net8.0/]
+                        - UberEats.WebApi.GlobalUsings.g.cs
+                        - UberEats.WebApi.AssemblyInfoInputs.cache
+                        - UberEats.WebApi.csproj.AssemblyReference.cache
+                        - UberEats.WebApi.assets.cache
+                        - UberEats.WebApi.AssemblyInfo.cs
+                        - UberEats.WebApi.GeneratedMSBuildEditorConfig.editorconfig
+                        [ref/]
+                        [refint/]
+            [bin/]
+                [Debug/]
+                    [net8.0/]
+            [Features/]
+                [Auth/]
+                    - AuthController.cs
+                [Restaurants/]
+                    - RestaurantController.cs
+                    [RestaurantDTOs/]
+                        - CreateRestaurantRequestDto.cs
+                        - EditRestaurantResultDto.cs
+                        - GetRestaurantsResultDto.cs
+                        - EditRestaurantRequestDto.cs
+                        - CreateRestaurantResultDto.cs
+                [Addresses/]
+                    - AddressController.cs
+                    [AddressDTOs/]
+                        - EditAddressResponseDto.cs
+                        - EditAddressRequestDto.cs
+                        - CreateAddressResponseDto.cs
+                        - GetAddressResultDto.cs
+                        - CreateAddressRequestDto.cs
+                [Dishes/]
+                    - MenuController.cs
+                    [DishDTOs/]
+                        - AddDishResponseDto.cs
+                        - AddDishRequestDto.cs
+                        - GetDishResultDto.cs
+                        - EditDishResponseDto.cs
+                        - EditDishRequestDto.cs
+                [Orders/]
+                    - OrderController.cs
+                    [OrderDTOs/]
+                        - CreateOrderItemRequestDto.cs
+                        - GetMyOrdersResultDto.cs
+                        - CreateOrderResponseDto.cs
+                        - GetActiveOrdersResultDto.cs
+                        - UpdateOrderStatusResponseDto.cs
+                        - OrderItemResultDto.cs
+                        - GetOrderByIdResultDto.cs
+                        - UpdateOrderStatusRequestDto.cs
+                        - CreateOrderRequestDto.cs
+                [Categories/]
+                    - CategoryController.cs
+                    [CategoryDTOs/]
+                        - EditCategoryRequestDto.cs
+                        - CreateCategoryRequestDto.cs
+                        - CreateCategoryResponseDto.cs
+                        - GetCategoryResultDto.cs
+                        - EditCategoryResponseDto.cs
+                [Reviews/]
+                    - ReviewController.cs
+                    [ReviewDTOs/]
+                        - AddRestaurantReviewResponseDto.cs
+                        - GetRestaurantReviewsRequestDto.cs
+                        - GetRestaurantReviewsResponseDto.cs
+                        - AddRestaurantReviewRequestDto.cs
+            [Middlewares/]
+                - GlobalExceptionHandler.cs
+            [Properties/]
+                - launchSettings.json
+        [UberEats.Domain/]
+            - UberEats.Domain.csproj
+            [obj/]
+                - UberEats.Domain.csproj.nuget.g.targets
+                - UberEats.Domain.csproj.nuget.dgspec.json
+                - project.nuget.cache
+                - project.assets.json
+                - UberEats.Domain.csproj.nuget.g.props
+                [Debug/]
+                    [net8.0/]
+                        - UberEats.Domain.AssemblyInfoInputs.cache
+                        - UberEats.Domain.AssemblyInfo.cs
+                        - UberEats.Domain.GeneratedMSBuildEditorConfig.editorconfig
+                        - UberEats.Domain.csproj.AssemblyReference.cache
+                        - UberEats.Domain.assets.cache
+                        - UberEats.Domain.GlobalUsings.g.cs
+                        [ref/]
+                        [refint/]
+            [Repository/]
+                - ICategoryRepository.cs
+                - IRestaurantReviewRepository.cs
+                - IAddressRepository.cs
+                - IOrderRepository.cs
+                - IRestaurantRepository.cs
+                - IRepository.cs
+            [bin/]
+                [Debug/]
+                    [net8.0/]
+            [Constants/]
+                - ReviewConstants.cs
+                - UserRoles.cs
+            [Enums/]
+                - OrderStatus.cs
+            [Roles/]
+                - UserRoles.cs
+            [Common/]
+                [Models/]
+                    - Entity.cs
+            [Services/]
+                - IFileStorage.cs
+                - ICurrentUserContext.cs
+            [Entities/]
+                - RestaurantReview.cs
+                - Order.cs
+                - ShoppingCartItem.cs
+                - Address.cs
+                - Allergy.cs
+                - DriverShift.cs
+                - Customer.cs
+                - OrderItem.cs
+                - Driver.cs
+                - DriverLocation.cs
+                - Dish.cs
+                - Category.cs
+                - OrderAddress.cs
+                - Restaurant.cs
+                - ApplicationUser.cs
+        [UberEats.Infrastructure/]
+            - DependencyInjection.cs
+            - UberEats.Infrastructure.csproj
+            [obj/]
+                - UberEats.Infrastructure.csproj.nuget.g.targets
+                - project.nuget.cache
+                - project.assets.json
+                - UberEats.Infrastructure.csproj.nuget.g.props
+                - UberEats.Infrastructure.csproj.nuget.dgspec.json
+                [Debug/]
+                    [net8.0/]
+                        - UberEats.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+                        - UberEats.Infrastructure.assets.cache
+                        - UberEats.Infrastructure.AssemblyInfo.cs
+                        - UberEats.Infrastructure.AssemblyInfoInputs.cache
+                        - UberEats.Infrastructure.csproj.AssemblyReference.cache
+                        - UberEats.Infrastructure.GlobalUsings.g.cs
+                        [ref/]
+                        [refint/]
+            [Migrations/]
+                - AppDbContextModelSnapshot.cs
+                - 20260601195650_InitDatabase.Designer.cs
+                - 20260601195650_InitDatabase.cs
+            [Repository/]
+                - RepositoryBase.cs
+                - RestaurantRepository.cs
+                - AddressRepository.cs
+                - CategoryRepository.cs
+                - RestaurantReviewRepository.cs
+                - OrderRepository.cs
+            [Databases/]
+                - AppDbContext.cs
+            [bin/]
+                [Debug/]
+                    [net8.0/]
+            [Seeders/]
+                - DevelopmentDataSeeder.cs
+            [Services/]
+                - FileSystemImageStorage.cs
+                - CurrentUserContext.cs
+        [UberEats.Application/]
+            - DependencyInjection.cs
+            - UberEats.Application.csproj
+            - CQRS_PATTERN_GUIDELINES.md
+            [obj/]
+                - UberEats.Application.csproj.nuget.g.props
+                - project.nuget.cache
+                - UberEats.Application.csproj.nuget.dgspec.json
+                - UberEats.Application.csproj.nuget.g.targets
+                - project.assets.json
+                [Debug/]
+                    [net8.0/]
+                        - UberEats.Application.GlobalUsings.g.cs
+                        - UberEats.Application.AssemblyInfo.cs
+                        - UberEats.Application.GeneratedMSBuildEditorConfig.editorconfig
+                        - UberEats.Application.csproj.AssemblyReference.cache
+                        - UberEats.Application.assets.cache
+                        - UberEats.Application.AssemblyInfoInputs.cache
+                        [ref/]
+                        [refint/]
+            [bin/]
+                [Debug/]
+                    [net8.0/]
+            [Restaurants/]
+                [CreateRestaurant/]
+                    - CreateRestaurantCommandHandler.cs
+                    - CreateRestaurantCommand.cs
+                [GetRestaurantById/]
+                    - GetRestaurantByIdQuery.cs
+                    - GetRestaurantByIdQueryHandler.cs
+                [UploadImages/]
+                    - UploadImagesRestaurantCommandHandler.cs
+                    - UploadImagesRestaurantCommand.cs
+                [DeleteImage/]
+                    - DeleteImageRestaurantCommand.cs
+                    - DeleteImageRestaurantCommandHandler.cs
+                [DeleteRestaurant/]
+                    - DeleteRestaurantCommandHandler.cs
+                    - DeleteRestaurantCommand.cs
+                [Dishes/]
+                    [AddDishToMenu/]
+                        - AddDishToMenuCommandHandler.cs
+                        - AddDishToMenuCommand.cs
+                    [GetDishes/]
+                        - GetDishesQuery.cs
+                        - GetDishesQueryHandler.cs
+                    [EditDish/]
+                        - EditDishCommandHandler.cs
+                        - EditDishCommand.cs
+                    [DeleteDish/]
+                        - DeleteDishCommandHandler.cs
+                        - DeleteDishCommand.cs
+                [EditRestaurant/]
+                    - EditRestaurantCommandHandler.cs
+                    - EditRestaurantCommand.cs
+                [Reviews/]
+                    [DeleteRestaurantReview/]
+                        - DeleteRestaurantReviewCommand.cs
+                    [GetRestaurantReviews/]
+                        - GetRestaurantReviewsQuery.cs
+                        - GetRestaurantReviewsResult.cs
+                    [AddRestaurantReview/]
+                        - AddRestaurantReviewCommand.cs
+                [GetRestaurants/]
+                    - GetRestaurantsQuery.cs
+                    - GetRestaurantsQueryHandler.cs
+            [Common/]
+                - UploadFile.cs
+                - MapObjects.cs
+                - UploadResult.cs
+            [Addresses/]
+                [EditAddress/]
+                    - EditAddressCommand.cs
+                [GetAddressById/]
+                    - GetAddressByIdQuery.cs
+                [CreateAddress/]
+                    - CreateAddressCommand.cs
+                [DeleteAddress/]
+                    - DeleteAddressCommand.cs
+                [GetAddresses/]
+                    - GetAddressesQuery.cs
+            [Orders/]
+                [GetOrderById/]
+                    - GetOrderByIdQuery.cs
+                [CreateOrder/]
+                    - CreateOrderCommand.cs
+                [UpdateOrderStatus/]
+                    - UpdateOrderStatusCommand.cs
+                [GetActiveOrdersByRestaurant/]
+                    - GetActiveOrdersByRestaurantQuery.cs
+                [GetMyOrders/]
+                    - GetMyOrdersQuery.cs
+            [Categories/]
+                [EditCategory/]
+                    - EditCategoryCommandHandler.cs
+                    - EditCategoryCommand.cs
+                [DeleteCategory/]
+                    - DeleteCategoryCommand.cs
+                    - DeleteCategoryCommandHandler.cs
+                [CreateCategory/]
+                    - CreateCategoryCommandHandler.cs
+                    - CreateCategoryCommand.cs
+                [GetCategories/]
+                    - GetCategoriesQuery.cs
+                    - GetCategoriesQueryHandler.cs
+                [GetCategoryById/]
+                    - GetCategoryByIdQuery.cs
+                    - GetCategoryByIdQueryHandler.cs
+        [UberEats.Tests/]
+            - AuthControllerTests.cs
+            - UberEats.Tests.csproj
+            [obj/]
+                - UberEats.Tests.csproj.nuget.g.targets
+                - UberEats.Tests.csproj.nuget.g.props
+                - project.nuget.cache
+                - project.assets.json
+                - UberEats.Tests.csproj.nuget.dgspec.json
+                [Debug/]
+                    [net8.0/]
+                        - UberEats.Tests.AssemblyInfo.cs
+                        - UberEats.Tests.csproj.AssemblyReference.cache
+                        - UberEats.Tests.assets.cache
+                        - UberEats.Tests.GlobalUsings.g.cs
+                        - UberEats.Tests.GeneratedMSBuildEditorConfig.editorconfig
+                        - UberEats.Tests.AssemblyInfoInputs.cache
+                        [ref/]
+                        [refint/]
+            [bin/]
+                [Debug/]
+                    [net8.0/]
+                        - CoverletSourceRootsMapping_UberEats.Tests
+    [Frontend_React/]
+        - tsconfig.node.json
+        - index.html
+        - db.json
+        - tsconfig.app.json
+        - README.md
+        - package-lock.json
+        - package.json
+        - tsconfig.json
+        - eslint.config.js
+        - vite.config.ts
+        [public/]
+            - vite.svg
+        [src/]
+            - App.tsx
+            - main.tsx
+            - App.css
+            - index.css
+            [config/]
+                - api.ts
+            [features/]
+                [auth/]
+                    - LoginForm.tsx
+                    - RegistrationForm.tsx
+                    [context/]
+                        - AuthContext.tsx
+                    [components/]
+                        - RequireRole.tsx
+                    [hooks/]
+                        - useAuth.ts
+                [restaurants/]
+                    - TestProduct.tsx
+                    - RestaurantInfoHeader.tsx
+                    - RestaurantCard.tsx
+                    - RestaurantMenuPage.tsx
+                    - RestaurantsPage.tsx
+                    [types/]
+                        - dish.ts
+                        - restaurantDtos.ts
+                    [hooks/]
+                        - useCreateRestaurant.ts
+                        - useGetDishes.ts
+                        - useGetOrders.ts
+                        - useGetRestaurants.ts
+                        - useGetRestaurant.ts
+                        - useEditRestaurant.ts
+                        - useDeleteRestaurant.ts
+                [address/]
+                    - AddressTestPage.tsx
+                    [types/]
+                        - addressDtos.ts
+                    [hooks/]
+                        - useGetAddress.ts
+                        - useCreateAddress.ts
+                        - useGetAddresses.ts
+                        - useEditAddress.ts
+                        - useDeleteAddress.ts
+                [cart/]
+                    - CheckoutPage.tsx
+                    - ShoppingCartUI.tsx
+                    - CheckoutOrderSummary.tsx
+                    - CheckoutAddressSelection.tsx
+                    [types/]
+                        - cart.ts
+                    [context/]
+                        - CartContext.tsx
+                [orders/]
+                    - OrdersHistoryPage.tsx
+                [categories/]
+                    - CategoryList.tsx
+                    - CategoriesPage.tsx
+                    - CategoryTestPage.tsx
+                    - CategoryForm.tsx
+                    [types/]
+                        - category.ts
+                        - categoryDtos.ts
+                    [hooks/]
+                        - useGetCategory.ts
+                        - useEditCategory.ts
+                        - useDeleteCategory.ts
+                        - useCreateCategory.ts
+                        - useGetCategories.ts
+                    [services/]
+                        - CategoryService.tsx
+                [reviews/]
+                    [types/]
+                        - review.ts
+                    [components/]
+                        - ReviewDialog.tsx
+                        - ReviewsSection.tsx
+                        - RatingStars.tsx
+                        - ReviewsList.tsx
+                        - ReviewForm.tsx
+                        - ReviewItem.tsx
+                    [hooks/]
+                        - useAddRestaurantReview.ts
+                        - useGetRestaurantReviews.ts
+                        - useDeleteRestaurantReview.ts
+                    [services/]
+                        - ReviewService.ts
+            [utils/]
+                - jwt.ts
+            [components/]
+                - AdminMenuPage.tsx
+                - RestaurantPanelLayout.tsx
+                [Common/]
+                    - Navbar.tsx
+            [api/]
+                - core.ts
+                [types/]
+                    - updatePayload.ts
+                    - guid.ts
+            [assets/]
+                - react.svg
