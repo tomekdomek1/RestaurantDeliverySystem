@@ -1,30 +1,53 @@
 import { Box, Typography, Card, CardContent, CircularProgress, Chip, Divider } from "@mui/material";
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+
 import { useGetOrders } from "../restaurants/hooks/useGetOrders";
+import type { GetMyOrdersResultDto, OrderItemResultDto } from "../../api/types/order";
 
 export default function OrdersHistoryPage() {
   const { orders, isLoading, error } = useGetOrders();
 
-  // Funkcja pomocnicza do dobierania kolorów statusów
-  const getStatusColor = (status: string) => {
+  // DANE TESTOWE (MOCK)
+  const mockOrders: GetMyOrdersResultDto[] = [
+    {
+      id: "mock-1",
+      date: new Date().toISOString(),
+      totalAmount: 85.50,
+      status: "Delivered",
+      items: [
+        { id: "m1", name: "Sushi California Roll", price: 27.99, quantity: 2, dishId: "" },
+        { id: "m2", name: "Zupa Miso", price: 14.50, quantity: 2, dishId: "" }
+      ],
+      restaurantId: "",
+      deliveryTime: "",
+      address: {
+        city: "Warszawa",
+        street: "Marszałkowska 1"
+      } as any // Ominięcie błędów typowania dla testu
+    }
+  ];
+
+  // Jeśli nie ma danych z backendu, używamy danych testowych
+  const displayOrders = (orders && orders.length > 0) ? orders : mockOrders;
+
+  const getStatusColor = (status: string): "warning" | "info" | "success" | "error" | "primary" => {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'warning';   // Pomarańczowy/Żółty
-      case 'accepted':
-        return 'info';      // Niebieski
-      case 'delivered':
-        return 'success';   // Zielony
-      case 'rejected':
-        return 'error';     // Czerwony
-      default:
-        return 'primary';   // Domyślny fiolet/niebieski
+      case 'pending': return 'warning';
+      case 'accepted': return 'info';
+      case 'delivered': return 'success';
+      case 'rejected': return 'error';
+      default: return 'primary';
     }
   };
 
   if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
-  if (error) return <Typography color="error" align="center" mt={5}>Wystąpił błąd podczas ładowania historii.</Typography>;
+  if (error) {
+    console.error("Błąd ładowania z API, używam danych testowych:", error);
+  }
 
-  const sortedOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedOrders: GetMyOrdersResultDto[] = [...displayOrders].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <Box sx={{ pt: 4, maxWidth: 900, mx: 'auto' }}>
@@ -52,10 +75,10 @@ export default function OrdersHistoryPage() {
                         Razem: {order.totalAmount.toFixed(2)} zł
                       </Typography>
                     </Box>
-                    {/* zmieniajacy kolor */}
+                    
                     <Chip 
                       label={order.status.toUpperCase()} 
-                      color={getStatusColor(order.status) as any} 
+                      color={getStatusColor(order.status)} 
                       sx={{ fontWeight: 'bold', minWidth: 100 }} 
                     />
                   </Box>
@@ -63,7 +86,7 @@ export default function OrdersHistoryPage() {
                   <Divider sx={{ my: 1.5 }} />
                   
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>Pozycje w zamówieniu:</Typography>
-                  {order.items.map((item: any) => (
+                  {order.items.map((item: OrderItemResultDto) => (
                     <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', bgcolor: '#f9f9f9', p: 1, mb: 0.5, borderRadius: 1 }}>
                       <Typography variant="body2">{item.quantity}x {item.name}</Typography>
                       <Typography variant="body2">{(item.price * item.quantity).toFixed(2)} zł</Typography>

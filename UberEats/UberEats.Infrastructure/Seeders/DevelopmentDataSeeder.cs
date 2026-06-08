@@ -212,7 +212,30 @@ public class DevelopmentDataSeeder : IHostedService
             }
         }
 
-        _logger.LogInformation($"Roles and admin user were created Successfully ");
+        // --- DODANE: Tworzymy konto do logowania dla Jana Kowalskiego ---
+        var janEmail = "jan.kowalski@example.com";
+        var janUser = await userManager.FindByEmailAsync(janEmail);
+
+        if (janUser == null)
+        {
+            var newJan = new ApplicationUser 
+            { 
+                UserName = janEmail, 
+                Email = janEmail, 
+                FullName = "Jan Kowalski" 
+            };
+            
+            // Nadajemy mu jawne hasło, żeby można było się zalogować
+            var result = await userManager.CreateAsync(newJan, "Password123!");
+            
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(newJan, UserRoles.User);
+            }
+        }
+        // ----------------------------------------------------------------
+
+        _logger.LogInformation($"Roles and users were created Successfully");
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
