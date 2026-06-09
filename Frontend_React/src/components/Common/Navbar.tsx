@@ -50,6 +50,9 @@ const Navbar: React.FC = () => {
               Panel Admina
             </Button>
           )}
+          <Button color="inherit" component={Link} to="/restaurant-report">
+              Raport Sprzedaży
+          </Button>
 
           <IconButton color="inherit" component={Link} to="/cart">
             <Badge badgeContent={totalItems} color="secondary">

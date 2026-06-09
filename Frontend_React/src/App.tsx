@@ -16,6 +16,7 @@ import OrdersHistoryPage from "./features/orders/OrdersHistoryPage";
 import RestaurantPanelLayout from "./components/RestaurantPanelLayout";
 import AdminMenuPage from "./components/AdminMenuPage";
 import RequireRole from "./features/auth/components/RequireRole";
+import { RestaurantReportPage } from './features/restaurants/RestaurantReportPage';
 
 export default function App() {
     return (
@@ -33,7 +34,7 @@ export default function App() {
 
                             <Route path="/restaurants" element={<RestaurantsPage />} />
                             <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
-
+                            <Route path="/restaurant-report" element={<RestaurantReportPage />} />
                             <Route path="/cart" element={<ShoppingCartUI />} />
                             <Route path="/checkout" element={<CheckoutPage />} />
                             <Route path="/orders" element={<OrdersHistoryPage />} />
