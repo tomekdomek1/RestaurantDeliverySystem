@@ -22,33 +22,37 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetReviews(Guid restaurantId, [FromQuery] GetRestaurantReviewsRequestDto request)
     {
         var currentUserId = User.FindFirstValue("uid") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var result = await _mediator.Send(new GetRestaurantReviewsQuery(
+        
+        // Klasa DTO ma domyślne wartości, więc przekazujemy parametry bezpośrednio
+        var query = new GetRestaurantReviewsQuery(
             restaurantId,
             request.PageNumber,
             request.PageSize,
             request.SortBy,
             request.SortDirection,
             request.MinRating,
-            request.MaxRating));
+            request.MaxRating);
 
-        var response = new GetRestaurantReviewsResponseDto
-        {
-            PageNumber = result.PageNumber,
-            PageSize = result.PageSize,
-            TotalCount = result.TotalCount,
-            Items = result.Items.Select(r => new GetRestaurantReviewItemDto
-            {
-                Id = r.Id,
-                Rating = r.Rating,
-                Description = r.Description,
-                CreatedAt = r.CreatedAt,
-                IsOwnedByCurrentUser = !string.IsNullOrWhiteSpace(currentUserId) && r.AuthorUserId == currentUserId
-            }).ToList()
-        };
+        var result = await _mediator.Send(query);
+        
+        var response = new GetRestaurantReviewsResponseDto 
+        { 
+            PageNumber = result.PageNumber, 
+            PageSize = result.PageSize, 
+            TotalCount = result.TotalCount, 
+            Items = result.Items.Select(r => new GetRestaurantReviewItemDto 
+            { 
+                Id = r.Id, 
+                Rating = r.Rating, 
+                Description = r.Description, 
+                CreatedAt = r.CreatedAt, 
+                IsOwnedByCurrentUser = !string.IsNullOrWhiteSpace(currentUserId) && r.AuthorUserId == currentUserId 
+            }).ToList() 
+        }; 
 
         return Ok(response);
     }
@@ -57,18 +61,20 @@ public class ReviewController : ControllerBase
     [Authorize(Roles = UserRoles.User)]
     public async Task<IActionResult> AddReview(Guid restaurantId, [FromBody] AddRestaurantReviewRequestDto request)
     {
-        var review = await _mediator.Send(new AddRestaurantReviewCommand(
+        var command = new AddRestaurantReviewCommand(
             restaurantId,
             request.Rating,
-            request.Description));
+            request.Description);
 
-        var response = new AddRestaurantReviewResponseDto
-        {
-            Id = review.Id,
-            RestaurantId = review.RestaurantId,
-            Rating = review.Rating,
-            Description = review.Description,
-            CreatedAt = review.CreatedAt
+        var review = await _mediator.Send(command);
+
+        var response = new AddRestaurantReviewResponseDto 
+        { 
+            Id = review.Id, 
+            RestaurantId = review.RestaurantId, 
+            Rating = review.Rating, 
+            Description = review.Description, 
+            CreatedAt = review.CreatedAt 
         };
 
         return CreatedAtAction(nameof(GetReviews), new { restaurantId }, response);
@@ -78,7 +84,8 @@ public class ReviewController : ControllerBase
     [Authorize]
     public async Task<IActionResult> DeleteReview(Guid restaurantId, Guid reviewId)
     {
-        await _mediator.Send(new DeleteRestaurantReviewCommand(restaurantId, reviewId));
+        var command = new DeleteRestaurantReviewCommand(restaurantId, reviewId);
+        await _mediator.Send(command);
         return NoContent();
     }
 }

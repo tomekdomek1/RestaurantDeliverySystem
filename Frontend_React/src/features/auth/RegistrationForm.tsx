@@ -1,121 +1,101 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "./hooks/useAuth";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Box, Button, TextField, Typography, Paper, Alert, Fade, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-const RegistrationForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar();
+export default function RegistrationForm() {
   const navigate = useNavigate();
-  const { register, loading } = useAuth();
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string; confirmPassword?: string }>({});
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const validate = () => {
-    const validationErrors: { fullName?: string; email?: string; password?: string; confirmPassword?: string } = {};
-    if (!formData.fullName) validationErrors.fullName = "Full name is required";
-    if (!formData.email) validationErrors.email = "Email is required";
-    if (formData.password.length < 6) validationErrors.password = "Password must be at least 6 characters";
-    if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = "Passwords do not match";
-    return validationErrors;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const newErrors: string[] = [];
+    if (!email.includes('@')) newErrors.push("Podaj poprawny adres email.");
+    if (fullName.trim().length < 3) newErrors.push("Imię i nazwisko musi mieć co najmniej 3 znaki.");
+    if (password.length < 6) newErrors.push("Hasło musi mieć co najmniej 6 znaków.");
+    if (!/(?=.*[A-Z])/.test(password)) newErrors.push("Hasło musi zawierać co najmniej jedną wielką literę.");
+    if (!/(?=.*[a-z])/.test(password)) newErrors.push("Hasło musi zawierać co najmniej jedną małą literę.");
+    if (!/(?=.*[0-9])/.test(password)) newErrors.push("Hasło musi zawierać co najmniej jedną cyfrę.");
+    if (!/(?=.*[!@#$%^&*])/.test(password)) newErrors.push("Hasło musi zawierać co najmniej jeden znak specjalny (!@#$%^&*).");
+    
+    setErrors(newErrors);
+    return newErrors.length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      enqueueSnackbar("Please fix the errors in the form.", { variant: "warning" });
-      return;
-    }
-
+    if (!validate()) return;
+    
     try {
-      await register(formData.email, formData.password, formData.fullName);
-      enqueueSnackbar("Registration successful! You are now logged in.", { variant: "success" });
-      setFormData({ fullName: "", email: "", password: "", confirmPassword: "" });
-      setErrors({});
-      navigate("/restaurants");
-    } catch (error) {
-      console.error("Error:", error);
-      const errorMsg = error instanceof Error ? error.message : "Registration failed. Email might be already taken.";
-      enqueueSnackbar(errorMsg, { variant: "error" });
+      const response = await fetch('http://localhost:5122/api/Auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        // Sprawdźmy co wypluwa backend .NET Identity
+        if (errorData && Array.isArray(errorData)) {
+            setErrors(errorData.map((e: any) => e.description || "Błąd walidacji"));
+        } else {
+            setErrors(["Użytkownik o podanym adresie email może już istnieć lub podano błędne dane."]);
+        }
+        return;
+      }
+      navigate('/login');
+    } catch (err) {
+      setErrors(["Wystąpił problem z połączeniem z serwerem."]);
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 400, mx: "auto", mt: 8 }}>
-      <Typography variant="h5" textAlign="center" mb={2}>
-        Create Account
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Full Name"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.fullName}
-          helperText={errors.fullName}
-          disabled={loading}
-        />
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.email}
-          helperText={errors.email}
-          disabled={loading}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.password}
-          helperText={errors.password}
-          disabled={loading}
-        />
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          margin="normal"
-          error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword}
-          disabled={loading}
-        />
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          sx={{ mt: 2 }}
-          disabled={loading}
-        >
-          {loading ? "Registering..." : "Register"}
-        </Button>
-      </Box>
-    </Paper>
-  );
-};
+    <Fade in={true} timeout={800}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <Paper elevation={6} sx={{ p: 4, width: '100%', maxWidth: 450, bgcolor: 'background.paper' }}>
+          <Typography variant="h4" gutterBottom align="center" color="primary.main" fontWeight="bold">
+            Rejestracja
+          </Typography>
+          <Typography variant="body2" align="center" sx={{ mb: 3 }} color="text.secondary">
+            Zarejestruj się w UberEats i zamawiaj co tylko zechcesz!
+          </Typography>
+          
+          {errors.length > 0 && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+                {errors.map((err, idx) => <li key={idx}>{err}</li>)}
+              </ul>
+            </Alert>
+          )}
 
-export default RegistrationForm;
+          <form onSubmit={handleSubmit}>
+            <TextField fullWidth label="Imię i nazwisko" margin="normal" variant="outlined" value={fullName} onChange={e => setFullName(e.target.value)} required />
+            <TextField fullWidth label="Email" type="email" margin="normal" variant="outlined" value={email} onChange={e => setEmail(e.target.value)} required />
+            <TextField fullWidth label="Hasło" type={showPassword ? 'text' : 'password'} margin="normal" variant="outlined" value={password} onChange={e => setPassword(e.target.value)} required 
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+            <Button fullWidth type="submit" variant="contained" color="primary" size="large" sx={{ mt: 4, mb: 3 }}>
+              Zarejestruj się
+            </Button>
+            <Box textAlign="center">
+              <Typography variant="body2" color="text.secondary">
+                Masz już konto? <Link to="/login" style={{ color: '#4caf50', textDecoration: 'none', fontWeight: 'bold' }}>Zaloguj się</Link>
+              </Typography>
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </Fade>
+  );
+}

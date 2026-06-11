@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 using UberEats.Domain.Common.Models;
 using UberEats.Domain.Enums;
 
@@ -12,23 +13,22 @@ public sealed class Order : Entity<Guid>
     public OrderStatus OrderStatus { get; set; }
     public decimal TotalAmount { get; set; }
 
-    // Atrybut [NotMapped] mówi EF Core: "Ignoruj to pole przy generowaniu SQL"
-    // Dzięki temu błąd "column o.CreatedAt does not exist" zniknie.
-    [NotMapped]
-    public DateTime CreatedAt { get; set; }
-    
     public Guid CustomerId { get; set; }
     public Customer Customer { get; set; } = null!;
+
     public Guid RestaurantId { get; set; }
     public Restaurant Restaurant { get; set; } = null!;
-    public Guid DriverId { get; set; }
-    public Driver Driver { get; set; } = null!;
 
-    public OrderAddress OrderAddress { get; set; } = null!;
+    // ZMIANA: Nullable! Zamówienie na starcie nie ma kierowcy
+    public Guid? DriverId { get; set; }
+    public Driver? Driver { get; set; }
+
+    public OrderAddress? OrderAddress { get; set; }
+
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-    public Order(Guid id, string? notes, DateTime date, TimeOnly deliveryTime, OrderStatus orderStatus, 
-                 Guid customerId, Guid restaurantId, Guid driverId) : base(id)
+    public Order(Guid id, string? notes, DateTime date, TimeOnly deliveryTime, OrderStatus orderStatus, Guid customerId, Guid restaurantId, Guid? driverId = null) 
+        : base(id)
     {
         Notes = notes;
         Date = date;
@@ -37,11 +37,5 @@ public sealed class Order : Entity<Guid>
         CustomerId = customerId;
         RestaurantId = restaurantId;
         DriverId = driverId;
-        
-        TotalAmount = 0; 
-        CreatedAt = DateTime.UtcNow;
     }
-
-    // Konstruktor dla EF Core
-    private Order() : base(Guid.Empty) { }
 }
