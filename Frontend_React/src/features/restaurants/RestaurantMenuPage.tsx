@@ -83,7 +83,14 @@ export default function RestaurantMenuPage() {
         </Box>
       )}
 
-      {id && <ReviewsSection restaurantId={id} />}
+      {/* Tutaj przekazujemy averageRating oraz totalReviews bezpośrednio z pobranego obiektu restaurant */}
+      {id && (
+        <ReviewsSection 
+          restaurantId={id} 
+          averageRating={restaurant.averageRating}
+          totalReviews={restaurant.totalReviews}
+        />
+      )}
     </Box>
   );
 }

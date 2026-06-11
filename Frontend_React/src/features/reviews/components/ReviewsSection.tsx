@@ -4,12 +4,17 @@ import AddIcon from "@mui/icons-material/Add";
 import { useAuth } from "../../auth/hooks/useAuth";
 import ReviewDialog from "./ReviewDialog";
 import ReviewsList from "./ReviewsList";
+// DODANY IMPORT:
+import RatingStars from "./RatingStars";
 
+// Rozszerzamy interfejs propsów o dane z restauracji
 interface ReviewsSectionProps {
   restaurantId: string;
+  averageRating: number;
+  totalReviews: number;
 }
 
-export default function ReviewsSection({ restaurantId }: ReviewsSectionProps) {
+export default function ReviewsSection({ restaurantId, averageRating, totalReviews }: ReviewsSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { isLoggedIn } = useAuth();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -29,9 +34,26 @@ export default function ReviewsSection({ restaurantId }: ReviewsSectionProps) {
   return (
     <Box sx={{ mt: 5 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>
-          Recenzje i oceny
-        </Typography>
+        
+        {/* Grupa: Tytuł + Gwiazdki ustawione poziomo */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            Recenzje i oceny
+          </Typography>
+          
+          {totalReviews > 0 && (
+            <Box sx={{ display: "flex", alignItems: "center", pt: 0.5 }}>
+              <RatingStars 
+                rating={averageRating} 
+                count={totalReviews}
+                readOnly
+                size="medium"
+                showLabel
+              />
+            </Box>
+          )}
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
