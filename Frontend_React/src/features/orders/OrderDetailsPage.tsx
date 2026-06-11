@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Container, Paper, Typography, Box, CircularProgress, 
-  Divider, Stepper, Step, StepLabel, Button, Alert 
+  Divider, Stepper, Step, StepLabel, Button, Alert,
+  Dialog, DialogTitle, DialogContent, DialogActions, Rating, TextField 
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,6 +11,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import HomeIcon from '@mui/icons-material/Home';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import NotesIcon from '@mui/icons-material/Notes';
+import StarIcon from '@mui/icons-material/Star';
 import { API_BASE_URL } from '../../config/api'; 
 
 const ORDER_STATUSES = [
@@ -25,6 +27,14 @@ export default function OrderDetailsPage() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // --- STANY DO SYSTEMU OPINII ---
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [rating, setRating] = useState<number | null>(5);
+  const [description, setDescription] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState('');
+  const [reviewError, setReviewError] = useState('');
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -48,6 +58,36 @@ export default function OrderDetailsPage() {
 
     if (id) fetchOrderDetails();
   }, [id]);
+
+  const handleSubmitReview = async () => {
+    setReviewSubmitting(true);
+    setReviewError('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/restaurants/${order.restaurantId}/reviews`, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          rating: rating,
+          description: description
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.text();
+        throw new Error(errData || 'Nie udało się dodać opinii');
+      }
+
+      setReviewSuccess('Dziękujemy za ocenę!');
+      setReviewModalOpen(false);
+    } catch (err: any) {
+      setReviewError(err.message);
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
   if (error) return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
@@ -89,7 +129,6 @@ export default function OrderDetailsPage() {
             <Typography variant="h6" fontWeight="bold" gutterBottom>Dane dostawy</Typography>
             <Paper variant="outlined" sx={{ p: 3, bgcolor: '#fafafa', borderRadius: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
               
-              {/* Sekcja Adresu */}
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                 <HomeIcon color="primary" sx={{ mt: 0.5 }} />
                 <Box>
@@ -106,7 +145,6 @@ export default function OrderDetailsPage() {
 
               <Divider />
 
-              {/* Sekcja Czasu Dostawy */}
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <AccessTimeIcon color="primary" />
                 <Box>
@@ -117,7 +155,6 @@ export default function OrderDetailsPage() {
                 </Box>
               </Box>
 
-              {/* Sekcja Notatki */}
               {order.notes && (
                 <>
                   <Divider />
@@ -154,9 +191,73 @@ export default function OrderDetailsPage() {
               <Typography variant="h6" fontWeight="bold">Suma całkowita:</Typography>
               <Typography variant="h6" color="primary" fontWeight="bold">{order.totalAmount.toFixed(2)} zł</Typography>
             </Box>
+
+            {!reviewSuccess && (
+              <Box sx={{ mt: 4 }}>
+                <Button 
+                  variant="contained" 
+                  color="warning" 
+                  fullWidth 
+                  size="large"
+                  startIcon={<StarIcon />}
+                  onClick={() => setReviewModalOpen(true)}
+                  sx={{ py: 1.5, fontWeight: 'bold' }}
+                >
+                  Oceń restaurację
+                </Button>
+              </Box>
+            )}
+            
+            {reviewSuccess && (
+              <Alert severity="success" sx={{ mt: 4 }}>
+                {reviewSuccess}
+              </Alert>
+            )}
+
           </Grid>
         </Grid>
       </Paper>
+
+      <Dialog open={reviewModalOpen} onClose={() => setReviewModalOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>Jak smakowało jedzenie?</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, pt: 2 }}>
+          
+          {reviewError && <Alert severity="error" sx={{ width: '100%' }}>{reviewError}</Alert>}
+          
+          <Rating 
+            value={rating} 
+            onChange={(event, newValue) => setRating(newValue)} 
+            size="large" 
+            sx={{ fontSize: '3rem' }}
+          />
+          
+          <TextField 
+            fullWidth 
+            multiline 
+            rows={3} 
+            label="Zostaw komentarz dla restauracji (opcjonalnie)" 
+            variant="outlined"
+            value={description} 
+            onChange={(e) => setDescription(e.target.value)} 
+          />
+          
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
+          <Button onClick={() => setReviewModalOpen(false)} color="inherit" disabled={reviewSubmitting}>
+            Anuluj
+          </Button>
+          <Button 
+            onClick={handleSubmitReview} 
+            variant="contained" 
+            color="warning" 
+            disabled={!rating || reviewSubmitting}
+            startIcon={reviewSubmitting ? <CircularProgress size={20} /> : <StarIcon />}
+          >
+            {reviewSubmitting ? 'Wysyłanie...' : 'Wyślij opinię'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Container>
   );
 }
