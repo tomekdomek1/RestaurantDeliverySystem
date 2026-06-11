@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace UberEats.Application.Orders.CreateOrder;
 
+public sealed record AddressDto(
+    string Street, 
+    int BuildingNumber, 
+    int AppartmentNumber, 
+    string City);
+
 public sealed record CreateOrderItem(
     Guid DishId, 
     string DishNameAtPurchase, 
@@ -15,8 +21,8 @@ public sealed record CreateOrderItem(
 public sealed record CreateOrderCommand(
     Guid CustomerId, 
     Guid RestaurantId, 
-    Guid? DriverId, // Zmiana na Nullable
-    Guid AddressId, 
+    Guid? DriverId, 
+    AddressDto Address,
     string? Notes, 
     TimeOnly DeliveryTime, 
     List<CreateOrderItem> Items) : IRequest<Order?>;
@@ -24,19 +30,14 @@ public sealed record CreateOrderCommand(
 public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Order?>
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly IAddressRepository _addressRepository;
 
-    public CreateOrderCommandHandler(IOrderRepository orderRepository, IAddressRepository addressRepository)
+    public CreateOrderCommandHandler(IOrderRepository orderRepository)
     {
         _orderRepository = orderRepository;
-        _addressRepository = addressRepository;
     }
 
     public async Task<Order?> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        var address = await _addressRepository.GetByIdAsync(request.AddressId);
-        if (address == null) return null;
-
         var order = new Order(
             Guid.NewGuid(), 
             request.Notes, 
@@ -56,12 +57,13 @@ public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderComma
             item.DishId)).ToList();
 
         order.OrderItems = orderItems;
+        
         order.OrderAddress = new OrderAddress(
             Guid.NewGuid(), 
-            address.Street, 
-            address.BuildingNumber, 
-            address.AppartmentNumber, 
-            address.City, 
+            request.Address.Street, 
+            request.Address.BuildingNumber, 
+            request.Address.AppartmentNumber, 
+            request.Address.City, 
             order.Id);
             
         order.TotalAmount = orderItems.Sum(item => item.PriceAtPurchase * item.Quantity);

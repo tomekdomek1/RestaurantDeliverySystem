@@ -34,6 +34,14 @@ public class AppDbContext : IdentityDbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Order>(builder =>
+        {
+            builder.HasOne(o => o.OrderAddress)
+                .WithOne(oa => oa.Order)
+                .HasForeignKey<OrderAddress>(oa => oa.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<RestaurantReview>(builder =>
         {
             builder.Property(r => r.Description)

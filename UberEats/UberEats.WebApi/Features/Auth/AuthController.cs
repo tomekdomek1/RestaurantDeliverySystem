@@ -45,7 +45,7 @@ namespace UberEats.WebApi.Features.Auth
             var name = nameParts.Length > 0 ? nameParts[0] : "Nowy";
             var surname = nameParts.Length > 1 ? nameParts[1] : "Użytkownik";
             
-            var address = new Address(Guid.NewGuid(), "Uzupełnij ulicę", 1, 1, "Uzupełnij miasto");
+            var address = new Address(Guid.NewGuid(), "", 0, 0, "");
             await _dbContext.Addresses.AddAsync(address);
             
             var customer = new Customer(Guid.Parse(userId), name, surname, dto.Email, "Brak telefonu", address.Id);

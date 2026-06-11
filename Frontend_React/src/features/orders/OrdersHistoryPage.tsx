@@ -1,23 +1,33 @@
-import { Box, Typography, Card, CardContent, CircularProgress, Chip, Divider } from "@mui/material";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Card, CardContent, CircularProgress, Chip, Divider, Button } from "@mui/material";
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useGetOrders } from "../restaurants/hooks/useGetOrders";
 
+const STATUS_LABELS: Record<string, string> = {
+  'waitingforconfirmation': 'Oczekuje',
+  'accepted': 'W przygotowaniu',
+  'indelivery': 'W drodze',
+  'delivered': 'Dostarczone',
+  'rejected': 'Odrzucone'
+};
+
 export default function OrdersHistoryPage() {
+  const navigate = useNavigate();
   const { orders, isLoading, error } = useGetOrders();
 
-  // Funkcja pomocnicza do dobierania kolorów statusów
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'warning';   // Pomarańczowy/Żółty
+      case 'waitingforconfirmation': // Zaktualizowane pod słownik
+        return 'warning';
       case 'accepted':
-        return 'info';      // Niebieski
+        return 'info';
       case 'delivered':
-        return 'success';   // Zielony
+        return 'success';
       case 'rejected':
-        return 'error';     // Czerwony
+        return 'error';
       default:
-        return 'primary';   // Domyślny fiolet/niebieski
+        return 'primary';
     }
   };
 
@@ -52,9 +62,9 @@ export default function OrdersHistoryPage() {
                         Razem: {order.totalAmount.toFixed(2)} zł
                       </Typography>
                     </Box>
-                    {/* zmieniajacy kolor */}
                     <Chip 
-                      label={order.status.toUpperCase()} 
+                      // Używamy tłumaczenia z obiektu STATUS_LABELS
+                      label={STATUS_LABELS[order.status.toLowerCase()] || order.status} 
                       color={getStatusColor(order.status) as any} 
                       sx={{ fontWeight: 'bold', minWidth: 100 }} 
                     />
@@ -69,6 +79,17 @@ export default function OrdersHistoryPage() {
                       <Typography variant="body2">{(item.price * item.quantity).toFixed(2)} zł</Typography>
                     </Box>
                   ))}
+
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button 
+                      variant="outlined" 
+                      size="small" 
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                      sx={{ borderRadius: 2, textTransform: 'none' }}
+                    >
+                      Zobacz szczegóły
+                    </Button>
+                  </Box>
                 </CardContent>
               </Card>
             </Box>

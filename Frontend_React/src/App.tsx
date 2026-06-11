@@ -17,6 +17,8 @@ import RestaurantPanelLayout from "./components/RestaurantPanelLayout";
 import AdminMenuPage from "./components/AdminMenuPage";
 import RequireRole from "./features/auth/components/RequireRole";
 import { RestaurantReportPage } from './features/restaurants/RestaurantReportPage';
+import OrderDetailsPage from "./features/orders/OrderDetailsPage";
+
 
 export default function App() {
     return (
@@ -31,7 +33,7 @@ export default function App() {
                             <Route path="/" element={<Navigate to="/restaurants" />} />
                             <Route path="/login" element={<LoginForm />} />
                             <Route path="/register" element={<RegistrationForm />} />
-
+                            <Route path="/orders/:id" element={<OrderDetailsPage />} />
                             <Route path="/restaurants" element={<RestaurantsPage />} />
                             <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
                             <Route path="/restaurant-report" element={<RestaurantReportPage />} />
