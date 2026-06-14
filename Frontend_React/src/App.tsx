@@ -64,7 +64,7 @@ export default function App() {
                                 <Route index element={<Navigate to="/admin/menu" />} />
                                 <Route path="menu" element={<AdminMenuPage />} />
                                 <Route path="reports" element={<RestaurantReportPage />} />
-                                <Route path="notifications/:restaurantId" element={<RestaurantNotificationsPage restaurantId={undefined} />} />
+                                <Route path="notifications/:restaurantId" element={<RestaurantNotificationsPage />} />
                                 <Route path="owners" element={<AdminOwnersPage />} />
                                 <Route path="restaurants-list" element={<AdminRestaurantsPage />} />
                                 <Route path="customers" element={<AdminCustomersPage />} />
