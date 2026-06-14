@@ -26,9 +26,12 @@ export const useRestaurantNotifications = (restaurantId: string): UseRestaurantN
       const response = await fetch(
         `http://localhost:5122/api/orders/restaurant/${restaurantId}/active`,
         {
+          method: 'GET',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
           },
+          credentials: 'include',
         }
       );
 
