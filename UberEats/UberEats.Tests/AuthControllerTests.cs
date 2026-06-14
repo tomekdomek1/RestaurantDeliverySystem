@@ -25,7 +25,7 @@ public class AuthControllerTests
         // Setup JWT configuration
         var jwtSettingsMock = new Mock<IConfigurationSection>();
         jwtSettingsMock.Setup(x => x["Key"]).Returns("test-secret-key-that-is-long-enough-for-jwt-signing-purposes");
-        jwtSettingsMock.Setup(x => x["Issuer"]).Returns("http://localhost:7062");
+        jwtSettingsMock.Setup(x => x["Issuer"]).Returns("http://localhost:5122");
         jwtSettingsMock.Setup(x => x["Audience"]).Returns("http://localhost:5173");
         jwtSettingsMock.Setup(x => x["ExpiryMinutes"]).Returns("60");
 
