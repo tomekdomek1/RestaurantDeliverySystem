@@ -83,6 +83,70 @@ namespace UberEats.WebApi.Features.Auth
             return Ok(new { Message = $"Staff member registered as {dto.Role}" });
         }
 
+        [HttpGet("owners")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> GetRestaurantOwners()
+        {
+            var owners = await _userManager.GetUsersInRoleAsync(UserRoles.RestaurantOwner);
+            var result = owners.Select(u => new 
+            { 
+                email = u.Email, 
+                fullName = u.FullName ?? "Restaurator" 
+            }).ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet("customers")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> GetCustomers()
+        {
+            var customers = await _userManager.GetUsersInRoleAsync(UserRoles.User);
+            
+            var result = customers.Select(u => new 
+            { 
+                email = u.Email, 
+                fullName = u.FullName ?? "Klient" 
+            }).ToList();
+
+            return Ok(result);
+        }
+
+        [HttpPut("staff/{email}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> UpdateStaff(string email, [FromBody] UpdateStaffDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return NotFound("Nie znaleziono użytkownika.");
+
+            user.FullName = dto.FullName;
+
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var passResult = await _userManager.ResetPasswordAsync(user, token, dto.Password);
+                if (!passResult.Succeeded) return BadRequest(passResult.Errors);
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok(new { Message = "Dane użytkownika zostały zaktualizowane." });
+        }
+
+        [HttpDelete("staff/{email}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> DeleteStaff(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return NotFound("Nie znaleziono użytkownika.");
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok(new { Message = "Użytkownik został pomyślnie usunięty." });
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -173,5 +237,11 @@ namespace UberEats.WebApi.Features.Auth
     {
         [Required, EmailAddress] public string Email { get; set; } = string.Empty;
         [Required] public string Password { get; set; } = string.Empty;
+    }
+
+    public class UpdateStaffDto
+    {
+        [Required] public string FullName { get; set; } = string.Empty;
+        public string? Password { get; set; }
     }
 }

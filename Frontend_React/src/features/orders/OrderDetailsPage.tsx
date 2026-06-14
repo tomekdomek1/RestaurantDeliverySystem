@@ -192,7 +192,7 @@ export default function OrderDetailsPage() {
               <Typography variant="h6" color="primary" fontWeight="bold">{order.totalAmount.toFixed(2)} zł</Typography>
             </Box>
 
-            {!reviewSuccess && (
+            {order.orderStatus === 'Delivered' && !reviewSuccess && (
               <Box sx={{ mt: 4 }}>
                 <Button 
                   variant="contained" 

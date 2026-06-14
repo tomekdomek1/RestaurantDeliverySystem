@@ -18,6 +18,9 @@ import AdminMenuPage from "./components/AdminMenuPage";
 import RequireRole from "./features/auth/components/RequireRole";
 import { RestaurantReportPage } from './features/restaurants/RestaurantReportPage';
 import OrderDetailsPage from "./features/orders/OrderDetailsPage";
+import AdminOwnersPage from "./components/AdminOwnersPage";
+import AdminRestaurantsPage from "./components/AdminRestaurantsPage";
+import AdminCustomersPage from "./components/AdminCustomersPage";
 
 
 export default function App() {
@@ -36,7 +39,6 @@ export default function App() {
                             <Route path="/orders/:id" element={<OrderDetailsPage />} />
                             <Route path="/restaurants" element={<RestaurantsPage />} />
                             <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
-                            <Route path="/restaurant-report" element={<RestaurantReportPage />} />
                             <Route path="/cart" element={<ShoppingCartUI />} />
                             <Route path="/checkout" element={<CheckoutPage />} />
                             <Route path="/orders" element={<OrdersHistoryPage />} />
@@ -45,13 +47,17 @@ export default function App() {
                             <Route
                                 path="/admin"
                                 element={
-                                    <RequireRole allowedRoles={['Admin']}>
+                                    <RequireRole allowedRoles={['Admin', 'RestaurantOwner']}>
                                         <RestaurantPanelLayout />
                                     </RequireRole>
                                 }
                             >
                                 <Route index element={<Navigate to="/admin/menu" />} />
                                 <Route path="menu" element={<AdminMenuPage />} />
+                                <Route path="reports" element={<RestaurantReportPage />} />
+                                <Route path="owners" element={<AdminOwnersPage />} />
+                                <Route path="restaurants-list" element={<AdminRestaurantsPage />} />
+                                <Route path="customers" element={<AdminCustomersPage />} />
                             </Route>
                         </Routes>
                     </Box>
