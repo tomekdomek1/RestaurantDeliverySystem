@@ -56,32 +56,23 @@ public class OrderController : ControllerBase
         return Ok(resultDto);
     }
 
-    [HttpGet("restaurant/{restaurantId:Guid}/active")]
-    public async Task<IActionResult> GetActiveOrders(Guid restaurantId)
-    {
-        var orders = await _mediator.Send(new GetActiveOrdersByRestaurantQuery(restaurantId));
-        var resultDto = orders.Select(order => new GetActiveOrdersResultDto
-        {
-            Id = order.Id, RestaurantId = order.RestaurantId, CustomerId = order.CustomerId, Date = order.Date,
-            Status = order.OrderStatus.ToString(), TotalAmount = order.TotalAmount,
-            Items = order.OrderItems.Select(item => new OrderItemResultDto
-            {
-                Id = item.Id, DishId = item.DishId, Name = item.DishNameAtPurchase, Price = item.PriceAtPurchase, Quantity = item.Quantity
-            }).ToList()
-        }).ToList();
-        return Ok(resultDto);
-    }
-
     [HttpGet("{id:Guid}")]
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         var entity = await _mediator.Send(new GetOrderByIdQuery(id));
+        if (entity == null) return NotFound();
+
         var resultDto = new GetOrderByIdResultDto
         {
             Id = entity.Id, Notes = entity.Notes, Date = entity.Date, DeliveryTime = entity.DeliveryTime, OrderStatus = entity.OrderStatus,
             TotalAmount = entity.TotalAmount, CustomerId = entity.CustomerId, RestaurantId = entity.RestaurantId, DriverId = entity.DriverId ?? Guid.Empty,
-            Address = entity.OrderAddress != null ? new OrderAddressDto { Street = entity.OrderAddress.Street, City = entity.OrderAddress.City, BuildingNumber = entity.OrderAddress.BuildingNumber, AppartmentNumber = entity.OrderAddress.AppartmentNumber } : null,
-            Driver = entity.Driver != null ? new OrderDriverDto { Name = entity.Driver.Name, Surname = entity.Driver.Surname, PhoneNumber = entity.Driver.PhoneNumber } : null,
+            Address = entity.OrderAddress != null ? new OrderAddressDto 
+            { 
+                Street = entity.OrderAddress.Street, 
+                BuildingNumber = entity.OrderAddress.BuildingNumber, 
+                AppartmentNumber = entity.OrderAddress.AppartmentNumber, 
+                City = entity.OrderAddress.City 
+            } : null,
             Items = entity.OrderItems.Select(i => new OrderItemDto { Id = i.Id, DishNameAtPurchase = i.DishNameAtPurchase, PriceAtPurchase = i.PriceAtPurchase, Quantity = i.Quantity, DishId = i.DishId }).ToList()
         };
         return Ok(resultDto);
@@ -91,24 +82,29 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequestDto request)
     {
+        Console.WriteLine($"DEBUG BACKEND: Ulica z requesta: {request.Address.Street}");
         var userIdStr = User.FindFirstValue("uid") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdStr, out var customerId)) return Unauthorized("Brak tożsamości.");
 
-        var customer = await _dbContext.Customers.FindAsync(customerId);
-        if (customer == null) return BadRequest("Nie znaleziono klienta. Upewnij się, że Twoje konto zostało w pełni zarejestrowane.");
+        var addressDto = new AddressDto(
+            request.Address.Street,
+            request.Address.BuildingNumber,
+            request.Address.AppartmentNumber,
+            request.Address.City
+        );
 
         var command = new CreateOrderCommand(
             customerId,
             request.RestaurantId,
             null,
-            customer.AddressId,
+            addressDto,
             request.Notes,
             request.DeliveryTime,
             request.Items.Select(item => new CreateOrderItem(
                 item.DishId, item.DishNameAtPurchase, item.PriceAtPurchase, item.Quantity)).ToList());
 
         var created = await _mediator.Send(command);
-        if (created == null) return BadRequest("Błąd serwera.");
+        if (created == null) return BadRequest("Błąd podczas tworzenia zamówienia.");
 
         var resultDto = new CreateOrderResponseDto
         {
@@ -117,13 +113,5 @@ public class OrderController : ControllerBase
         };
 
         return Created(string.Empty, resultDto);
-    }
-
-    [HttpPatch("{id:Guid}/status")]
-    public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusRequestDto request)
-    {
-        var updated = await _mediator.Send(new UpdateOrderStatusCommand(id, request.Status));
-        if (updated == null) return NotFound();
-        return Created(string.Empty, new UpdateOrderStatusResponseDto { Id = updated.Id, Status = updated.OrderStatus.ToString() });
     }
 }

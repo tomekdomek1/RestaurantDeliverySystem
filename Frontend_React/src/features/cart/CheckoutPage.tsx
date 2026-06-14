@@ -6,7 +6,6 @@ import { useAuth } from '../auth/hooks/useAuth';
 import { useCart } from './context/CartContext';
 import { API_BASE_URL } from '../../config/api';
 
-
 const CheckoutPage: React.FC = () => {
     const { state, dispatch } = useCart();
     const { isLoggedIn } = useAuth();
@@ -14,6 +13,14 @@ const CheckoutPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [notes, setNotes] = useState('');
+    
+    // Zmiana: Inicjujemy numery jako puste stringi zamiast zer
+    const [address, setAddress] = useState({
+        street: '',
+        buildingNumber: '', 
+        appartmentNumber: '', 
+        city: ''
+    });
 
     if (state.items.length === 0) {
         return (
@@ -39,11 +46,16 @@ const CheckoutPage: React.FC = () => {
     const handleCheckout = async () => {
         setLoading(true);
         setError('');
-
         try {
             const payload = {
                 restaurantId: orderRestaurantId,
-                addressId: "00000000-0000-0000-0000-000000000000",
+                address: {
+                    street: address.street,
+                    // Zmiana: Rzutowanie na liczbę tuż przed wysłaniem. Jeśli puste, wysyła 0.
+                    buildingNumber: Number(address.buildingNumber) || 0,
+                    appartmentNumber: Number(address.appartmentNumber) || 0,
+                    city: address.city
+                },
                 notes: notes,
                 deliveryTime: new Date(new Date().getTime() + 45 * 60000).toISOString().split('T')[1].substring(0, 8),
                 items: state.items.map((item: any) => ({
@@ -64,7 +76,8 @@ const CheckoutPage: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error("Wystąpił błąd. Upewnij się, że jesteś poprawnie zalogowany.");
+                const errorData = await response.text();
+                throw new Error(errorData || "Wystąpił błąd podczas składania zamówienia.");
             }
 
             dispatch({ type: 'CLEAR_CART' });
@@ -116,6 +129,41 @@ const CheckoutPage: React.FC = () => {
                     rows={2}
                     sx={{ mt: 3 }}
                 />
+                
+                <Box sx={{ my: 3 }}>
+                    <TextField 
+                        fullWidth 
+                        label="Ulica" 
+                        value={address.street} 
+                        onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))} 
+                        margin="normal" 
+                    />
+                    <TextField 
+                        fullWidth 
+                        label="Numer budynku" 
+                        type="number" 
+                        value={address.buildingNumber} 
+                        // Zmiana: zapisuje to jako zwykły wpisywany tekst w stanie 
+                        onChange={(e) => setAddress(prev => ({ ...prev, buildingNumber: e.target.value }))} 
+                        margin="normal" 
+                    />
+                    <TextField 
+                        fullWidth 
+                        label="Numer mieszkania (opcjonalne)" 
+                        type="number" 
+                        value={address.appartmentNumber} 
+                        // Zmiana: tak samo jak wyżej
+                        onChange={(e) => setAddress(prev => ({ ...prev, appartmentNumber: e.target.value }))} 
+                        margin="normal" 
+                    />
+                    <TextField 
+                        fullWidth 
+                        label="Miasto" 
+                        value={address.city} 
+                        onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))} 
+                        margin="normal" 
+                    />
+                </Box>
 
                 <Button
                     fullWidth
