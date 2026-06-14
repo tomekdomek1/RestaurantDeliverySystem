@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { NotificationWidget } from '../orders/NotificationWidget';
 
 export const RestaurantReportPage = () => {
     const [startDate, setStartDate] = useState('');
@@ -53,49 +54,70 @@ export const RestaurantReportPage = () => {
         }
     };
 
+    const handleViewAllNotifications = () => {
+        // Navigate to notifications page with restaurant ID
+        if (selectedRestaurantId) {
+            window.location.href = `/admin/notifications/${selectedRestaurantId}`;
+        }
+    };
+
     return (
-        <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-            <h1>Raport Sprzedaży</h1>
-            <p>Wybierz restaurację oraz okres, za który chcesz wygenerować podsumowanie.</p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '20px' }}>
-                
-                <label style={{ display: 'flex', flexDirection: 'column', fontWeight: 'bold' }}>
-                    Wybierz restaurację:
-                    <select 
-                        value={selectedRestaurantId} 
-                        onChange={e => setSelectedRestaurantId(e.target.value)}
-                        style={{ padding: '8px', marginTop: '5px', borderRadius: '4px' }}
-                    >
-                        {restaurants.map(rest => (
-                            <option key={rest.id} value={rest.id}>
-                                {rest.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+        <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                    <h1>Raport Sprzedaży</h1>
+                    <p>Wybierz restaurację oraz okres, za który chcesz wygenerować podsumowanie.</p>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '20px' }}>
+                        
+                        <label style={{ display: 'flex', flexDirection: 'column', fontWeight: 'bold' }}>
+                            Wybierz restaurację:
+                            <select 
+                                value={selectedRestaurantId} 
+                                onChange={e => setSelectedRestaurantId(e.target.value)}
+                                style={{ padding: '8px', marginTop: '5px', borderRadius: '4px' }}
+                            >
+                                {restaurants.map(rest => (
+                                    <option key={rest.id} value={rest.id}>
+                                        {rest.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
 
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                    <label>Od: <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} /></label>
-                    <label>Do: <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} /></label>
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                            <label>Od: <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} /></label>
+                            <label>Do: <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} /></label>
+                        </div>
+
+                        <button 
+                            onClick={fetchReport} 
+                            style={{ padding: '10px 16px', cursor: 'pointer', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+                        >
+                            Generuj Raport
+                        </button>
+                    </div>
+
+                    {report && (
+                        <div style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', border: '1px solid #ddd', marginTop: '20px' }}>
+                            <h3>Podsumowanie:</h3>
+                            <p><strong>Ilość zamówień:</strong> {report.totalOrders}</p>
+                            <p><strong>Przychód całkowity:</strong> {report.totalRevenue} zł</p>
+                            <p><strong>Unikalni klienci:</strong> {report.newCustomers}</p>
+                        </div>
+                    )}
                 </div>
 
-                <button 
-                    onClick={fetchReport} 
-                    style={{ padding: '10px 16px', cursor: 'pointer', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}
-                >
-                    Generuj Raport
-                </button>
+                {selectedRestaurantId && (
+                    <div>
+                        <NotificationWidget 
+                            restaurantId={selectedRestaurantId}
+                            maxItems={5}
+                            onViewAll={handleViewAllNotifications}
+                        />
+                    </div>
+                )}
             </div>
-
-            {report && (
-                <div style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', border: '1px solid #ddd', marginTop: '20px' }}>
-                    <h3>Podsumowanie:</h3>
-                    <p><strong>Ilość zamówień:</strong> {report.totalOrders}</p>
-                    <p><strong>Przychód całkowity:</strong> {report.totalRevenue} zł</p>
-                    <p><strong>Unikalni klienci:</strong> {report.newCustomers}</p>
-                </div>
-            )}
         </div>
     );
 };

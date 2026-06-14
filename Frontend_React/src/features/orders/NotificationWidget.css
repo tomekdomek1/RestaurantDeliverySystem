@@ -1,0 +1,213 @@
+.notification-widget {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.widget-badge {
+  background-color: #ff5722;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.widget-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.widget-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.widget-item:hover {
+  background-color: #fafafa;
+}
+
+.widget-item:last-child {
+  border-bottom: none;
+}
+
+.widget-item.unread {
+  background-color: #fff8f7;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.unread-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #ff5722;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.item-order-id {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.item-amount {
+  font-size: 12px;
+  color: #666;
+}
+
+.item-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.item-status {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.item-status.status-waitingforconfirmation {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.item-status.status-confirmed {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.item-status.status-isbeingprepared {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.item-status.status-waitingfordriver {
+  background-color: #f3e5f5;
+  color: #4a148c;
+}
+
+.item-status.status-indelivery {
+  background-color: #fce4ec;
+  color: #880e4f;
+}
+
+.item-status.status-delivered {
+  background-color: #e0f2f1;
+  color: #004d40;
+}
+
+.widget-empty {
+  padding: 30px 16px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.widget-empty p {
+  margin: 0;
+}
+
+.widget-view-all {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+  color: #1976d2;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.widget-view-all:hover {
+  background-color: #f0f0f0;
+}
+
+/* Scrollbar styling */
+.widget-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.widget-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.widget-content::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 3px;
+}
+
+.widget-content::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+@media (max-width: 768px) {
+  .item-status {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .item-order-id {
+    font-size: 12px;
+  }
+
+  .item-amount {
+    font-size: 11px;
+  }
+
+  .item-time {
+    font-size: 10px;
+  }
+}

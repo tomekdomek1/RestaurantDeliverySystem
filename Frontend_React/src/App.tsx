@@ -17,6 +17,7 @@ import RestaurantPanelLayout from "./components/RestaurantPanelLayout";
 import AdminMenuPage from "./components/AdminMenuPage";
 import RequireRole from "./features/auth/components/RequireRole";
 import { RestaurantReportPage } from './features/restaurants/RestaurantReportPage';
+import { RestaurantNotificationsPage } from './features/orders/RestaurantNotificationsPage';
 import OrderDetailsPage from "./features/orders/OrderDetailsPage";
 import AdminOwnersPage from "./components/AdminOwnersPage";
 import AdminRestaurantsPage from "./components/AdminRestaurantsPage";
@@ -63,6 +64,7 @@ export default function App() {
                                 <Route index element={<Navigate to="/admin/menu" />} />
                                 <Route path="menu" element={<AdminMenuPage />} />
                                 <Route path="reports" element={<RestaurantReportPage />} />
+                                <Route path="notifications/:restaurantId" element={<RestaurantNotificationsPage restaurantId={undefined} />} />
                                 <Route path="owners" element={<AdminOwnersPage />} />
                                 <Route path="restaurants-list" element={<AdminRestaurantsPage />} />
                                 <Route path="customers" element={<AdminCustomersPage />} />
