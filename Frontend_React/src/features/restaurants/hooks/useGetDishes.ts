@@ -1,14 +1,23 @@
-import useSWR from "swr";
-import type { Dish } from "../types/dish";
+import useSWR from 'swr';
 
-export function useGetDishes(restaurantId?: string) {
-    const url = restaurantId ? `/api/dishes?restaurantId=${restaurantId}` : null;
-    const { data, error, isLoading, mutate } = useSWR<Dish[]>(url);
+// Twardo ustawiony fetcher na Twoje API .NET
+const fetcher = async (url: string) => {
+  const res = await fetch(`http://localhost:5122${url}`);
+  if (!res.ok) throw new Error('Błąd pobierania menu');
+  return res.json();
+};
 
-    return {
-        dishes: data ?? [],
-        isLoading,
-        error,
-        refreshDishes: mutate
-    };
+export function useGetDishes(restaurantId: string | undefined) {
+  const { data, error, isLoading, mutate } = useSWR(
+    restaurantId ? `/api/restaurants/${restaurantId}/dishes` : null,
+    fetcher
+  );
+
+  return {
+    // API backendowe zwraca tutaj bezpośrednio tablicę
+    dishes: Array.isArray(data) ? data : [],
+    isLoading,
+    error,
+    mutate
+  };
 }

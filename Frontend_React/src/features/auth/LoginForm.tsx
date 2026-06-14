@@ -1,81 +1,65 @@
-import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "./hooks/useAuth";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Box, Button, TextField, Typography, Paper, Alert, Fade, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useAuth } from './hooks/useAuth';
 
-const LoginForm: React.FC = () => {
-  const { enqueueSnackbar } = useSnackbar();
+export default function LoginForm() {
   const navigate = useNavigate();
-  const { login, loading } = useAuth();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState<string>("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     try {
-      await login(formData.email, formData.password);
-      enqueueSnackbar("Login successful! Welcome back.", { variant: "success" });
-      navigate("/restaurants");
-    } catch (error) {
-      console.error("Error:", error);
-      const errorMsg = error instanceof Error ? error.message : "Invalid email or password";
-      setError(errorMsg);
-      enqueueSnackbar(errorMsg, { variant: "error" });
+      await login(email, password);
+      navigate('/');
+    } catch (err: any) {
+      setError("Nieprawidłowy adres email lub hasło.");
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 400, mx: "auto", mt: 8 }}>
-      <Typography variant="h5" textAlign="center" mb={2}>
-        Login
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          margin="normal"
-          disabled={loading}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          margin="normal"
-          disabled={loading}
-        />
-        {error && (
-          <Typography color="error" variant="body2" mt={1}>
-            {error}
+    <Fade in={true} timeout={800}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <Paper elevation={6} sx={{ p: 4, width: '100%', maxWidth: 450, borderRadius: 3, bgcolor: 'background.paper' }}>
+          <Typography variant="h4" gutterBottom align="center" color="primary.main" fontWeight="bold">
+            Logowanie
           </Typography>
-        )}
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          sx={{ mt: 2 }}
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </Button>
-      </Box>
-    </Paper>
-  );
-};
+          <Typography variant="body2" align="center" sx={{ mb: 3 }} color="text.secondary">
+            Witaj ponownie! Zaloguj się, aby kontynuować.
+          </Typography>
+          
+          {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
 
-export default LoginForm;
+          <form onSubmit={handleSubmit}>
+            <TextField fullWidth label="Email" type="email" margin="normal" variant="outlined" value={email} onChange={e => setEmail(e.target.value)} required />
+            <TextField fullWidth label="Hasło" type={showPassword ? 'text' : 'password'} margin="normal" variant="outlined" value={password} onChange={e => setPassword(e.target.value)} required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+            <Button fullWidth type="submit" variant="contained" color="primary" size="large" sx={{ mt: 4, mb: 3, py: 1.5 }}>
+              Zaloguj się
+            </Button>
+            <Box textAlign="center">
+              <Typography variant="body2" color="text.secondary">
+                Nie masz konta? <Link to="/register" style={{ color: '#4caf50', textDecoration: 'none', fontWeight: 'bold' }}>Zarejestruj się</Link>
+              </Typography>
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </Fade>
+  );
+}

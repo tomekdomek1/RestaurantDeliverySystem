@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Roles;
+using UberEats.Infrastructure.Databases;
 
 namespace UberEats.WebApi.Features.Auth
 {
@@ -17,11 +18,13 @@ namespace UberEats.WebApi.Features.Auth
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly AppDbContext _dbContext;
 
-        public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration, AppDbContext dbContext)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _dbContext = dbContext;
         }
 
         [HttpPost("register")]
@@ -30,12 +33,24 @@ namespace UberEats.WebApi.Features.Auth
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, FullName = dto.FullName, IsActive = true };
+            var userId = Guid.NewGuid().ToString();
+            var user = new ApplicationUser { Id = userId, UserName = dto.Email, Email = dto.Email, FullName = dto.FullName, IsActive = true };
             var result = await _userManager.CreateAsync(user, dto.Password);
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             await _userManager.AddToRoleAsync(user, UserRoles.User);
+
+            var nameParts = dto.FullName.Split(' ');
+            var name = nameParts.Length > 0 ? nameParts[0] : "Nowy";
+            var surname = nameParts.Length > 1 ? nameParts[1] : "Użytkownik";
+            
+            var address = new Address(Guid.NewGuid(), "Uzupełnij ulicę", 1, 1, "Uzupełnij miasto");
+            await _dbContext.Addresses.AddAsync(address);
+            
+            var customer = new Customer(Guid.Parse(userId), name, surname, dto.Email, "Brak telefonu", address.Id);
+            await _dbContext.Customers.AddAsync(customer);
+            await _dbContext.SaveChangesAsync();
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
@@ -46,13 +61,7 @@ namespace UberEats.WebApi.Features.Auth
             {
                 Message = "User registered successfully",
                 Token = isProduction ? null : token,
-                User = new
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    Roles = roles
-                }
+                User = new { Id = user.Id, Email = user.Email, FullName = user.FullName, Roles = roles }
             });
         }
 
@@ -69,7 +78,6 @@ namespace UberEats.WebApi.Features.Auth
             var result = await _userManager.CreateAsync(user, dto.Password);
 
             if (!result.Succeeded) return BadRequest(result.Errors);
-
             await _userManager.AddToRoleAsync(user, dto.Role);
 
             return Ok(new { Message = $"Staff member registered as {dto.Role}" });
@@ -79,12 +87,10 @@ namespace UberEats.WebApi.Features.Auth
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Unauthorized(new { Error = "Invalid credentials" });
             
-            if (!user.IsActive)
-                return Unauthorized(new { Error = "Account is inactive. Please contact support." });
+            if (!user.IsActive) return Unauthorized(new { Error = "Account is inactive." });
 
             var token = await GenerateJwtToken(user);
             SetJwtCookie(token);
@@ -95,13 +101,7 @@ namespace UberEats.WebApi.Features.Auth
             {
                 Message = "Login successful",
                 Token = isProduction ? null : token,
-                User = new
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    Roles = roles
-                }
+                User = new { Id = user.Id, Email = user.Email, FullName = user.FullName, Roles = roles }
             });
         }
 
@@ -116,31 +116,20 @@ namespace UberEats.WebApi.Features.Auth
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key not configured")));
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key error")));
             var userRoles = await _userManager.GetRolesAsync(user);
-
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                // Zabezpieczenie przed nullem, którego krzyczał kompilator (CS8604)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("uid", user.Id)
             };
 
-            foreach (var role in userRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            foreach (var role in userRoles) claims.Add(new Claim(ClaimTypes.Role, role));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds
-            );
+            var token = new JwtSecurityToken(issuer: jwtSettings["Issuer"], audience: jwtSettings["Audience"], claims: claims, expires: DateTime.UtcNow.AddHours(1), signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -152,11 +141,8 @@ namespace UberEats.WebApi.Features.Auth
 
         private Microsoft.AspNetCore.Http.CookieOptions GetCookieOptions(bool isLogout = false)
         {
-            // For security, assume production (secure cookies) if not explicitly set to false
             var isProduction = _configuration.GetValue<bool?>("IsProduction") ?? true;
             var isHttps = Request.Scheme == "https";
-            
-            // SameSite=None requires Secure=true
             var useSecure = isHttps || isProduction;
             
             return new Microsoft.AspNetCore.Http.CookieOptions
@@ -170,33 +156,22 @@ namespace UberEats.WebApi.Features.Auth
         }
     }
 
+    // Inicjalizowanie wartości string.Empty dla klas DTO usuwa ostrzeżenia C# o nullach (CS8618)
     public class RegisterUserDto
     {
-        [Required, EmailAddress]
-        public string Email { get; set; }
-        [Required, MinLength(6)]
-        public string Password { get; set; }
-        [Required]
-        public string FullName { get; set; }
+        [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+        [Required, MinLength(6)] public string Password { get; set; } = string.Empty;
+        [Required] public string FullName { get; set; } = string.Empty;
     }
 
-    public class RegisterStaffDto
+    public class RegisterStaffDto : RegisterUserDto
     {
-        [Required, EmailAddress]
-        public string Email { get; set; }
-        [Required, MinLength(6)]
-        public string Password { get; set; }
-        [Required]
-        public string FullName { get; set; }
-        [Required]
-        public string Role { get; set; }
+        [Required] public string Role { get; set; } = string.Empty;
     }
 
     public class LoginDto
     {
-        [Required, EmailAddress]
-        public string Email { get; set; }
-        [Required]
-        public string Password { get; set; }
+        [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+        [Required] public string Password { get; set; } = string.Empty;
     }
 }

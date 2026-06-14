@@ -6,6 +6,7 @@ using UberEats.Application.Restaurants.DeleteImage;
 using UberEats.Application.Restaurants.DeleteRestaurant;
 using UberEats.Application.Restaurants.EditRestaurant;
 using UberEats.Application.Restaurants.GetRestaurantById;
+using UberEats.Application.Restaurants.GetRestaurantReport;
 using UberEats.Application.Restaurants.GetRestaurants;
 using UberEats.Application.Restaurants.UploadImages;
 using UberEats.Domain.Constants;
@@ -184,6 +185,20 @@ public class RestaurantController : ControllerBase
         var command = new DeleteImageRestaurantCommand(id, imageId);
         var result = await _mediator.Send(command);
         return result ? NoContent() : BadRequest();
+    }
+
+    [HttpGet("{id}/report")]
+    public async Task<IActionResult> GetReport(Guid id, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var query = new GetRestaurantReportQuery 
+        { 
+            RestaurantId = id, 
+            StartDate = startDate, 
+            EndDate = endDate 
+        };
+        
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
 }

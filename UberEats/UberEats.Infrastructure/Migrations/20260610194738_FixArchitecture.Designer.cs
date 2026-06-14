@@ -11,8 +11,8 @@ using UberEats.Infrastructure.Databases;
 namespace UberEats.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260601195650_InitDatabase")]
-    partial class InitDatabase
+    [Migration("20260610194738_FixArchitecture")]
+    partial class FixArchitecture
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -451,7 +451,7 @@ namespace UberEats.Infrastructure.Migrations
                     b.Property<TimeOnly>("DeliveryTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("DriverId")
+                    b.Property<Guid?>("DriverId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
@@ -771,9 +771,7 @@ namespace UberEats.Infrastructure.Migrations
 
                     b.HasOne("UberEats.Domain.Entities.Driver", "Driver")
                         .WithMany("Orders")
-                        .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DriverId");
 
                     b.HasOne("UberEats.Domain.Entities.Restaurant", "Restaurant")
                         .WithMany("Orders")
@@ -889,8 +887,7 @@ namespace UberEats.Infrastructure.Migrations
 
             modelBuilder.Entity("UberEats.Domain.Entities.Order", b =>
                 {
-                    b.Navigation("OrderAddress")
-                        .IsRequired();
+                    b.Navigation("OrderAddress");
 
                     b.Navigation("OrderItems");
                 });

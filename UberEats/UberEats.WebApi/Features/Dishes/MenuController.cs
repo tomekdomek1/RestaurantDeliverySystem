@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UberEats.Application.Restaurants.Dishes.AddDishToMenu;
 using UberEats.Application.Restaurants.Dishes.DeleteDish;
@@ -11,7 +10,7 @@ using UberEats.WebApi.Features.Dishes.DishDTOs;
 
 namespace UberEats.WebApi.Features.Dishes;
 
-[Route("api/restaurants/{restaurantId}/dishes")]
+[Route("api/restaurants/{restaurantId:Guid}/dishes")]
 [ApiController]
 public class MenuController : ControllerBase
 {
@@ -23,6 +22,7 @@ public class MenuController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetDishes(Guid restaurantId)
     {
         var dishes = await _mediator.Send(new GetDishesQuery(restaurantId));
@@ -36,11 +36,12 @@ public class MenuController : ControllerBase
             CategoryId = dish.CategoryId
         });
 
+        // Frontend oczekuje tablicy bezpośrednio
         return Ok(resultDto);
     }
 
     [HttpPost]
-    [Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.RestaurantOwner)]
     public async Task<IActionResult> AddDishToMenu(Guid restaurantId, [FromBody] AddDishRequestDto request)
     {
         var command = new AddDishToMenuCommand(
@@ -61,18 +62,14 @@ public class MenuController : ControllerBase
             CategoryId = dish.CategoryId
         };
 
-        return Created(nameof(AddDishToMenu), resultDto);
+        return Created(string.Empty, resultDto);
     }
 
-    // TODO: Seems to delete strings that are not provided in the body of the request. It's most likely an issue with the MapObjects.Map() function.
     [HttpPatch("{dishId:Guid}")]
-    [Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.RestaurantOwner)]
     public async Task<IActionResult> EditDish(Guid restaurantId, Guid dishId, [FromBody] EditDishRequestDto request)
     {
-        if (request == null)
-        {
-            return BadRequest();
-        }
+        if (request == null) return BadRequest();
 
         var command = new EditDishCommand(
             dishId,
@@ -84,10 +81,7 @@ public class MenuController : ControllerBase
 
         var edited = await _mediator.Send(command);
 
-        if (edited == null)
-        {
-            return NotFound();
-        }
+        if (edited == null) return NotFound();
 
         var resultDto = new EditDishResponseDto
         {
@@ -98,15 +92,14 @@ public class MenuController : ControllerBase
             CategoryId = edited.CategoryId
         };
 
-        return Created(string.Empty, resultDto);
+        return Ok(resultDto);
     }
 
     [HttpDelete("{dishId:Guid}")]
-    [Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.RestaurantOwner)]
     public async Task<IActionResult> DeleteDish(Guid restaurantId, Guid dishId)
     {
         await _mediator.Send(new DeleteDishCommand(dishId, restaurantId));
-
         return NoContent();
     }
 }
