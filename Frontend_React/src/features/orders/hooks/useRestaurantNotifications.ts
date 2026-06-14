@@ -22,6 +22,11 @@ export const useRestaurantNotifications = (restaurantId: string): UseRestaurantN
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchActiveOrders = useCallback(async (): Promise<Order[]> => {
+    if (!restaurantId) {
+      setError('Restaurant ID is required');
+      return [];
+    }
+
     try {
       const response = await fetch(
         `http://localhost:5122/api/orders/restaurant/${restaurantId}/active`,
