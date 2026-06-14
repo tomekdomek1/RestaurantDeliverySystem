@@ -11,7 +11,6 @@ public enum OrderStatus
     WaitingForConfirmation,
     Confirmed,
     IsBeingPrepared,
-    WaitingForDriver,
     InDelivery,
     Delivered
 }

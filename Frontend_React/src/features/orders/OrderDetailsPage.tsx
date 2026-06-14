@@ -13,13 +13,8 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import NotesIcon from '@mui/icons-material/Notes';
 import StarIcon from '@mui/icons-material/Star';
 import { API_BASE_URL } from '../../config/api'; 
-
-const ORDER_STATUSES = [
-  { backendName: 'WaitingForConfirmation', label: 'Oczekuje na akceptację' },
-  { backendName: 'Accepted', label: 'W przygotowaniu' },
-  { backendName: 'InDelivery', label: 'W drodze' },
-  { backendName: 'Delivered', label: 'Dostarczone' }
-];
+// NOWY IMPORT Z TWOJEGO PLIKU:
+import { ORDER_STATUSES, getActiveStepIndex } from '../../constants/OrderStatuses'
 
 export default function OrderDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -93,8 +88,8 @@ export default function OrderDetailsPage() {
   if (error) return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
   if (!order) return null;
 
-  let activeStep = ORDER_STATUSES.findIndex(s => s.backendName === order.orderStatus);
-  if (activeStep === -1) activeStep = 0;
+  // UŻYCIE NASZEJ NOWEJ FUNKCJI DO WYLICZENIA KROKU:
+  const activeStep = getActiveStepIndex(order.orderStatus);
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
@@ -116,8 +111,9 @@ export default function OrderDetailsPage() {
 
         <Box sx={{ width: '100%', mb: 6 }}>
           <Stepper activeStep={activeStep} alternativeLabel>
+            {/* UŻYCIE WSPÓLNEJ TABLICY STATUSÓW: */}
             {ORDER_STATUSES.map((status) => (
-              <Step key={status.label}>
+              <Step key={status.backendName}>
                 <StepLabel>{status.label}</StepLabel>
               </Step>
             ))}
@@ -192,7 +188,8 @@ export default function OrderDetailsPage() {
               <Typography variant="h6" color="primary" fontWeight="bold">{order.totalAmount.toFixed(2)} zł</Typography>
             </Box>
 
-            {order.orderStatus === 'Delivered' && !reviewSuccess && (
+            {/* Przycisk recenzji pokazuje się tylko dla statusu 4 (Dostarczone) */}
+            {order.orderStatus === 4 && !reviewSuccess && (
               <Box sx={{ mt: 4 }}>
                 <Button 
                   variant="contained" 

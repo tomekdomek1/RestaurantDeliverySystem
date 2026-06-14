@@ -6,6 +6,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import PeopleIcon from '@mui/icons-material/People';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PersonIcon from '@mui/icons-material/Person';
 
 const drawerWidth = 280;
 
@@ -36,9 +38,10 @@ export default function RestaurantPanelLayout() {
     menuItems.push({ text: 'Klienci', icon: <PeopleIcon />, path: '/admin/customers' });
   } 
   else if (isOwner) {
+    menuItems.push({ text: 'Zamówienia', icon: <ReceiptLongIcon />, path: '/admin/orders' });
     menuItems.push({ text: 'Moje Menu', icon: <RestaurantMenuIcon />, path: '/admin/menu' });
-    menuItems.push({ text: 'Raporty (Dashboard)', icon: <DashboardIcon />, path: '/admin/reports' });
-  } 
+    menuItems.push({ text: 'Raporty', icon: <DashboardIcon />, path: '/admin/reports' });
+  }
 
   return (
     <Box sx={{ display: 'flex', bgcolor: '#f4f7fe', minHeight: '100vh' }}>

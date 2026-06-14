@@ -1,4 +1,3 @@
-// Frontend_React/src/context/CartContext.tsx
 import React, { createContext, useReducer, useContext } from 'react';
 import type { CartAction, CartState } from '../types/cart';
 import type { PropsWithChildren } from 'react';
@@ -10,7 +9,7 @@ const initialState: CartState = {
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM':
-      const newItem = action.payload;
+      const newItem = (action as any).payload;
       const existingItem = state.items.find((item: any) => item.id === newItem.id);
 
       if (existingItem) {
@@ -32,7 +31,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'REMOVE_ITEM':
       return {
         ...state,
-        items: state.items.filter((item: any) => item.id !== action.payload.id),
+        items: state.items.filter((item: any) => item.id !== (action as any).payload.id),
       };
 
     case 'UPDATE_QUANTITY':
@@ -40,8 +39,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         ...state,
         items: state.items
           .map((item: any) =>
-            item.id === action.payload.id
-              ? { ...item, quantity: action.payload.quantity }
+            item.id === (action as any).payload.id
+              ? { ...item, quantity: (action as any).payload.quantity }
               : item
           )
           .filter((item: any) => item.quantity > 0),
@@ -62,14 +61,39 @@ interface CartContextType {
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined) as React.Context<CartContextType>;
+
 export const CartProvider: React.FC<PropsWithChildren<{}>> = ({ children }): React.ReactElement => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  
+  const customDispatch = (action: CartAction) => {
+    if (action.type === 'ADD_ITEM') {
+      const newItem = (action as any).payload;
+      
+      const currentRestaurantId = state.items.length > 0 ? (state.items[0] as any).restaurantId : null;
+
+      if (currentRestaurantId && currentRestaurantId !== newItem.restaurantId) {
+        const wantsToClear = window.confirm(
+          "Masz już w koszyku dania z innej restauracji. Koszyk może zawierać produkty tylko z jednego lokalu naraz.\n\nCzy chcesz wyczyścić koszyk i rozpocząć nowe zamówienie w tej restauracji?"
+        );
+        
+        if (wantsToClear) {
+          dispatch({ type: 'CLEAR_CART' } as CartAction);
+          dispatch(action);
+        }
+        
+        return; 
+      }
+    }
+    
+    dispatch(action);
+  };
+
   const totalPrice = state.items.reduce(function(acc: number, item: any) {
     return acc + item.price * item.quantity;
   }, 0);
 
   return (
-    <CartContext.Provider value={{ state, dispatch, totalPrice }}>
+    <CartContext.Provider value={{ state, dispatch: customDispatch, totalPrice }}>
       {children}
     </CartContext.Provider>
   );
