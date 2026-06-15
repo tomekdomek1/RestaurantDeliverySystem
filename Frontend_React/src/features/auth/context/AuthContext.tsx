@@ -104,7 +104,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       if (!response.ok) {
-        throw new Error('Registration failed');
+        const errorData = await response.json();
+        let errorMessage = 'Błąd rejestracji';
+        
+        if (errorData && Array.isArray(errorData)) {
+          errorMessage = errorData.map((e: any) => e.description || 'Błąd walidacji').join('; ');
+        } else if (errorData && typeof errorData === 'object' && 'message' in errorData) {
+          errorMessage = errorData.message;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json() as AuthResponse;

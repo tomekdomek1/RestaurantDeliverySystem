@@ -4,6 +4,7 @@ import { Container, Typography, Card, CardContent, CardActions, Button, Box, Cir
 import { API_BASE_URL } from '../../config/api';
 import { useCart } from '../cart/context/CartContext';
 import { useAuth } from '../auth/hooks/useAuth';
+import ReviewsSection from '../reviews/components/ReviewsSection';
 
 interface Dish {
   id: string;
@@ -185,7 +186,7 @@ const RestaurantMenuPage: React.FC = () => {
           totalReviews={restaurant.totalReviews}
         />
       )}
-    </Box>
+    </Container>
   );
 };
 
