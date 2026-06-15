@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Order, NotificationRecord } from '../services/NotificationService';
 import { NotificationService } from '../services/NotificationService';
+import { API_BASE_URL } from '../../../config/api';
 
 const POLLING_INTERVAL = 10000; // 10 seconds
 
@@ -10,6 +11,7 @@ export interface UseRestaurantNotificationsReturn {
   isLoading: boolean;
   error: string | null;
   markAsRead: (orderId: string) => void;
+  markAllAsRead: () => void;
   clearHistory: () => void;
   refresh: () => Promise<void>;
 }
@@ -29,7 +31,7 @@ export const useRestaurantNotifications = (restaurantId: string): UseRestaurantN
 
     try {
       const response = await fetch(
-        `http://localhost:5122/api/orders/restaurant/${restaurantId}/active`,
+        `${API_BASE_URL}/api/orders/restaurant/${restaurantId}/active`,
         {
           method: 'GET',
           headers: {
@@ -83,6 +85,15 @@ export const useRestaurantNotifications = (restaurantId: string): UseRestaurantN
     setUnreadCount(NotificationService.getUnreadCount());
   }, []);
 
+  const markAllAsRead = useCallback(() => {
+    const allNotifications = NotificationService.getNotifications();
+    allNotifications.forEach(n => {
+      NotificationService.markAsRead(n.orderId);
+    });
+    setNotifications(NotificationService.getNotifications());
+    setUnreadCount(0);
+  }, []);
+
   const clearHistory = useCallback(() => {
     NotificationService.clearHistory();
     setNotifications([]);
@@ -114,6 +125,7 @@ export const useRestaurantNotifications = (restaurantId: string): UseRestaurantN
     isLoading,
     error,
     markAsRead,
+    markAllAsRead,
     clearHistory,
     refresh,
   };
