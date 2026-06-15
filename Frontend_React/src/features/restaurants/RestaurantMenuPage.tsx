@@ -4,6 +4,7 @@ import { Container, Typography, Card, CardContent, CardActions, Button, Box, Cir
 import { API_BASE_URL } from '../../config/api';
 import { useCart } from '../cart/context/CartContext';
 import { useAuth } from '../auth/hooks/useAuth';
+import ReviewsSection from '../reviews/components/ReviewsSection';
 
 interface Dish {
   id: string;
@@ -177,29 +178,13 @@ const RestaurantMenuPage: React.FC = () => {
         </Box>
       )}
 
-      <Divider sx={{ my: 6, borderColor: 'primary.dark' }} />
-
-      <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>Opinie klientów</Typography>
-      {reviews.length === 0 ? (
-        <Typography variant="body1" color="text.secondary">Jeszcze nikt nie ocenił tej restauracji.</Typography>
-      ) : (
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
-          {reviews.map((review) => (
-            <Paper key={review.id} elevation={2} sx={{ p: 3, borderRadius: 2, backgroundColor: 'background.paper', height: '100%' }}>
-              <Box display="flex" alignItems="center" mb={1}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary" sx={{ mr: 2 }}>
-                  {review.rating} ⭐
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {new Date(review.createdAt).toLocaleDateString()}
-                </Typography>
-              </Box>
-              {review.description && (
-                <Typography variant="body1" sx={{ mt: 1 }}>{review.description}</Typography>
-              )}
-            </Paper>
-          ))}
-        </Box>
+      {/* Tutaj przekazujemy averageRating oraz totalReviews bezpośrednio z pobranego obiektu restaurant */}
+      {id && (
+        <ReviewsSection 
+          restaurantId={id} 
+          averageRating={restaurant.averageRating}
+          totalReviews={restaurant.totalReviews}
+        />
       )}
     </Container>
   );

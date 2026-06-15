@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Box, Button, TextField, Typography, Paper, Alert, Fade, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useAuth } from './hooks/useAuth';
 
 export default function RegistrationForm() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -30,25 +32,11 @@ export default function RegistrationForm() {
     if (!validate()) return;
     
     try {
-      const response = await fetch('http://localhost:5122/api/Auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, fullName })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        // Sprawdźmy co wypluwa backend .NET Identity
-        if (errorData && Array.isArray(errorData)) {
-            setErrors(errorData.map((e: any) => e.description || "Błąd walidacji"));
-        } else {
-            setErrors(["Użytkownik o podanym adresie email może już istnieć lub podano błędne dane."]);
-        }
-        return;
-      }
+      await register(email, password, fullName);
       navigate('/login');
     } catch (err) {
-      setErrors(["Wystąpił problem z połączeniem z serwerem."]);
+      const error = err instanceof Error ? err.message : 'Wystąpił problem z rejestracją.';
+      setErrors([error]);
     }
   };
 

@@ -1,0 +1,293 @@
+.notifications-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.unread-badge {
+  background-color: #ff5722;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-refresh,
+.btn-clear-history {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-refresh {
+  background-color: #1976d2;
+  color: white;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  background-color: #1565c0;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.btn-refresh:disabled {
+  background-color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.btn-clear-history {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-clear-history:hover {
+  background-color: #d32f2f;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.error-message {
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.filters label {
+  font-weight: 600;
+  color: #555;
+}
+
+.status-filter {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.notifications-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.notification-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #bbb;
+}
+
+.notification-item.unread {
+  border-left: 4px solid #ff5722;
+  background-color: #fff8f7;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.order-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.order-id {
+  font-weight: 700;
+  font-size: 16px;
+  color: #333;
+}
+
+.order-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-waitingforconfirmation {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.status-confirmed {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.status-isbeingprepared {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.status-waitingfordriver {
+  background-color: #f3e5f5;
+  color: #4a148c;
+}
+
+.status-indelivery {
+  background-color: #fce4ec;
+  color: #880e4f;
+}
+
+.status-delivered {
+  background-color: #e0f2f1;
+  color: #004d40;
+}
+
+.order-details {
+  margin-bottom: 12px;
+  color: #666;
+  font-size: 14px;
+}
+
+.order-details p {
+  margin: 4px 0;
+}
+
+.order-items {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.order-items strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 14px;
+}
+
+.order-items ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #666;
+}
+
+.order-items li {
+  margin: 4px 0;
+}
+
+.btn-mark-read {
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.btn-mark-read:hover {
+  background-color: #45a049;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.empty-state p {
+  font-size: 18px;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .notifications-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .header-actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .btn-refresh,
+  .btn-clear-history {
+    flex: 1;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .notification-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-mark-read {
+    width: 100%;
+  }
+}

@@ -114,7 +114,6 @@ public class OrderController : ControllerBase
 
         return Created(string.Empty, resultDto);
     }
-
     [HttpPatch("{id}/status")]
     public async Task<ActionResult<UpdateOrderStatusResponseDto>> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusRequestDto request)
     {
@@ -159,7 +158,38 @@ public class OrderController : ControllerBase
             },
             Items = order.OrderItems.Select(item => new OrderItemResultDto
             {
-                Id = item.Id, DishId = item.DishId, Name = item.DishNameAtPurchase, Price = item.PriceAtPurchase, Quantity = item.Quantity
+                Id = item.Id,
+                DishId = item.DishId,
+                Name = item.DishNameAtPurchase,
+                Price = item.PriceAtPurchase,
+                Quantity = item.Quantity
+            }).ToList()
+        }).ToList();
+
+        return Ok(resultDto);
+    }
+
+    [Authorize]
+    [HttpGet("restaurant/{restaurantId:Guid}/active")]
+    public async Task<IActionResult> GetActiveOrdersByRestaurant(Guid restaurantId)
+    {
+        var orders = await _mediator.Send(new GetActiveOrdersByRestaurantQuery(restaurantId));
+
+        var resultDto = orders.Select(order => new GetActiveOrdersResultDto
+        {
+            Id = order.Id,
+            RestaurantId = order.RestaurantId,
+            CustomerId = order.CustomerId,
+            Date = order.Date,
+            Status = order.OrderStatus.ToString(),
+            TotalAmount = order.TotalAmount,
+            Items = order.OrderItems.Select(item => new OrderItemResultDto
+            {
+                Id = item.Id,
+                DishId = item.DishId,
+                Name = item.DishNameAtPurchase,
+                Price = item.PriceAtPurchase,
+                Quantity = item.Quantity
             }).ToList()
         }).ToList();
 
