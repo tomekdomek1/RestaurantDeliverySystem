@@ -18,7 +18,6 @@ export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  // --- ODCZYTYWANIE ROLI ---
   const token = localStorage.getItem('auth_token');
   let isAdmin = false;
   let isOwner = false;
@@ -82,7 +81,6 @@ export default function Navbar() {
                   <AccountCircleIcon />
                 </Avatar>
               </IconButton>
-              
               <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose} transformOrigin={{ horizontal: 'right', vertical: 'top' }} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }} PaperProps={{ elevation: 4, sx: { mt: 1.5, minWidth: 200, borderRadius: 2 }}}>
                 {!isAdmin && !isOwner && (
                   <MenuItem component={Link} to="/orders" onClick={handleMenuClose} sx={{ fontWeight: 600, py: 1.5 }}>🧾 Moje Zamówienia</MenuItem>
