@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Card, CardContent, CircularProgress, Chip, Divider, Button } from "@mui/material";
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -6,13 +6,13 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useGetOrders } from "../restaurants/hooks/useGetOrders";
 import type { GetMyOrdersResultDto, OrderItemResultDto } from "../../api/types/order";
 
-const STATUS_LABELS: Record<string, string> = {
-  'waitingforconfirmation': 'Oczekuje',
-  'accepted': 'W przygotowaniu',
-  'indelivery': 'W drodze',
-  'delivered': 'Dostarczone',
-  'rejected': 'Odrzucone'
-};
+// const STATUS_LABELS: Record<string, string> = {
+//   'waitingforconfirmation': 'Oczekuje',
+//   'accepted': 'W przygotowaniu',
+//   'indelivery': 'W drodze',
+//   'delivered': 'Dostarczone',
+//   'rejected': 'Odrzucone'
+// };
 
 export default function OrdersHistoryPage() {
   const navigate = useNavigate();
