@@ -1,8 +1,11 @@
 import useSWR from "swr";
-import type { GetRestaurantResponseDto } from "../types/restaurantDtos";
+import type { GetRestaurantResponseDto, RestaurantCategory } from "../types/restaurantDtos";
 
-export function useGetRestaurants() {
-    const { data, error, isLoading, mutate } = useSWR<GetRestaurantResponseDto[]>('/api/restaurants');
+export function useGetRestaurants(category?: RestaurantCategory | '') {
+
+    const queryUrl = category ? `/api/restaurants?category=${category}` : '/api/restaurants';
+    
+    const { data, error, isLoading, mutate } = useSWR<GetRestaurantResponseDto[]>(queryUrl);
 
     return {
         restaurants: data ?? [],

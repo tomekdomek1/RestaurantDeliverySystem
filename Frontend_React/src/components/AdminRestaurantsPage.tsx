@@ -1,13 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Typography, Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, IconButton, Tooltip, Autocomplete, InputAdornment, Divider 
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, IconButton, Tooltip, Autocomplete, InputAdornment, Divider, MenuItem, Chip 
 } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import { API_BASE_URL } from '../config/api';
+
+const CATEGORIES = [
+  { value: 'Pizza', label: 'Pizza' },
+  { value: 'Burgers', label: 'Burgery' },
+  { value: 'Sushi', label: 'Sushi' },
+  { value: 'Kebab', label: 'Kebab' },
+  { value: 'Asian', label: 'Azjatyckie' },
+  { value: 'Italian', label: 'Włoskie' },
+  { value: 'Polish', label: 'Polskie' },
+  { value: 'Vegan', label: 'Wegańskie' },
+  { value: 'Other', label: 'Inne' },
+];
 
 export default function AdminRestaurantsPage() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -19,7 +31,7 @@ export default function AdminRestaurantsPage() {
   const [status, setStatus] = useState({ type: '', message: '' });
 
   const [form, setForm] = useState({ 
-    id: '', name: '', phone: '', desc: '', addressId: '', ownerEmail: '',
+    id: '', name: '', phone: '', desc: '', addressId: '', ownerEmail: '', category: 'Other',
     addressCity: '', addressStreet: '', addressBuilding: '', addressAppartment: '' 
   });
 
@@ -70,7 +82,18 @@ export default function AdminRestaurantsPage() {
 
       const url = isEditing ? `${API_BASE_URL}/api/restaurants/${form.id}` : `${API_BASE_URL}/api/restaurants`;
       const desc = `${form.desc} [OWNER:${form.ownerEmail}]`;
-      const response = await fetch(url, { method: isEditing ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }, body: JSON.stringify({ name: form.name, phoneNumber: form.phone, descrition: desc, addressId: finalAddressId })});
+      
+      const response = await fetch(url, { 
+        method: isEditing ? 'PATCH' : 'POST', 
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }, 
+        body: JSON.stringify({ 
+          name: form.name, 
+          phoneNumber: form.phone, 
+          descrition: desc, 
+          addressId: finalAddressId,
+          category: form.category
+        })
+      });
       
       if (!response.ok) throw new Error('Błąd zapisywania restauracji.');
       
@@ -90,7 +113,11 @@ export default function AdminRestaurantsPage() {
 
   const openEdit = async (rest: any) => {
     setIsEditing(true);
-    setForm({ id: rest.id, name: rest.name, phone: rest.phoneNumber, desc: rest.cleanDesc, addressId: rest.addressId, ownerEmail: rest.ownerEmail, addressCity: 'Ładowanie...', addressStreet: 'Ładowanie...', addressBuilding: '', addressAppartment: '' });
+    setForm({ 
+      id: rest.id, name: rest.name, phone: rest.phoneNumber, desc: rest.cleanDesc, 
+      addressId: rest.addressId, ownerEmail: rest.ownerEmail, category: rest.category || 'Other',
+      addressCity: 'Ładowanie...', addressStreet: 'Ładowanie...', addressBuilding: '', addressAppartment: '' 
+    });
     setStatus({ type: '', message: '' }); 
     setOpenModal(true);
     try {
@@ -104,7 +131,10 @@ export default function AdminRestaurantsPage() {
 
   const openCreate = () => {
     setIsEditing(false);
-    setForm({ id: '', name: '', phone: '', desc: '', addressId: '', ownerEmail: '', addressCity: '', addressStreet: '', addressBuilding: '', addressAppartment: '' });
+    setForm({ 
+      id: '', name: '', phone: '', desc: '', addressId: '', ownerEmail: '', category: 'Other',
+      addressCity: '', addressStreet: '', addressBuilding: '', addressAppartment: '' 
+    });
     setStatus({ type: '', message: '' });
     setOpenModal(true);
   };
@@ -120,11 +150,14 @@ export default function AdminRestaurantsPage() {
       </Box>
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}><TableRow><TableCell><b>Nazwa</b></TableCell><TableCell><b>E-mail Właściciela</b></TableCell><TableCell><b>Telefon</b></TableCell><TableCell align="right"><b>Akcje</b></TableCell></TableRow></TableHead>
+          <TableHead sx={{ bgcolor: '#f5f5f5' }}><TableRow><TableCell><b>Nazwa</b></TableCell><TableCell><b>Kategoria</b></TableCell><TableCell><b>E-mail Właściciela</b></TableCell><TableCell><b>Telefon</b></TableCell><TableCell align="right"><b>Akcje</b></TableCell></TableRow></TableHead>
           <TableBody>
-            {filteredRestaurants.length === 0 ? <TableRow><TableCell colSpan={4} align="center">Brak wyników</TableCell></TableRow> : filteredRestaurants.map((rest) => (
+            {filteredRestaurants.length === 0 ? <TableRow><TableCell colSpan={5} align="center">Brak wyników</TableCell></TableRow> : filteredRestaurants.map((rest) => (
               <TableRow key={rest.id} hover>
-                <TableCell>{rest.name}</TableCell><TableCell>{rest.ownerEmail}</TableCell><TableCell>{rest.phoneNumber}</TableCell>
+                <TableCell>{rest.name}</TableCell>
+                <TableCell><Chip size="small" label={CATEGORIES.find(c => c.value === rest.category)?.label || rest.category} /></TableCell>
+                <TableCell>{rest.ownerEmail}</TableCell>
+                <TableCell>{rest.phoneNumber}</TableCell>
                 <TableCell align="right">
                   <Tooltip title="Usuń restaurację"><IconButton color="error" onClick={() => handleDelete(rest.id)} sx={{ mr: 1 }}><DeleteIcon /></IconButton></Tooltip>
                   <Tooltip title="Edytuj dane i przypisanie"><IconButton color="primary" onClick={() => openEdit(rest)}><EditIcon /></IconButton></Tooltip>
@@ -140,8 +173,15 @@ export default function AdminRestaurantsPage() {
         <DialogContent dividers>
           {status.message && <Alert severity={status.type as any} sx={{ mb: 2 }}>{status.message}</Alert>}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <Typography variant="subtitle2" color="text.secondary">Przypisanie</Typography>
+            <Typography variant="subtitle2" color="text.secondary">Przypisanie i Typ</Typography>
             <Autocomplete options={owners} getOptionLabel={(option) => `${option.fullName} (${option.email})`} isOptionEqualToValue={(option, value) => option.email === value.email} value={owners.find(o => o.email === form.ownerEmail) || null} onChange={(event, newValue) => setForm({ ...form, ownerEmail: newValue ? newValue.email : '' })} renderInput={(params) => <TextField {...params} label="Właściciel" required />} />
+            
+            <TextField select label="Kategoria" value={form.category} onChange={e => setForm({...form, category: e.target.value})} fullWidth required>
+              {CATEGORIES.map((option) => (
+                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+              ))}
+            </TextField>
+
             <Divider sx={{ my: 1 }} />
             <Typography variant="subtitle2" color="text.secondary">Dane ogólne</Typography>
             <TextField label="Nazwa" value={form.name} onChange={e => setForm({...form, name: e.target.value})} fullWidth />

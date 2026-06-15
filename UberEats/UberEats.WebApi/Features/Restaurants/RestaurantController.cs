@@ -10,6 +10,7 @@ using UberEats.Application.Restaurants.GetRestaurantReport;
 using UberEats.Application.Restaurants.GetRestaurants;
 using UberEats.Application.Restaurants.UploadImages;
 using UberEats.Domain.Constants;
+using UberEats.Domain.Enums;
 using UberEats.Domain.Repository;
 using UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
 
@@ -29,14 +30,13 @@ public class RestaurantController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRestaurants()
+    public async Task<IActionResult> GetRestaurants([FromQuery] RestaurantCategory? category)
     {
-        var entities = await _mediator.Send(new GetRestaurantsQuery());
+        var entities = await _mediator.Send(new GetRestaurantsQuery { Category = category });
         var ratingsByRestaurantId = await _reviewRepository.GetAverageRatingsAndCountsAsync(
             entities.Select(r => r.Id),
             ReviewConstants.GetReviewCutoffDate());
 
-        // TODO: implement pagination
         var resultDto = entities.Select(r =>
         {
             var ratingStats = ratingsByRestaurantId.GetValueOrDefault(r.Id, (AverageRating: 0m, TotalCount: 0));
@@ -48,7 +48,8 @@ public class RestaurantController : ControllerBase
                 Descrition = r.Descrition,
                 AddressId = r.AddressId,
                 AverageRating = ratingStats.AverageRating,
-                TotalReviews = ratingStats.TotalCount
+                TotalReviews = ratingStats.TotalCount,
+                Category = r.Category.ToString()
             };
         }).ToList();
 
@@ -75,7 +76,8 @@ public class RestaurantController : ControllerBase
             Descrition = entity.Descrition,
             AddressId = entity.AddressId,
             AverageRating = averageRating,
-            TotalReviews = totalReviews
+            TotalReviews = totalReviews,
+            Category = entity.Category.ToString()
         };
 
         return Ok(resultDto);
@@ -93,7 +95,8 @@ public class RestaurantController : ControllerBase
             request.Name,
             request.PhoneNumber,
             request.Descrition,
-            request.AddressId);
+            request.AddressId,
+            request.Category);
 
         var created = await _mediator.Send(command);
 
@@ -103,10 +106,10 @@ public class RestaurantController : ControllerBase
             Name = created.Name,
             PhoneNumber = created.PhoneNumber,
             Descrition = created.Descrition,
-            AddressId = created.AddressId
+            AddressId = created.AddressId,
+            Category = created.Category.ToString()
         };
 
-        // change for GetRestaurantById later or handle response differently
         return Created(string.Empty, resultDto);
     }
 
@@ -122,7 +125,8 @@ public class RestaurantController : ControllerBase
             id,
             request.Name,
             request.PhoneNumber,
-            request.Descrition);
+            request.Descrition,
+            request.Category);
 
         var edited = await _mediator.Send(command);
 
@@ -137,10 +141,10 @@ public class RestaurantController : ControllerBase
             Name = edited.Name,
             PhoneNumber = edited.PhoneNumber,
             Descrition = edited.Descrition,
-            AddressId = edited.AddressId
+            AddressId = edited.AddressId,
+            Category = edited.Category.ToString()
         };
 
-        // change for GetRestaurantById later or handle response differently
         return Created(string.Empty, resultDto);
     }
 
@@ -148,13 +152,10 @@ public class RestaurantController : ControllerBase
     public async Task<IActionResult> DeleteRestaurant(Guid id)
     {
         var command = new DeleteRestaurantCommand(id);
-        // don't know if it should return something, an 'ok' string doesn't sound too professional
         await _mediator.Send(command);
 
         return NoContent();
     }
-
-
 
     [HttpPost("{id:Guid}/images")]
     public async Task<IActionResult> UploadImages(Guid id, IFormFileCollection images)
@@ -175,13 +176,12 @@ public class RestaurantController : ControllerBase
 
         var result = await _mediator.Send(command);
 
-        return Ok(result) ;
+        return Ok(result);
     }
 
     [HttpDelete("{id:Guid}/images/{imageId:guid}")]
     public async Task<IActionResult> DeleteImage(Guid id, Guid imageId)
     {
-
         var command = new DeleteImageRestaurantCommand(id, imageId);
         var result = await _mediator.Send(command);
         return result ? NoContent() : BadRequest();
@@ -200,5 +200,4 @@ public class RestaurantController : ControllerBase
         var result = await _mediator.Send(query);
         return Ok(result);
     }
-
 }

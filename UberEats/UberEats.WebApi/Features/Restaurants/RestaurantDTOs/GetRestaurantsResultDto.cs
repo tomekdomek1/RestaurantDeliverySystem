@@ -1,6 +1,8 @@
-﻿namespace UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
+﻿using UberEats.Domain.Enums;
 
-public class GetRestaurantsResultDto
+namespace UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
+
+public class GetRestaurantsResultDto 
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -9,4 +11,5 @@ public class GetRestaurantsResultDto
     public Guid AddressId { get; set; }
     public decimal AverageRating { get; set; }
     public int TotalReviews { get; set; }
+    public string Category { get; set; } = string.Empty;
 }

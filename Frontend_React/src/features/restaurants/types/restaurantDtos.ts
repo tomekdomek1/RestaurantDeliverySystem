@@ -1,10 +1,13 @@
 import type { Guid } from "../../../api/types/guid";
 
+export type RestaurantCategory = 'Pizza' | 'Burgers' | 'Sushi' | 'Kebab' | 'Asian' | 'Vegan' | 'Italian' | 'Polish' | 'Other';
+
 export interface CreateRestaurantDto {
     name: string,
     phoneNumber: string,
     descrition: string,
-    addressId: Guid
+    addressId: Guid,
+    category: RestaurantCategory
 }
 
 export interface CreateRestaurantResponseDto {
@@ -12,7 +15,8 @@ export interface CreateRestaurantResponseDto {
     name: string,
     phoneNumber: string,
     descrition: string,
-    addressId: Guid
+    addressId: Guid,
+    category: RestaurantCategory
 }
 
 export interface GetRestaurantResponseDto extends CreateRestaurantResponseDto {
