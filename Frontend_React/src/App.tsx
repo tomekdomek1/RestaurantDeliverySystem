@@ -21,7 +21,7 @@ import OrderDetailsPage from "./features/orders/OrderDetailsPage";
 import AdminOwnersPage from "./components/AdminOwnersPage";
 import AdminRestaurantsPage from "./components/AdminRestaurantsPage";
 import AdminCustomersPage from "./components/AdminCustomersPage";
-
+import AboutPage from "./features/about/AboutPage"; // <-- IMPORT STRONY O PROJEKCIE
 
 export default function App() {
     return (
@@ -34,6 +34,7 @@ export default function App() {
                     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 6 }}>
                         <Routes>
                             <Route path="/" element={<Navigate to="/restaurants" />} />
+                            <Route path="/about" element={<AboutPage />} /> {/* <-- ROUTING STRONY */}
                             <Route path="/login" element={<LoginForm />} />
                             <Route path="/register" element={<RegistrationForm />} />
                             <Route path="/orders/:id" element={<OrderDetailsPage />} />
