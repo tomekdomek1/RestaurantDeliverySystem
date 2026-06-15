@@ -43,15 +43,11 @@ const CheckoutPage: React.FC = () => {
     const orderRestaurantId = (state.items[0] as any).restaurantId || "00000000-0000-0000-0000-000000000000";
 
     const handleCheckout = async () => {
-        // =====================================
-        // NASZ NOWY STRAŻNIK (WALIDACJA)
-        // =====================================
         if (!address.city.trim() || !address.street.trim() || !address.buildingNumber.toString().trim()) {
             setError("Miasto, ulica oraz numer budynku są wymagane do dostawy!");
             
-            // Przewijamy stronę na samą górę, żeby klient na pewno zobaczył czerwony błąd
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
-            return; // Zatrzymujemy wysyłanie!
+            return;
         }
 
         setLoading(true);

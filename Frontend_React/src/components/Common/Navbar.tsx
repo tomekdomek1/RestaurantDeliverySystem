@@ -38,10 +38,8 @@ export default function Navbar() {
     }
   }
 
-  // ZAWSZE wywoływaj hook - nigdy warunkowa!
   const notificationsData = useRestaurantNotifications(restaurantId || '');
   
-  // Tylko restaurator z restaurantId widzi dzwonek
   const showNotificationBell = isOwner && restaurantId && !isLoadingRestaurantId;
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
