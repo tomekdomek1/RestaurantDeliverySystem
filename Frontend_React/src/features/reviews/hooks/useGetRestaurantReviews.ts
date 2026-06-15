@@ -1,24 +1,31 @@
 import useSWR from 'swr';
+import { API_BASE_URL } from '../../../config/api';
+import type { ReviewsFilter } from '../types/review';
 
-// Twardo ustawiony fetcher na Twoje API .NET
 const fetcher = async (url: string) => {
-  const res = await fetch(`http://localhost:5122${url}`);
+  const res = await fetch(`${API_BASE_URL}${url}`);
   if (!res.ok) throw new Error('Błąd pobierania opinii');
   return res.json();
 };
 
-export function useGetRestaurantReviews(restaurantId: string | undefined) {
-  // Przekazujemy PageSize=100 aby na Happy Path pobrać wszystkie opinie na raz
-  const { data, error, isLoading, mutate } = useSWR(
-    restaurantId ? `/api/restaurants/${restaurantId}/reviews?PageNumber=1&PageSize=100` : null,
-    fetcher
-  );
+export function useGetRestaurantReviews(restaurantId: string | undefined, filters?: Partial<ReviewsFilter>) {
+  const queryParams = new URLSearchParams();
+  if (filters?.pageNumber) queryParams.append('PageNumber', String(filters.pageNumber));
+  if (filters?.pageSize) queryParams.append('PageSize', String(filters.pageSize));
+  if (filters?.sortBy) queryParams.append('SortBy', filters.sortBy);
+  if (filters?.sortDirection) queryParams.append('SortDirection', filters.sortDirection);
+  if (filters?.minRating) queryParams.append('MinRating', String(filters.minRating));
+  if (filters?.maxRating) queryParams.append('MaxRating', String(filters.maxRating));
+
+  const query = queryParams.toString();
+  const url = restaurantId ? `/api/restaurants/${restaurantId}/reviews${query ? '?' + query : ''}` : null;
+
+  const { data, error, isLoading, mutate } = useSWR(url, fetcher);
 
   return {
-    // API backendowe (GetRestaurantReviewsResponseDto) trzyma tablicę opinii w polu "items"
-    reviews: data?.items ? data.items : [],
+    reviews: data,
     isLoading,
     error,
-    mutate
+    refreshReviews: mutate
   };
 }

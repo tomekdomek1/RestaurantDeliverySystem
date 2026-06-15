@@ -97,10 +97,13 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+        else
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.UseExceptionHandler();
         app.UseCors("AllowFrontend");
-        app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
 
