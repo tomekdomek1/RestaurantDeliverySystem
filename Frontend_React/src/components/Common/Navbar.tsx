@@ -8,13 +8,15 @@ import InfoIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../features/cart/context/CartContext';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { useRestaurantId } from '../../features/auth/hooks/useRestaurantId';
 import { useRestaurantNotifications } from '../../features/orders/hooks/useRestaurantNotifications';
 import NotificationBell from '../../features/orders/components/NotificationBell';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { state } = useCart();
-  const { isLoggedIn, logout, user } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
+  const { restaurantId, isLoading: isLoadingRestaurantId } = useRestaurantId();
   
   const cartItemsCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -24,7 +26,6 @@ export default function Navbar() {
   const token = localStorage.getItem('auth_token');
   let isAdmin = false;
   let isOwner = false;
-  let restaurantId = '';
   
   if (token) {
     try {
@@ -35,11 +36,6 @@ export default function Navbar() {
     } catch (e) { 
       console.error("Błąd odczytu roli z tokena", e);
     }
-  }
-
-  // Pobierz restaurantId z localStorage lub user context
-  if (isOwner && user?.id) {
-    restaurantId = user.id;
   }
 
   // Hook do powiadomień tylko dla restauratora
@@ -84,12 +80,14 @@ export default function Navbar() {
 
               {isOwner && (
                 <>
-                  <NotificationBell 
-                    notifications={notifications}
-                    unreadCount={unreadCount}
-                    onMarkAsRead={markAsRead}
-                    restaurantId={restaurantId}
-                  />
+                  {!isLoadingRestaurantId && restaurantId && (
+                    <NotificationBell 
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      onMarkAsRead={markAsRead}
+                      restaurantId={restaurantId}
+                    />
+                  )}
                   <Button component={Link} to="/admin/menu" variant="contained" color="warning" startIcon={<StorefrontIcon />} sx={{ fontWeight: 'bold', borderRadius: 2, textTransform: 'none' }}>
                     Panel Restauratora
                   </Button>
