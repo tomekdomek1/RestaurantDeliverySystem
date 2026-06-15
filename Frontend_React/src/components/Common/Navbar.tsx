@@ -38,10 +38,11 @@ export default function Navbar() {
     }
   }
 
-  // Hook do powiadomień tylko dla restauratora
-  const { notifications, unreadCount, markAsRead } = isOwner && restaurantId
-    ? useRestaurantNotifications(restaurantId)
-    : { notifications: [], unreadCount: 0, markAsRead: () => {} };
+  // ZAWSZE wywoływaj hook - nigdy warunkowa!
+  const notificationsData = useRestaurantNotifications(restaurantId || '');
+  
+  // Tylko restaurator z restaurantId widzi dzwonek
+  const showNotificationBell = isOwner && restaurantId && !isLoadingRestaurantId;
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
@@ -80,11 +81,11 @@ export default function Navbar() {
 
               {isOwner && (
                 <>
-                  {!isLoadingRestaurantId && restaurantId && (
+                  {showNotificationBell && (
                     <NotificationBell 
-                      notifications={notifications}
-                      unreadCount={unreadCount}
-                      onMarkAsRead={markAsRead}
+                      notifications={notificationsData.notifications}
+                      unreadCount={notificationsData.unreadCount}
+                      onMarkAsRead={notificationsData.markAsRead}
                       restaurantId={restaurantId}
                     />
                   )}
