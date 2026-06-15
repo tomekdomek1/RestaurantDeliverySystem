@@ -34,7 +34,6 @@ export default function OwnerOrdersPage() {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const userEmail = payload.sub || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || payload.email || "";
 
-      // 1. Pobieramy restauracje i zachowujemy całe obiekty (żeby mieć ich nazwy!)
       const restRes = await fetch(`${API_BASE_URL}/api/restaurants`);
       if (!restRes.ok) throw new Error('Błąd pobierania restauracji.');
       const allRestaurants = await restRes.json();
@@ -98,7 +97,6 @@ export default function OwnerOrdersPage() {
     }
   };
 
-  // Wyszukiwarka szuka teraz też po nazwie restauracji!
   const filteredOrders = orders.filter(o => 
     (o.address?.city || '').toLowerCase().includes(search.toLowerCase()) ||
     (o.address?.street || '').toLowerCase().includes(search.toLowerCase()) ||

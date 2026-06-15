@@ -55,7 +55,6 @@ export const RestaurantReportPage = () => {
     };
 
     const handleViewAllNotifications = () => {
-        // Navigate to notifications page with restaurant ID
         if (selectedRestaurantId) {
             window.location.href = `/admin/notifications/${selectedRestaurantId}`;
         }
