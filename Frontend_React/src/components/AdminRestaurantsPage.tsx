@@ -174,7 +174,8 @@ export default function AdminRestaurantsPage() {
           {status.message && <Alert severity={status.type as any} sx={{ mb: 2 }}>{status.message}</Alert>}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
             <Typography variant="subtitle2" color="text.secondary">Przypisanie i Typ</Typography>
-            <Autocomplete options={owners} getOptionLabel={(option) => `${option.fullName} (${option.email})`} isOptionEqualToValue={(option, value) => option.email === value.email} value={owners.find(o => o.email === form.ownerEmail) || null} onChange={(event, newValue) => setForm({ ...form, ownerEmail: newValue ? newValue.email : '' })} renderInput={(params) => <TextField {...params} label="Właściciel" required />} />
+            {/* ZMIANA TUTAJ: onChange używa `_` zamiast nieużywanego `event` */}
+            <Autocomplete options={owners} getOptionLabel={(option) => `${option.fullName} (${option.email})`} isOptionEqualToValue={(option, value) => option.email === value.email} value={owners.find(o => o.email === form.ownerEmail) || null} onChange={(_, newValue) => setForm({ ...form, ownerEmail: newValue ? newValue.email : '' })} renderInput={(params) => <TextField {...params} label="Właściciel" required />} />
             
             <TextField select label="Kategoria" value={form.category} onChange={e => setForm({...form, category: e.target.value})} fullWidth required>
               {CATEGORIES.map((option) => (

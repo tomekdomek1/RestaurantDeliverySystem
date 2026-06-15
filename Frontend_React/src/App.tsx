@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom"; // <-- Dodałam Outlet
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom"; // <-- Doda�am Outlet
 import { CartProvider } from "./features/cart/context/CartContext";
 import { AuthProvider } from "./features/auth/context/AuthContext";
 import { Box, CssBaseline } from '@mui/material';
@@ -22,6 +22,7 @@ import AdminOwnersPage from "./components/AdminOwnersPage";
 import AdminRestaurantsPage from "./components/AdminRestaurantsPage";
 import AdminCustomersPage from "./components/AdminCustomersPage";
 import OwnerOrdersPage from './components/OwnerOrdersPage';
+import AboutPage from "./features/about/AboutPage";
 
 const StorefrontWrapper = () => (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 6 }}>
@@ -36,23 +37,21 @@ export default function App() {
                 <CartProvider>
                     <CssBaseline />
                     <Navbar />
-                    <Box sx={{ width: '100%' }}>
-                        <Routes>
-                            
-                            <Route element={<StorefrontWrapper />}>
-                                <Route path="/" element={<Navigate to="/restaurants" />} />
-                                <Route path="/login" element={<LoginForm />} />
-                                <Route path="/register" element={<RegistrationForm />} />
-                                <Route path="/orders/:id" element={<OrderDetailsPage />} />
-                                <Route path="/restaurants" element={<RestaurantsPage />} />
-                                <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
-                                <Route path="/cart" element={<ShoppingCartUI />} />
-                                <Route path="/checkout" element={<CheckoutPage />} />
-                                <Route path="/orders" element={<OrdersHistoryPage />} />
-                                <Route path="/categories-test" element={<CategoryTestPage />} />
-                                <Route path="/addresses-test" element={<AddressTestPage />} />
-                            </Route>
 
+                    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 6 }}>
+                        <Routes>
+                            <Route path="/" element={<Navigate to="/restaurants" />} />
+                            <Route path="/about" element={<AboutPage />} /> {/* <-- ROUTING STRONY */}
+                            <Route path="/login" element={<LoginForm />} />
+                            <Route path="/register" element={<RegistrationForm />} />
+                            <Route path="/orders/:id" element={<OrderDetailsPage />} />
+                            <Route path="/restaurants" element={<RestaurantsPage />} />
+                            <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
+                            <Route path="/cart" element={<ShoppingCartUI />} />
+                            <Route path="/checkout" element={<CheckoutPage />} />
+                            <Route path="/orders" element={<OrdersHistoryPage />} />
+                            <Route path="/categories-test" element={<CategoryTestPage />} />
+                            <Route path="/addresses-test" element={<AddressTestPage />} />
                             <Route
                                 path="/admin"
                                 element={
