@@ -27,13 +27,20 @@ const STATUS_POLISH_NAMES: Record<string, string> = {
   'Delivered': 'Dostarczone'
 };
 
+const READ_FILTER_OPTIONS = [
+  { value: 'all', label: 'Wszystkie' },
+  { value: 'unread', label: 'Nieodczytane' },
+  { value: 'read', label: 'Przeczytane' }
+];
+
 export const RestaurantNotificationsPage: React.FC<NotificationsPageProps> = ({ restaurantId: propRestaurantId }) => {
   const { restaurantId: routeRestaurantId } = useParams<{ restaurantId: string }>();
   const effectiveRestaurantId = propRestaurantId || routeRestaurantId || '';
   
-  const { notifications, unreadCount, isLoading, error, markAsRead, clearHistory, refresh } = 
+  const { notifications, unreadCount, isLoading, error, markAsRead, markAllAsRead, clearHistory, refresh } = 
     useRestaurantNotifications(effectiveRestaurantId);
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
+  const [readFilter, setReadFilter] = useState<string>('all');
 
   if (!effectiveRestaurantId) {
     return (
@@ -46,11 +53,22 @@ export const RestaurantNotificationsPage: React.FC<NotificationsPageProps> = ({ 
   }
 
   const filteredNotifications = useMemo(() => {
-    if (selectedStatus === 'All') {
-      return notifications;
+    let filtered = notifications;
+
+    // Filtruj po statusie
+    if (selectedStatus !== 'All') {
+      filtered = filtered.filter(n => n.order.status === selectedStatus);
     }
-    return notifications.filter(n => n.order.status === selectedStatus);
-  }, [notifications, selectedStatus]);
+
+    // Filtruj po przeczytaniu
+    if (readFilter === 'unread') {
+      filtered = filtered.filter(n => !n.read);
+    } else if (readFilter === 'read') {
+      filtered = filtered.filter(n => n.read);
+    }
+
+    return filtered;
+  }, [notifications, selectedStatus, readFilter]);
 
   const formatDate = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -79,6 +97,14 @@ export const RestaurantNotificationsPage: React.FC<NotificationsPageProps> = ({ 
           >
             {isLoading ? 'Odświeżanie...' : 'Odśwież'}
           </button>
+          {unreadCount > 0 && (
+            <button 
+              onClick={markAllAsRead}
+              className="btn-mark-all-read"
+            >
+              Oznacz wszystkie jako przeczytane
+            </button>
+          )}
           <button 
             onClick={clearHistory}
             className="btn-clear-history"
@@ -95,18 +121,35 @@ export const RestaurantNotificationsPage: React.FC<NotificationsPageProps> = ({ 
       )}
 
       <div className="filters">
-        <label>Filtruj po statusie:</label>
-        <select 
-          value={selectedStatus} 
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="status-filter"
-        >
-          {ORDER_STATUSES.map(status => (
-            <option key={status} value={status}>
-              {STATUS_POLISH_NAMES[status]}
-            </option>
-          ))}
-        </select>
+        <div className="filter-group">
+          <label>Filtruj po statusie:</label>
+          <select 
+            value={selectedStatus} 
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="status-filter"
+          >
+            {ORDER_STATUSES.map(status => (
+              <option key={status} value={status}>
+                {STATUS_POLISH_NAMES[status]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Filtruj po przeczytaniu:</label>
+          <select 
+            value={readFilter} 
+            onChange={(e) => setReadFilter(e.target.value)}
+            className="read-filter"
+          >
+            {READ_FILTER_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="notifications-list">

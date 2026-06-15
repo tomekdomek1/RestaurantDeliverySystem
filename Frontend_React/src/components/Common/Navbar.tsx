@@ -4,15 +4,17 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import InfoIcon from '@mui/icons-material/InfoOutlined'; // <-- Ikona do nowej zakładki
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../features/cart/context/CartContext';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { useRestaurantNotifications } from '../../features/orders/hooks/useRestaurantNotifications';
+import NotificationBell from '../../features/orders/components/NotificationBell';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { state } = useCart();
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
   
   const cartItemsCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -22,6 +24,7 @@ export default function Navbar() {
   const token = localStorage.getItem('auth_token');
   let isAdmin = false;
   let isOwner = false;
+  let restaurantId = '';
   
   if (token) {
     try {
@@ -33,6 +36,16 @@ export default function Navbar() {
       console.error("Błąd odczytu roli z tokena", e);
     }
   }
+
+  // Pobierz restaurantId z localStorage lub user context
+  if (isOwner && user?.id) {
+    restaurantId = user.id;
+  }
+
+  // Hook do powiadomień tylko dla restauratora
+  const { notifications, unreadCount, markAsRead } = isOwner && restaurantId
+    ? useRestaurantNotifications(restaurantId)
+    : { notifications: [], unreadCount: 0, markAsRead: () => {} };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
@@ -53,7 +66,6 @@ export default function Navbar() {
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           
-          {/* NOWA ZAKŁADKA */}
           <Button component={Link} to="/about" color="inherit" startIcon={<InfoIcon />} sx={{ fontWeight: 600, textTransform: 'none', fontSize: '1rem', color: '#666', '&:hover': { color: '#000' } }}>
             O projekcie
           </Button>
@@ -71,9 +83,17 @@ export default function Navbar() {
               )}
 
               {isOwner && (
-                <Button component={Link} to="/admin/menu" variant="contained" color="warning" startIcon={<StorefrontIcon />} sx={{ fontWeight: 'bold', borderRadius: 2, textTransform: 'none' }}>
-                  Panel Restauratora
-                </Button>
+                <>
+                  <NotificationBell 
+                    notifications={notifications}
+                    unreadCount={unreadCount}
+                    onMarkAsRead={markAsRead}
+                    restaurantId={restaurantId}
+                  />
+                  <Button component={Link} to="/admin/menu" variant="contained" color="warning" startIcon={<StorefrontIcon />} sx={{ fontWeight: 'bold', borderRadius: 2, textTransform: 'none' }}>
+                    Panel Restauratora
+                  </Button>
+                </>
               )}
 
               {!isAdmin && !isOwner && (
