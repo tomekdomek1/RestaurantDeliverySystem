@@ -22,6 +22,7 @@ export default function Navbar() {
   const token = localStorage.getItem('auth_token');
   let isAdmin = false;
   let isOwner = false;
+  
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
