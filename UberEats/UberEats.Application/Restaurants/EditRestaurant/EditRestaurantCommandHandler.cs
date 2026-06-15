@@ -12,17 +12,19 @@ namespace UberEats.Application.Restaurants.EditRestaurant;
 public class EditRestaurantCommandHandler : IRequestHandler<EditRestaurantCommand, Restaurant>
 {
     private readonly IRestaurantRepository _restaurantRepository;
+    
     public EditRestaurantCommandHandler(IRestaurantRepository restaurantRepository)
     {
         _restaurantRepository = restaurantRepository;
     }
+    
     public async Task<Restaurant> Handle(EditRestaurantCommand request, CancellationToken cancellationToken)
     {
         var restaurantToUpdate = await _restaurantRepository.GetByIdAsync(request.Id);
 
         if (restaurantToUpdate == null)
         {
-            return null; // maybe a custom exception
+            return null!; 
         }
 
         if (request.Name != null)
@@ -37,7 +39,12 @@ public class EditRestaurantCommandHandler : IRequestHandler<EditRestaurantComman
 
         if (request.Description != null)
         {
-            restaurantToUpdate.Descrition = request.Description;
+            restaurantToUpdate.Descrition = request.Description; 
+        }
+
+        if (request.Category.HasValue)
+        {
+            restaurantToUpdate.Category = request.Category.Value;
         }
 
         await _restaurantRepository.SaveChangesAsync();

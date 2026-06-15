@@ -4,6 +4,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import InfoIcon from '@mui/icons-material/InfoOutlined'; // <-- Ikona do nowej zakładki
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../features/cart/context/CartContext';
 import { useAuth } from '../../features/auth/hooks/useAuth';
@@ -21,6 +22,7 @@ export default function Navbar() {
   const token = localStorage.getItem('auth_token');
   let isAdmin = false;
   let isOwner = false;
+  
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -50,6 +52,12 @@ export default function Navbar() {
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          
+          {/* NOWA ZAKŁADKA */}
+          <Button component={Link} to="/about" color="inherit" startIcon={<InfoIcon />} sx={{ fontWeight: 600, textTransform: 'none', fontSize: '1rem', color: '#666', '&:hover': { color: '#000' } }}>
+            O projekcie
+          </Button>
+
           <Button component={Link} to="/restaurants" color="inherit" sx={{ fontWeight: 600, textTransform: 'none', fontSize: '1rem' }}>
             Restauracje
           </Button>

@@ -1,8 +1,11 @@
-﻿namespace UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
+﻿using UberEats.Domain.Enums;
 
-public class EditRestaurantRequestDto
+namespace UberEats.WebApi.Features.Restaurants.RestaurantDTOs;
+
+public class EditRestaurantRequestDto 
 {
     public string? Name { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Descrition { get; set; }
+    public RestaurantCategory? Category { get; set; }
 }
