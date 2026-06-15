@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Roles;
 using UberEats.Infrastructure.Databases;
@@ -175,6 +176,24 @@ namespace UberEats.WebApi.Features.Auth
         {
             Response.Cookies.Delete("auth_token", GetCookieOptions(isLogout: true));
             return Ok(new { Message = "Logged out successfully" });
+        }
+
+        [Authorize(Roles = UserRoles.RestaurantOwner)]
+        [HttpGet("me/restaurant")]
+        public async Task<IActionResult> GetMyRestaurant()
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
+            if (string.IsNullOrEmpty(userEmail))
+                return Unauthorized(new { Error = "Email claim not found" });
+
+            var restaurants = await _dbContext.Restaurants.ToListAsync();
+            var myRestaurant = restaurants.FirstOrDefault(r => 
+                r.Descrition != null && r.Descrition.Contains($"[owner:{userEmail.ToLower()}]"));
+
+            if (myRestaurant == null)
+                return NotFound(new { Error = "No restaurant found for this owner" });
+
+            return Ok(new { RestaurantId = myRestaurant.Id });
         }
 
         private async Task<string> GenerateJwtToken(ApplicationUser user)
