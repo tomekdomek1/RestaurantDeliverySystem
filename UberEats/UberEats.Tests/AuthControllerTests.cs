@@ -2,10 +2,12 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using UberEats.Domain.Entities;
 using UberEats.Domain.Roles;
+using UberEats.Infrastructure.Databases;
 using UberEats.WebApi.Features.Auth;
 
 namespace UberEats.Tests;
@@ -14,6 +16,7 @@ public class AuthControllerTests
 {
     private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
     private readonly Mock<IConfiguration> _configurationMock;
+    private readonly AppDbContext _dbContext;
     private readonly AuthController _controller;
 
     public AuthControllerTests()
@@ -21,6 +24,12 @@ public class AuthControllerTests
         var store = new Mock<IUserStore<ApplicationUser>>();
         _userManagerMock = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
         _configurationMock = new Mock<IConfiguration>();
+
+        // Setup in-memory database
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        _dbContext = new AppDbContext(options);
 
         // Setup JWT configuration
         var jwtSettingsMock = new Mock<IConfigurationSection>();
@@ -31,7 +40,7 @@ public class AuthControllerTests
 
         var isProductionMock = new Mock<IConfigurationSection>();
         isProductionMock.SetupGet(x => x.Value).Returns("false");
-        
+
         _configurationMock.Setup(x => x.GetSection("JwtSettings"))
             .Returns(jwtSettingsMock.Object);
         _configurationMock.Setup(x => x.GetSection("IsProduction"))
@@ -40,7 +49,7 @@ public class AuthControllerTests
         _userManagerMock.Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>()))
             .ReturnsAsync([]);
 
-        _controller = new AuthController(_userManagerMock.Object, _configurationMock.Object);
+        _controller = new AuthController(_userManagerMock.Object, _configurationMock.Object, _dbContext);
         _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()
@@ -53,10 +62,10 @@ public class AuthControllerTests
     {
         // Arrange
         var dto = new RegisterUserDto { Email = "test@test.com", Password = "Password123!", FullName = "Test User" };
-        
+
         _userManagerMock.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
-            
+
         _userManagerMock.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), UserRoles.User))
             .ReturnsAsync(IdentityResult.Success);
 
@@ -80,21 +89,21 @@ public class AuthControllerTests
         result.Should().BeOfType<BadRequestObjectResult>()
             .Which.Value.Should().Be("Invalid role selected");
     }
-    
+
     [Fact]
     public async Task Login_ShouldReturnUnauthorized_WhenAccountIsInactive()
     {
         // Arrange
-        var user = new ApplicationUser 
-        { 
-            Email = "inactive@test.com", 
+        var user = new ApplicationUser
+        {
+            Email = "inactive@test.com",
             IsActive = false
         };
         var dto = new LoginDto { Email = "inactive@test.com", Password = "Password123!" };
 
         _userManagerMock.Setup(x => x.FindByEmailAsync(dto.Email))
             .ReturnsAsync(user);
-        
+
         _userManagerMock.Setup(x => x.CheckPasswordAsync(user, dto.Password))
             .ReturnsAsync(true);
 

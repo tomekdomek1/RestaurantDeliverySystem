@@ -11,8 +11,8 @@ using UberEats.Infrastructure.Databases;
 namespace UberEats.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260610194738_FixArchitecture")]
-    partial class FixArchitecture
+    [Migration("20260615165431_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -547,6 +547,9 @@ namespace UberEats.Infrastructure.Migrations
 
                     b.Property<Guid>("AddressId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Descrition")
                         .IsRequired()

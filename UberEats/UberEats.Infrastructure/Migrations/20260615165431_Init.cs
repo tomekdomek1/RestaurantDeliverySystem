@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace UberEats.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class FixArchitecture : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -137,7 +137,8 @@ namespace UberEats.Infrastructure.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
                     Descrition = table.Column<string>(type: "TEXT", nullable: false),
-                    AddressId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    AddressId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Category = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
