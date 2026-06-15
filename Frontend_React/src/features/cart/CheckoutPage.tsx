@@ -14,7 +14,6 @@ const CheckoutPage: React.FC = () => {
     const [error, setError] = useState('');
     const [notes, setNotes] = useState('');
     
-    // Zmiana: Inicjujemy numery jako puste stringi zamiast zer
     const [address, setAddress] = useState({
         street: '',
         buildingNumber: '', 
@@ -44,14 +43,25 @@ const CheckoutPage: React.FC = () => {
     const orderRestaurantId = (state.items[0] as any).restaurantId || "00000000-0000-0000-0000-000000000000";
 
     const handleCheckout = async () => {
+        // =====================================
+        // NASZ NOWY STRAŻNIK (WALIDACJA)
+        // =====================================
+        if (!address.city.trim() || !address.street.trim() || !address.buildingNumber.toString().trim()) {
+            setError("Miasto, ulica oraz numer budynku są wymagane do dostawy!");
+            
+            // Przewijamy stronę na samą górę, żeby klient na pewno zobaczył czerwony błąd
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            return; // Zatrzymujemy wysyłanie!
+        }
+
         setLoading(true);
         setError('');
+        
         try {
             const payload = {
                 restaurantId: orderRestaurantId,
                 address: {
                     street: address.street,
-                    // Zmiana: Rzutowanie na liczbę tuż przed wysłaniem. Jeśli puste, wysyła 0.
                     buildingNumber: Number(address.buildingNumber) || 0,
                     appartmentNumber: Number(address.appartmentNumber) || 0,
                     city: address.city
@@ -84,6 +94,7 @@ const CheckoutPage: React.FC = () => {
             navigate('/orders'); 
         } catch (err: any) {
             setError(err.message);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } finally {
             setLoading(false);
         }
@@ -95,9 +106,9 @@ const CheckoutPage: React.FC = () => {
 
     return (
         <Container maxWidth="sm">
-            <Paper sx={{ p: 4, mt: 4 }}>
+            <Paper sx={{ p: 4, mt: 4, mb: 8 }}>
                 <Typography variant="h4" gutterBottom>Kasa i płatność</Typography>
-                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                {error && <Alert severity="error" sx={{ mb: 2, fontWeight: 'bold' }}>{error}</Alert>}
                 
                 <Box mb={2}>
                     {state.items.map((item: any) => (
@@ -131,38 +142,43 @@ const CheckoutPage: React.FC = () => {
                 />
                 
                 <Box sx={{ my: 3 }}>
+                    <Typography variant="h6" gutterBottom color="text.secondary">Dokąd mamy przywieźć jedzenie?</Typography>
                     <TextField 
-                        fullWidth 
-                        label="Ulica" 
-                        value={address.street} 
-                        onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))} 
-                        margin="normal" 
+                        fullWidth
+                        required
+                        label="Miasto"
+                        value={address.city}
+                        onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+                        margin="normal"
                     />
-                    <TextField 
-                        fullWidth 
-                        label="Numer budynku" 
-                        type="number" 
-                        value={address.buildingNumber} 
-                        // Zmiana: zapisuje to jako zwykły wpisywany tekst w stanie 
-                        onChange={(e) => setAddress(prev => ({ ...prev, buildingNumber: e.target.value }))} 
-                        margin="normal" 
+                    <TextField
+                        fullWidth
+                        required
+                        label="Ulica"
+                        value={address.street}
+                        onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+                        margin="normal"
                     />
-                    <TextField 
-                        fullWidth 
-                        label="Numer mieszkania (opcjonalne)" 
-                        type="number" 
-                        value={address.appartmentNumber} 
-                        // Zmiana: tak samo jak wyżej
-                        onChange={(e) => setAddress(prev => ({ ...prev, appartmentNumber: e.target.value }))} 
-                        margin="normal" 
-                    />
-                    <TextField 
-                        fullWidth 
-                        label="Miasto" 
-                        value={address.city} 
-                        onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))} 
-                        margin="normal" 
-                    />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <TextField
+                            fullWidth
+                            required
+                            label="Numer budynku"
+                            type="number"
+                            value={address.buildingNumber}
+                            onChange={(e) => setAddress(prev => ({ ...prev, buildingNumber: e.target.value }))}
+                            margin="normal"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Numer lokalu / mieszkania"
+                            type="number"
+                            value={address.appartmentNumber}
+                            onChange={(e) => setAddress(prev => ({ ...prev, appartmentNumber: e.target.value }))}
+                            margin="normal"
+                            helperText="Opcjonalne"
+                        />
+                    </Box>
                 </Box>
 
                 <Button
@@ -172,7 +188,7 @@ const CheckoutPage: React.FC = () => {
                     size="large"
                     onClick={handleCheckout}
                     disabled={loading}
-                    sx={{ mt: 3, py: 1.5 }}
+                    sx={{ mt: 3, py: 1.5, fontWeight: 'bold', fontSize: '1.1rem' }}
                 >
                     {loading ? 'Przetwarzanie zamówienia...' : 'ZAMAWIAM I PŁACĘ'}
                 </Button>

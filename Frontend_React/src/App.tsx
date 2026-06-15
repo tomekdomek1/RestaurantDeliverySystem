@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom"; // <-- Dodałam Outlet
 import { CartProvider } from "./features/cart/context/CartContext";
 import { AuthProvider } from "./features/auth/context/AuthContext";
 import { Box, CssBaseline } from '@mui/material';
@@ -21,7 +21,13 @@ import OrderDetailsPage from "./features/orders/OrderDetailsPage";
 import AdminOwnersPage from "./components/AdminOwnersPage";
 import AdminRestaurantsPage from "./components/AdminRestaurantsPage";
 import AdminCustomersPage from "./components/AdminCustomersPage";
+import OwnerOrdersPage from './components/OwnerOrdersPage';
 
+const StorefrontWrapper = () => (
+    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 6 }}>
+        <Outlet />
+    </Box>
+);
 
 export default function App() {
     return (
@@ -30,20 +36,23 @@ export default function App() {
                 <CartProvider>
                     <CssBaseline />
                     <Navbar />
-
-                    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 6 }}>
+                    <Box sx={{ width: '100%' }}>
                         <Routes>
-                            <Route path="/" element={<Navigate to="/restaurants" />} />
-                            <Route path="/login" element={<LoginForm />} />
-                            <Route path="/register" element={<RegistrationForm />} />
-                            <Route path="/orders/:id" element={<OrderDetailsPage />} />
-                            <Route path="/restaurants" element={<RestaurantsPage />} />
-                            <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
-                            <Route path="/cart" element={<ShoppingCartUI />} />
-                            <Route path="/checkout" element={<CheckoutPage />} />
-                            <Route path="/orders" element={<OrdersHistoryPage />} />
-                            <Route path="/categories-test" element={<CategoryTestPage />} />
-                            <Route path="/addresses-test" element={<AddressTestPage />} />
+                            
+                            <Route element={<StorefrontWrapper />}>
+                                <Route path="/" element={<Navigate to="/restaurants" />} />
+                                <Route path="/login" element={<LoginForm />} />
+                                <Route path="/register" element={<RegistrationForm />} />
+                                <Route path="/orders/:id" element={<OrderDetailsPage />} />
+                                <Route path="/restaurants" element={<RestaurantsPage />} />
+                                <Route path="/restaurants/:id" element={<RestaurantMenuPage />} />
+                                <Route path="/cart" element={<ShoppingCartUI />} />
+                                <Route path="/checkout" element={<CheckoutPage />} />
+                                <Route path="/orders" element={<OrdersHistoryPage />} />
+                                <Route path="/categories-test" element={<CategoryTestPage />} />
+                                <Route path="/addresses-test" element={<AddressTestPage />} />
+                            </Route>
+
                             <Route
                                 path="/admin"
                                 element={
@@ -58,7 +67,9 @@ export default function App() {
                                 <Route path="owners" element={<AdminOwnersPage />} />
                                 <Route path="restaurants-list" element={<AdminRestaurantsPage />} />
                                 <Route path="customers" element={<AdminCustomersPage />} />
+                                <Route path="orders" element={<OwnerOrdersPage />} />
                             </Route>
+
                         </Routes>
                     </Box>
                 </CartProvider>

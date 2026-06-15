@@ -114,4 +114,55 @@ public class OrderController : ControllerBase
 
         return Created(string.Empty, resultDto);
     }
+
+    [HttpPatch("{id}/status")]
+    public async Task<ActionResult<UpdateOrderStatusResponseDto>> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusRequestDto request)
+    {
+        var command = new UpdateOrderStatusCommand(id, request.Status);
+        var result = await _mediator.Send(command);
+
+        if (result == null)
+        {
+            return NotFound(new { message = "Nie znaleziono zamówienia." });
+        }
+
+        var response = new UpdateOrderStatusResponseDto
+        {
+            Id = result.Id,
+            Status = result.OrderStatus.ToString()
+        };
+
+        return Ok(response);
+    }
+    [HttpGet("restaurant/{restaurantId:Guid}")]
+    public async Task<IActionResult> GetOrdersByRestaurant(Guid restaurantId)
+    {
+        var orders = await _mediator.Send(new GetActiveOrdersByRestaurantQuery(restaurantId));
+
+        if (orders == null) return Ok(new List<GetMyOrdersResultDto>());
+
+        var resultDto = orders.Select(order => new GetMyOrdersResultDto
+        {
+            Id = order.Id,
+            RestaurantId = order.RestaurantId,
+            Date = order.Date,
+            DeliveryTime = order.DeliveryTime,
+            Notes = order.Notes,
+            Status = order.OrderStatus.ToString(),
+            TotalAmount = order.TotalAmount,
+            Address = order.OrderAddress == null ? new OrderAddressResultDto() : new OrderAddressResultDto
+            {
+                Street = order.OrderAddress.Street,
+                BuildingNumber = order.OrderAddress.BuildingNumber,
+                AppartmentNumber = order.OrderAddress.AppartmentNumber,
+                City = order.OrderAddress.City
+            },
+            Items = order.OrderItems.Select(item => new OrderItemResultDto
+            {
+                Id = item.Id, DishId = item.DishId, Name = item.DishNameAtPurchase, Price = item.PriceAtPurchase, Quantity = item.Quantity
+            }).ToList()
+        }).ToList();
+
+        return Ok(resultDto);
+    }
 }
