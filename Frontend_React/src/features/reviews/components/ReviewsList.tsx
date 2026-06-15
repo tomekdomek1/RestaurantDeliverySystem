@@ -176,7 +176,7 @@ export default function ReviewsList({
           </Box>
         ) : (
           <>
-            {reviews && reviews.items.length > 0 ? (
+            {reviews && reviews.items && reviews.items.length > 0 ? (
               <>
                 {reviews.items.map((review) => (
                   <ReviewItem
